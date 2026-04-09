@@ -6,7 +6,7 @@
   <title>DECON 34 — Badge Pre-Order</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
- 
+
     :root {
       --pip-green: #14fe17;
       --pip-dim: #0a7a0b;
@@ -15,9 +15,9 @@
       --pip-glow: rgba(20, 254, 23, 0.15);
       --scanline-opacity: 0.04;
     }
- 
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
- 
+
     body {
       font-family: 'Share Tech Mono', monospace;
       background: var(--pip-bg);
@@ -31,116 +31,108 @@
       position: relative;
       overflow: hidden;
     }
- 
-    /* CRT scanline overlay */
+
     body::after {
       content: '';
       position: fixed;
       inset: 0;
       background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
+        0deg, transparent, transparent 2px,
         rgba(0,0,0, var(--scanline-opacity)) 2px,
         rgba(0,0,0, var(--scanline-opacity)) 4px
       );
       pointer-events: none;
       z-index: 1000;
     }
- 
+
     .terminal {
-      max-width: 600px;
+      max-width: 640px;
       width: 100%;
       border: 2px solid var(--pip-dim);
       padding: 2rem;
       background: rgba(10, 30, 10, 0.9);
-      box-shadow:
-        0 0 20px var(--pip-glow),
-        inset 0 0 20px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px var(--pip-glow), inset 0 0 20px rgba(0,0,0,0.5);
     }
- 
+
     .terminal-header {
       border-bottom: 1px solid var(--pip-dim);
       padding-bottom: 1rem;
       margin-bottom: 1.5rem;
       text-align: center;
     }
- 
+
     h1 {
       font-size: 1.5rem;
       letter-spacing: 0.3rem;
       text-shadow: 0 0 10px var(--pip-glow);
     }
- 
-    .subtitle {
-      color: var(--pip-dim);
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
+
+    .subtitle { color: var(--pip-dim); font-size: 0.85rem; margin-top: 0.5rem; }
+
+    .products { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .product-card {
+      border: 1px solid var(--pip-border);
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
     }
- 
-    .status-line {
+    .product-card:hover:not(.sold-out) { border-color: var(--pip-dim); }
+    .product-card.selected {
+      border-color: var(--pip-green);
+      box-shadow: 0 0 10px var(--pip-glow);
+    }
+    .product-card.sold-out { opacity: 0.4; cursor: not-allowed; }
+
+    .product-header {
       display: flex;
       justify-content: space-between;
-      padding: 0.4rem 0;
-      border-bottom: 1px dashed var(--pip-border);
+      align-items: center;
+      margin-bottom: 0.6rem;
     }
- 
-    .status-label { color: var(--pip-dim); }
-    .status-value { text-align: right; }
- 
-    .stock-bar-container {
-      margin: 1.5rem 0;
-    }
- 
+    .product-name { font-size: 1.1rem; }
+    .product-price { font-size: 1.1rem; }
+
     .stock-bar-bg {
       width: 100%;
-      height: 20px;
+      height: 14px;
       background: var(--pip-border);
       border: 1px solid var(--pip-dim);
-      position: relative;
     }
- 
     .stock-bar-fill {
       height: 100%;
       background: var(--pip-green);
-      box-shadow: 0 0 8px var(--pip-glow);
+      box-shadow: 0 0 6px var(--pip-glow);
       transition: width 0.5s ease;
     }
- 
-    .stock-bar-label {
-      text-align: center;
-      font-size: 0.8rem;
-      margin-top: 0.3rem;
+    .stock-label {
+      font-size: 0.75rem;
       color: var(--pip-dim);
+      margin-top: 0.2rem;
     }
- 
+
+    .controls { margin-top: 1.5rem; display: none; }
+    .controls.visible { display: block; }
+
     .qty-section {
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin: 1.5rem 0;
+      margin-bottom: 1rem;
     }
- 
     .qty-section label { color: var(--pip-dim); }
- 
     .qty-btn {
       background: var(--pip-border);
       border: 1px solid var(--pip-dim);
       color: var(--pip-green);
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       font-size: 1.2rem;
       cursor: pointer;
       font-family: inherit;
     }
     .qty-btn:hover { background: var(--pip-dim); }
- 
-    .qty-display {
-      font-size: 1.4rem;
-      min-width: 2rem;
-      text-align: center;
-    }
- 
+    .qty-display { font-size: 1.4rem; min-width: 2rem; text-align: center; }
+
     .buy-btn {
       width: 100%;
       padding: 1rem;
@@ -159,11 +151,8 @@
       color: var(--pip-bg);
       box-shadow: 0 0 20px var(--pip-glow);
     }
-    .buy-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
- 
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
     .message {
       margin-top: 1rem;
       padding: 0.8rem;
@@ -173,7 +162,7 @@
     }
     .message.error { border-color: #fe1414; color: #fe1414; }
     .message.visible { display: block; }
- 
+
     .flavor {
       margin-top: 1.5rem;
       font-size: 0.75rem;
@@ -181,173 +170,160 @@
       text-align: center;
       line-height: 1.6;
     }
- 
+
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
- 
-    .loading { position: relative; }
+
     .loading::after {
       content: '...';
       animation: dots 1.5s steps(4, end) infinite;
     }
     @keyframes dots {
-      0% { content: ''; }
-      25% { content: '.'; }
-      50% { content: '..'; }
-      75% { content: '...'; }
+      0% { content: ''; } 25% { content: '.'; }
+      50% { content: '..'; } 75% { content: '...'; }
     }
   </style>
 </head>
 <body>
- 
+
 <div class="terminal">
   <div class="terminal-header">
     <h1>DECON 34<span class="blink">_</span></h1>
     <div class="subtitle">VAULT-TEC AUTHORIZED BADGE REQUISITION TERMINAL</div>
   </div>
- 
-  <div class="status-line">
-    <span class="status-label">ITEM</span>
-    <span class="status-value" id="productName">Loading...</span>
+
+  <div class="products" id="products">
+    <div style="color: var(--pip-dim)">LOADING INVENTORY DATA...</div>
   </div>
-  <div class="status-line">
-    <span class="status-label">UNIT PRICE</span>
-    <span class="status-value" id="price">—</span>
-  </div>
-  <div class="status-line">
-    <span class="status-label">INVENTORY</span>
-    <span class="status-value" id="available">—</span>
-  </div>
- 
-  <div class="stock-bar-container">
-    <div class="stock-bar-bg">
-      <div class="stock-bar-fill" id="stockBar" style="width: 100%"></div>
+
+  <div class="controls" id="controls">
+    <div class="qty-section">
+      <label>QTY:</label>
+      <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+      <span class="qty-display" id="qty">1</span>
+      <button class="qty-btn" onclick="adjustQty(1)">+</button>
     </div>
-    <div class="stock-bar-label" id="stockLabel">LOADING INVENTORY DATA...</div>
+    <button class="buy-btn" id="buyBtn" onclick="handleBuy()" disabled>
+      [ REQUISITION BADGE ]
+    </button>
   </div>
- 
-  <div class="qty-section">
-    <label>QTY:</label>
-    <button class="qty-btn" onclick="adjustQty(-1)">−</button>
-    <span class="qty-display" id="qty">1</span>
-    <button class="qty-btn" onclick="adjustQty(1)">+</button>
-  </div>
- 
-  <button class="buy-btn" id="buyBtn" onclick="handleBuy()" disabled>
-    INITIALIZING...
-  </button>
- 
+
   <div class="message" id="msg"></div>
- 
+
   <div class="flavor">
     ⚠ NOTICE: Badge contains no actual radioactive material.<br>
     Vault-Tec assumes no liability for spontaneous hacking incidents.<br>
     War never changes. But our stock does. Buy now.
   </div>
 </div>
- 
+
 <script>
-  // ======================== CONFIG ========================
-  // Replace with your deployed Apps Script URL
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
-  // ========================================================
- 
-  let state = { available: 0, maxQty: 2, qty: 1, price: 0, loading: true };
- 
+
+  let state = { products: [], maxQty: 5, qty: 1, selectedSku: null };
+
   async function init() {
     try {
       const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
       const data = await resp.json();
- 
-      state.available = data.available || 0;
-      state.maxQty = data.max_per_order || 2;
-      state.price = data.price_cents || 0;
-      state.loading = false;
- 
-      document.getElementById('productName').textContent = data.product || 'DECON 34 Badge';
-      document.getElementById('price').textContent = '$' + (state.price / 100).toFixed(2);
-      document.getElementById('available').textContent = state.available + ' units';
- 
-      const totalStock = state.available + (data.sold || 0);
-      const pct = totalStock > 0 ? (state.available / totalStock * 100) : 0;
-      document.getElementById('stockBar').style.width = pct + '%';
-      document.getElementById('stockLabel').textContent =
-        state.available > 0
-          ? state.available + ' OF ' + totalStock + ' REMAINING'
-          : '*** STOCK DEPLETED ***';
- 
-      const btn = document.getElementById('buyBtn');
-      if (state.available > 0) {
-        btn.textContent = '[ REQUISITION BADGE ]';
-        btn.disabled = false;
-      } else {
-        btn.textContent = 'SOLD OUT — WASTELAND EMPTY';
-        btn.disabled = true;
-      }
+      state.products = data.products || [];
+      state.maxQty = data.max_per_order || 5;
+      renderProducts();
     } catch (err) {
       showMessage('ERROR: Terminal connection failed. Try again later.', true);
-      console.error(err);
     }
   }
- 
+
+  function renderProducts() {
+    const c = document.getElementById('products');
+    if (!state.products.length) {
+      c.innerHTML = '<div style="color:#fe1414">*** NO PRODUCTS AVAILABLE ***</div>';
+      return;
+    }
+    c.innerHTML = state.products.map(p => {
+      const pct = p.total > 0 ? (p.available / p.total * 100) : 0;
+      const out = p.available === 0;
+      return `
+        <div class="product-card${out ? ' sold-out' : ''}"
+             data-sku="${p.sku}"
+             onclick="${out ? '' : "selectProduct('" + p.sku + "')"}">
+          <div class="product-header">
+            <span class="product-name">${p.name}</span>
+            <span class="product-price">$${(p.price_cents / 100).toFixed(2)}</span>
+          </div>
+          <div class="stock-bar-bg">
+            <div class="stock-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="stock-label">
+            ${out ? '*** STOCK DEPLETED ***' : p.available + ' OF ' + p.total + ' REMAINING'}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function selectProduct(sku) {
+    state.selectedSku = sku;
+    state.qty = 1;
+    document.getElementById('qty').textContent = '1';
+    document.querySelectorAll('.product-card').forEach(el =>
+      el.classList.toggle('selected', el.dataset.sku === sku));
+    document.getElementById('controls').classList.add('visible');
+    const btn = document.getElementById('buyBtn');
+    btn.disabled = false;
+    btn.textContent = '[ REQUISITION BADGE ]';
+    btn.classList.remove('loading');
+    hideMessage();
+  }
+
   function adjustQty(delta) {
-    state.qty = Math.min(Math.max(1, state.qty + delta), state.maxQty, state.available);
+    const p = state.products.find(x => x.sku === state.selectedSku);
+    if (!p) return;
+    state.qty = Math.min(Math.max(1, state.qty + delta), state.maxQty, p.available);
     document.getElementById('qty').textContent = state.qty;
   }
- 
+
   async function handleBuy() {
+    if (!state.selectedSku) return;
     const btn = document.getElementById('buyBtn');
     btn.disabled = true;
     btn.textContent = 'PROCESSING REQUISITION';
     btn.classList.add('loading');
     hideMessage();
- 
+
     try {
       const resp = await fetch(
-        APPS_SCRIPT_URL + '?action=create_checkout&quantity=' + state.qty
-      );
- 
+        APPS_SCRIPT_URL + '?action=create_checkout&sku=' +
+        encodeURIComponent(state.selectedSku) + '&quantity=' + state.qty);
       const data = await resp.json();
- 
+
       if (data.error) {
         showMessage('> ' + data.error, true);
         btn.textContent = '[ REQUISITION BADGE ]';
         btn.disabled = false;
         btn.classList.remove('loading');
-        if (data.available !== undefined) {
-          state.available = data.available;
-          document.getElementById('available').textContent = data.available + ' units';
-        }
         return;
       }
- 
       if (data.checkout_url) {
         btn.textContent = 'REDIRECTING TO PAYMENT TERMINAL';
         window.location.href = data.checkout_url;
       }
- 
     } catch (err) {
       showMessage('ERROR: Requisition failed. The Enclave may be interfering.', true);
       btn.textContent = '[ REQUISITION BADGE ]';
       btn.disabled = false;
       btn.classList.remove('loading');
-      console.error(err);
     }
   }
- 
+
   function showMessage(text, isError) {
     const el = document.getElementById('msg');
     el.textContent = text;
     el.className = 'message visible' + (isError ? ' error' : '');
   }
- 
-  function hideMessage() {
-    document.getElementById('msg').className = 'message';
-  }
- 
-  // Boot up
+  function hideMessage() { document.getElementById('msg').className = 'message'; }
+
   init();
 </script>
- 
+
 </body>
 </html>
