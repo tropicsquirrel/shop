@@ -258,7 +258,7 @@
     </div>
 
     <div class="pricing-card">
-      <div class="stock-badge">⚡ Only 47 left in stock</div>
+      <div class="stock-badge" data-stock="47">⚡ Only <span id="stock-count">47</span> left in stock</div>
       <div class="price-tag"><sup>$</sup>35</div>
       <p class="price-note">Free shipping within the US · $8 international</p>
       <ul class="perks">
@@ -325,32 +325,45 @@
     <div>
       <a href="mailto:badges@badge.shop">badges@badge.shop</a>
       &nbsp;·&nbsp;
-      <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/tropicsquirrel/defcon-badge" target="_blank" rel="noopener">GitHub</a>
     </div>
     <div style="margin-top:.25rem">Not affiliated with DEF CON Communications, Inc.</div>
   </div>
 </footer>
 
 <script>
-  // Animate LEDs on page load
-  document.querySelectorAll('.badge-svg circle').forEach(function(led, i) {
-    led.style.animation = 'none';
-    var delay = i * 120;
-    setTimeout(function() {
-      led.style.transition = 'opacity 0.4s';
-      setInterval(function() {
-        led.style.opacity = (Math.random() * 0.5 + 0.5).toFixed(2);
-      }, 800 + Math.random() * 600);
-    }, delay);
-  });
+  // Only animate LEDs if the user hasn't requested reduced motion
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var ledIntervals = [];
 
-  // Simple stock counter pulse
-  var stockBadge = document.querySelector('.stock-badge');
-  if (stockBadge) {
-    setInterval(function() {
-      stockBadge.style.opacity = '0.6';
-      setTimeout(function() { stockBadge.style.opacity = '1'; }, 500);
-    }, 3000);
+    document.querySelectorAll('.badge-svg circle').forEach(function(led, i) {
+      var delay = i * 120;
+      setTimeout(function() {
+        led.style.transition = 'opacity 0.4s';
+        var id = setInterval(function() {
+          led.style.opacity = (Math.random() * 0.5 + 0.5).toFixed(2);
+        }, 800 + Math.random() * 600);
+        ledIntervals.push(id);
+      }, delay);
+    });
+
+    // Simple stock badge pulse
+    var stockBadge = document.querySelector('.stock-badge');
+    if (stockBadge) {
+      var pulseId = setInterval(function() {
+        stockBadge.style.opacity = '0.6';
+        setTimeout(function() { stockBadge.style.opacity = '1'; }, 500);
+      }, 3000);
+      ledIntervals.push(pulseId);
+    }
+
+    // Clean up intervals when the page is hidden / unloaded
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        ledIntervals.forEach(clearInterval);
+        ledIntervals = [];
+      }
+    });
   }
 </script>
 </body>
