@@ -61,7 +61,6 @@
       border-bottom: 1px solid var(--pip-dim);
       padding-bottom: 1rem;
       margin-bottom: 1.5rem;
-      text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -69,11 +68,13 @@
     }
 
     .header-icon {
-      width: 64px;
-      height: 64px;
+      height: 88px;
+      width: auto;
       object-fit: contain;
       flex-shrink: 0;
-      filter: drop-shadow(0 0 6px var(--pip-glow));
+      filter:
+        drop-shadow(0 0 4px rgba(51, 255, 54, 0.5))
+        drop-shadow(0 0 12px rgba(51, 255, 54, 0.25));
     }
 
     .header-text { text-align: center; }
@@ -101,31 +102,38 @@
       align-items: center;
       padding: 1rem;
       cursor: pointer;
-      min-height: 56px; /* touch target */
+      min-height: 56px;
       -webkit-user-select: none;
       user-select: none;
     }
-    .product-summary:active { background: rgba(20, 254, 23, 0.06); }
+    .product-summary:active { background: rgba(51, 255, 54, 0.06); }
 
-    .product-name { font-size: 1.1rem; }
-    .product-price { color: var(--pip-green); font-size: 1.1rem; }
+    .product-name { font-size: 1.15rem; }
+    .product-price { color: var(--pip-green); font-size: 1.15rem; }
     .product-toggle { color: var(--pip-dim); font-size: 1rem; margin-left: 0.5rem; }
 
-    /* Expandable detail section */
     .product-detail {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s ease;
+      transition: max-height 0.5s ease;
       border-top: 1px solid var(--pip-border);
     }
-    .product-detail.open { max-height: 1200px; }
+    .product-detail.open { max-height: 2000px; }
     .product-detail-inner { padding: 1rem; }
 
     .product-description {
       color: var(--pip-dim);
-      font-size: 0.95rem;
+      font-size: 1rem;
       margin-bottom: 1rem;
       line-height: 1.6;
+    }
+
+    .pro-deadline {
+      color: var(--pip-amber);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px dashed var(--pip-amber);
     }
 
     .media-gallery {
@@ -140,7 +148,6 @@
       object-fit: cover;
       border: 1px solid var(--pip-border);
       cursor: pointer;
-      transition: border-color 0.2s;
     }
     .media-gallery img:active { border-color: var(--pip-green); }
     .media-gallery .video-thumb {
@@ -151,7 +158,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--pip-dim);
       text-align: center;
       padding: 0.5rem;
@@ -194,14 +201,43 @@
       margin-bottom: 0.3rem;
     }
     .stock-bar-fill { height: 100%; background: var(--pip-green); box-shadow: 0 0 6px var(--pip-glow); transition: width 0.5s; }
-    .stock-label { font-size: 0.85rem; color: var(--pip-dim); }
+    .stock-label { font-size: 0.9rem; color: var(--pip-dim); margin-bottom: 0.8rem; }
 
-    /* Qty controls — touch-friendly */
+    /* ── Per-color qty rows (Pro) ── */
+    .color-qty-section { margin-top: 0.5rem; }
+    .color-qty-header { color: var(--pip-dim); font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .color-qty-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--pip-border);
+    }
+    .color-qty-row:last-child { border-bottom: none; }
+    .color-swatch {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--pip-dim);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .color-label { flex: 1; font-size: 0.95rem; color: var(--pip-dim); }
+    .color-qty-row .qty-btn {
+      width: 40px; height: 40px;
+      font-size: 1.2rem;
+    }
+    .color-qty-row .qty-val {
+      font-size: 1.2rem;
+      min-width: 1.6rem;
+      text-align: center;
+    }
+
+    /* ── Simple qty row (Std, RAD) ── */
     .qty-row {
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin-top: 1rem;
+      margin-top: 0.8rem;
     }
     .qty-row label { color: var(--pip-dim); font-size: 1rem; }
     .qty-btn {
@@ -222,7 +258,7 @@
     /* ── Delivery Toggle ── */
     .section-label {
       color: var(--pip-dim);
-      font-size: 0.95rem;
+      font-size: 1rem;
       margin: 1.5rem 0 0.5rem;
       border-bottom: 1px dashed var(--pip-border);
       padding-bottom: 0.3rem;
@@ -260,12 +296,12 @@
       border: 1px solid var(--pip-border);
       padding: 1rem;
       margin-bottom: 1rem;
-      font-size: 1rem;
+      font-size: 1.05rem;
     }
     .cart-line { display: flex; justify-content: space-between; padding: 0.3rem 0; }
     .cart-line.total { border-top: 1px solid var(--pip-dim); margin-top: 0.5rem; padding-top: 0.5rem; }
     .cart-line .label { color: var(--pip-dim); }
-    .cart-note { color: var(--pip-amber); font-size: 0.85rem; margin-top: 0.5rem; }
+    .cart-note { color: var(--pip-amber); font-size: 0.9rem; margin-top: 0.5rem; }
 
     .buy-btn {
       width: 100%;
@@ -274,7 +310,7 @@
       border: 2px solid var(--pip-green);
       color: var(--pip-green);
       font-family: inherit;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       letter-spacing: 0.15rem;
       cursor: pointer;
       text-transform: uppercase;
@@ -286,14 +322,9 @@
       color: var(--pip-bg);
       box-shadow: 0 0 20px var(--pip-glow);
     }
-    /* keep hover for desktop */
     @media (hover: hover) {
-      .buy-btn:hover:not(:disabled) {
-        background: var(--pip-green);
-        color: var(--pip-bg);
-        box-shadow: 0 0 20px var(--pip-glow);
-      }
-      .product-summary:hover { background: rgba(20, 254, 23, 0.03); }
+      .buy-btn:hover:not(:disabled) { background: var(--pip-green); color: var(--pip-bg); box-shadow: 0 0 20px var(--pip-glow); }
+      .product-summary:hover { background: rgba(51, 255, 54, 0.03); }
       .qty-btn:hover { background: var(--pip-dim); }
       .media-gallery img:hover { border-color: var(--pip-green); }
       .media-gallery .video-thumb:hover { border-color: var(--pip-green); color: var(--pip-green); }
@@ -305,19 +336,18 @@
     .message.error { border-color: #fe1414; color: #fe1414; }
     .message.visible { display: block; }
 
-    .flavor { margin-top: 1.5rem; font-size: 0.85rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
+    .flavor { margin-top: 1.5rem; font-size: 0.9rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
 
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
     .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
 
-    /* Mobile adjustments */
     @media (max-width: 480px) {
       body { padding: 0.75rem; font-size: 1.1rem; }
       .terminal { padding: 1rem; }
       h1 { font-size: 1.3rem; letter-spacing: 0.1rem; }
-      .header-icon { width: 48px; height: 48px; }
+      .header-icon { height: 64px; }
       .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
     }
   </style>
@@ -339,10 +369,10 @@
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
     <button class="delivery-btn active" onclick="setDelivery('pickup')" id="btn-pickup">
-      📍 PICKUP AT DEFCON<br><span style="font-size:0.8rem">Free · No sales tax</span>
+      📍 PICKUP AT DEFCON<br><span style="font-size:0.85rem">Free · No sales tax · Up to 10</span>
     </button>
     <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">
-      📦 SHIP TO US ADDRESS<br><span style="font-size:0.8rem">$20–$30 + tax if applicable</span>
+      📦 SHIP TO US ADDRESS<br><span style="font-size:0.85rem">$20–$30 + tax · Up to 5</span>
     </button>
   </div>
 
@@ -361,7 +391,6 @@
   </div>
 </div>
 
-<!-- Lightbox overlay — tap close button (not background) to dismiss on mobile -->
 <div class="lightbox" id="lightbox">
   <div id="lightboxContent"></div>
   <button class="lightbox-close" onclick="closeLightbox()">[ CLOSE ]</button>
@@ -370,7 +399,17 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
 
-  const MAX_TOTAL_BADGES = 5;
+  // ──────────────────────────────────────────────
+  // Pro color options
+  // ──────────────────────────────────────────────
+  const PRO_COLORS = [
+    { id: 'Red',            swatch: '#cc2222' },
+    { id: 'Blue',           swatch: '#2255cc' },
+    { id: 'Black',          swatch: '#1a1a1a' },
+    { id: 'Black + Glow',   swatch: '#1a1a1a', border: '#33ff36' },
+    { id: 'White',          swatch: '#e8e8e8' },
+    { id: '50s Silver',     swatch: '#b0b0b0' },
+  ];
 
   // ──────────────────────────────────────────────
   // Product media config
@@ -393,7 +432,8 @@
     'DC34-PRO': {
       description: 'The ClipBoy Pro — for those who require additional firepower. '
         + 'Everything in Standard, plus expanded SAO port, '
-        + 'upgraded enclosure, and bonus pre-loaded games. '
+        + 'upgraded enclosure in your choice of custom color, '
+        + 'and bonus pre-loaded games. '
         + 'Limited run. When they\'re gone, they\'re gone.',
       images: [
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
@@ -404,15 +444,53 @@
         { thumb: '▶ ClipBoy Pro Demo', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
         { thumb: '▶ SAO Port Walkthrough', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
       ],
+      hasColors: true,
+      preorderDeadline: 'PRO PRE-ORDERS CLOSE JULY 31, 2026 — custom colors need printing time!',
+    },
+    'DC34-RAD': {
+      description: 'The ClipBoy RAD Edition — maximum radiation exposure. '
+        + 'Everything in Pro, bathed head-to-toe in RADiation Green. '
+        + 'Only 5 will ever exist. You can\'t pick the color. '
+        + 'The color picked you.',
+      images: [
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
+      ],
+      videos: [
+        { thumb: '▶ RAD Edition Reveal', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      ],
     },
   };
 
+  // ──────────────────────────────────────────────
+  // State
+  // ──────────────────────────────────────────────
   let state = {
     products: [],
+    maxPickup: 10,
+    maxShip: 5,
+    // Cart uses keys like "DC34-STD", "DC34-PRO:Red", "DC34-PRO:Blue", "DC34-RAD"
     cart: {},
     delivery: 'pickup',
     expanded: {},
   };
+
+  function currentMax() {
+    return state.delivery === 'pickup' ? state.maxPickup : state.maxShip;
+  }
+
+  function cartTotal() {
+    return Object.values(state.cart).reduce((a, b) => a + b, 0);
+  }
+
+  // Sum qty for a base SKU across all color variants
+  function cartQtyForSku(baseSku) {
+    let total = 0;
+    for (const [key, qty] of Object.entries(state.cart)) {
+      if (key === baseSku || key.startsWith(baseSku + ':')) total += qty;
+    }
+    return total;
+  }
 
   // ──────────────────────────────────────────────
   // Init
@@ -422,7 +500,21 @@
       const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
       const data = await resp.json();
       state.products = data.products || [];
-      for (const p of state.products) state.cart[p.sku] = 0;
+      state.maxPickup = data.max_pickup || 10;
+      state.maxShip = data.max_ship || 5;
+
+      // Init cart keys
+      for (const p of state.products) {
+        const media = PRODUCT_MEDIA[p.sku] || {};
+        if (media.hasColors) {
+          for (const c of PRO_COLORS) {
+            state.cart[p.sku + ':' + c.id] = 0;
+          }
+        } else {
+          state.cart[p.sku] = 0;
+        }
+      }
+
       renderProducts();
       updateCart();
     } catch (err) {
@@ -431,14 +523,7 @@
   }
 
   // ──────────────────────────────────────────────
-  // Total badges in cart
-  // ──────────────────────────────────────────────
-  function cartTotal() {
-    return Object.values(state.cart).reduce((a, b) => a + b, 0);
-  }
-
-  // ──────────────────────────────────────────────
-  // Render product cards
+  // Render
   // ──────────────────────────────────────────────
   function renderProducts() {
     const c = document.getElementById('products');
@@ -446,12 +531,48 @@
       const pct = p.total > 0 ? (p.available / p.total * 100) : 0;
       const out = p.available === 0;
       const media = PRODUCT_MEDIA[p.sku] || {};
+
       const imgs = (media.images || []).map(url =>
         `<img src="${url}" alt="${p.name}" onclick="event.stopPropagation(); openLightbox('image','${url}')">`
       ).join('');
       const vids = (media.videos || []).map(v =>
         `<div class="video-thumb" onclick="event.stopPropagation(); openLightbox('video','${v.embed}')">${v.thumb || '▶ Video'}</div>`
       ).join('');
+
+      // Deadline notice (Pro only)
+      const deadlineHtml = media.preorderDeadline
+        ? `<div class="pro-deadline">⏳ ${media.preorderDeadline}</div>` : '';
+
+      // Qty controls
+      let qtyHtml = '';
+      if (!out) {
+        if (media.hasColors) {
+          // Per-color qty rows
+          const rows = PRO_COLORS.map(clr => {
+            const cartKey = p.sku + ':' + clr.id;
+            const borderStyle = clr.border ? 'border-color:' + clr.border : '';
+            return `<div class="color-qty-row">
+              <span class="color-swatch" style="background:${clr.swatch};${borderStyle}"></span>
+              <span class="color-label">${clr.id}</span>
+              <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',-1)">−</button>
+              <span class="qty-val" id="qty-${CSS.escape(cartKey)}">0</span>
+              <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',1)">+</button>
+            </div>`;
+          }).join('');
+          qtyHtml = `<div class="color-qty-section">
+            <div class="color-qty-header">SELECT COLOR & QUANTITY:</div>
+            ${rows}
+          </div>`;
+        } else {
+          // Simple qty row
+          qtyHtml = `<div class="qty-row">
+            <label>QTY:</label>
+            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',-1)">−</button>
+            <span class="qty-val" id="qty-${p.sku}">0</span>
+            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',1)">+</button>
+          </div>`;
+        }
+      }
 
       return `
         <div class="product-card${out ? ' sold-out' : ''}" id="card-${p.sku}" data-sku="${p.sku}">
@@ -465,16 +586,11 @@
           <div class="product-detail" id="detail-${p.sku}">
             <div class="product-detail-inner">
               ${media.description ? '<div class="product-description">' + media.description + '</div>' : ''}
+              ${deadlineHtml}
               ${(imgs || vids) ? '<div class="media-gallery">' + imgs + vids + '</div>' : ''}
               <div class="stock-bar-bg"><div class="stock-bar-fill" style="width:${pct}%"></div></div>
               <div class="stock-label">${out ? '*** STOCK DEPLETED ***' : p.available + ' of ' + p.total + ' remaining'}</div>
-              ${out ? '' : `
-              <div class="qty-row">
-                <label>QTY:</label>
-                <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}', -1)">−</button>
-                <span class="qty-val" id="qty-${p.sku}">0</span>
-                <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}', 1)">+</button>
-              </div>`}
+              ${qtyHtml}
             </div>
           </div>
         </div>`;
@@ -495,11 +611,9 @@
   // ──────────────────────────────────────────────
   function openLightbox(type, src) {
     const content = document.getElementById('lightboxContent');
-    if (type === 'image') {
-      content.innerHTML = `<img src="${src}">`;
-    } else {
-      content.innerHTML = `<iframe src="${src}" frameborder="0" allowfullscreen></iframe>`;
-    }
+    content.innerHTML = type === 'image'
+      ? `<img src="${src}">`
+      : `<iframe src="${src}" frameborder="0" allowfullscreen></iframe>`;
     document.getElementById('lightbox').classList.add('open');
   }
   function closeLightbox() {
@@ -508,24 +622,40 @@
   }
 
   // ──────────────────────────────────────────────
-  // Cart logic — 5 badge total limit
+  // Cart logic
   // ──────────────────────────────────────────────
-  function adjustQty(sku, delta) {
-    const p = state.products.find(x => x.sku === sku);
+  /**
+   * @param {string} cartKey  e.g. "DC34-STD" or "DC34-PRO:Red"
+   * @param {string} baseSku  e.g. "DC34-STD" or "DC34-PRO"
+   * @param {number} delta    +1 or -1
+   */
+  function adjustQty(cartKey, baseSku, delta) {
+    const p = state.products.find(x => x.sku === baseSku);
     if (!p) return;
 
-    const current = state.cart[sku] || 0;
+    const current = state.cart[cartKey] || 0;
     let desired = current + delta;
     desired = Math.max(0, desired);
-    desired = Math.min(desired, p.available);
 
-    // Enforce global limit: total across all SKUs <= MAX_TOTAL_BADGES
+    // Can't exceed available stock for this base SKU
+    const othersForSku = cartQtyForSku(baseSku) - current;
+    desired = Math.min(desired, p.available - othersForSku);
+
+    // Can't exceed global limit
     const othersTotal = cartTotal() - current;
-    desired = Math.min(desired, MAX_TOTAL_BADGES - othersTotal);
+    desired = Math.min(desired, currentMax() - othersTotal);
 
-    state.cart[sku] = desired;
-    document.getElementById('qty-' + sku).textContent = desired;
-    document.getElementById('card-' + sku).classList.toggle('has-qty', desired > 0);
+    state.cart[cartKey] = desired;
+
+    // Update display
+    const el = document.getElementById('qty-' + CSS.escape(cartKey));
+    if (el) el.textContent = desired;
+
+    // Highlight card if any qty for this base SKU
+    const skuTotal = cartQtyForSku(baseSku);
+    document.getElementById('card-' + baseSku).classList.toggle('has-qty', skuTotal > 0);
+
+    hideMessage();
     updateCart();
   }
 
@@ -533,6 +663,22 @@
     state.delivery = method;
     document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
     document.getElementById('btn-ship').classList.toggle('active', method === 'ship');
+
+    // If switching to ship and cart exceeds 5, trim excess
+    if (method === 'ship' && cartTotal() > state.maxShip) {
+      // Simple approach: reset cart
+      for (const key of Object.keys(state.cart)) state.cart[key] = 0;
+      // Re-render qty displays
+      for (const key of Object.keys(state.cart)) {
+        const el = document.getElementById('qty-' + CSS.escape(key));
+        if (el) el.textContent = '0';
+      }
+      for (const p of state.products) {
+        document.getElementById('card-' + p.sku).classList.remove('has-qty');
+      }
+      showMessage('> Cart cleared — shipped orders limited to ' + state.maxShip + ' badges. Please re-select.', true);
+    }
+
     updateCart();
   }
 
@@ -543,16 +689,36 @@
     let subtotal = 0;
     let lines = '';
 
+    // Group cart entries for display
     for (const p of state.products) {
-      const qty = state.cart[p.sku] || 0;
-      if (qty > 0) {
-        totalQty += qty;
-        const lineTotal = qty * p.price_cents;
-        subtotal += lineTotal;
-        lines += `<div class="cart-line">
-          <span class="label">${p.name} × ${qty}</span>
-          <span>$${(lineTotal / 100).toFixed(2)}</span>
-        </div>`;
+      const media = PRODUCT_MEDIA[p.sku] || {};
+
+      if (media.hasColors) {
+        // Show each color with qty
+        for (const clr of PRO_COLORS) {
+          const cartKey = p.sku + ':' + clr.id;
+          const qty = state.cart[cartKey] || 0;
+          if (qty > 0) {
+            totalQty += qty;
+            const lineTotal = qty * p.price_cents;
+            subtotal += lineTotal;
+            lines += `<div class="cart-line">
+              <span class="label">${p.name} (${clr.id}) × ${qty}</span>
+              <span>$${(lineTotal / 100).toFixed(2)}</span>
+            </div>`;
+          }
+        }
+      } else {
+        const qty = state.cart[p.sku] || 0;
+        if (qty > 0) {
+          totalQty += qty;
+          const lineTotal = qty * p.price_cents;
+          subtotal += lineTotal;
+          lines += `<div class="cart-line">
+            <span class="label">${p.name} × ${qty}</span>
+            <span>$${(lineTotal / 100).toFixed(2)}</span>
+          </div>`;
+        }
       }
     }
 
@@ -563,7 +729,6 @@
       return;
     }
 
-    // Shipping cost
     let shipCost = 0;
     let shipLabel = 'Pickup at DEFCON';
     if (state.delivery === 'ship') {
@@ -588,8 +753,9 @@
       lines += '<div class="cart-note">No sales tax for DEFCON pickup</div>';
     }
 
-    if (totalQty >= MAX_TOTAL_BADGES) {
-      lines += '<div class="cart-note">Maximum ' + MAX_TOTAL_BADGES + ' badges per order reached</div>';
+    const max = currentMax();
+    if (totalQty >= max) {
+      lines += '<div class="cart-note">Maximum ' + max + ' badges per ' + (state.delivery === 'pickup' ? 'pickup' : 'shipped') + ' order reached</div>';
     }
 
     lines += '<div class="cart-note" style="color:var(--pip-dim)">⏱ You will have 30 minutes to complete checkout once you click Requisition</div>';
@@ -611,9 +777,10 @@
     btn.classList.add('loading');
     hideMessage();
 
+    // Build cart with only non-zero entries
     const cart = {};
-    for (const [sku, qty] of Object.entries(state.cart)) {
-      if (qty > 0) cart[sku] = qty;
+    for (const [key, qty] of Object.entries(state.cart)) {
+      if (qty > 0) cart[key] = qty;
     }
 
     try {
