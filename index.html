@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com; frame-ancestors 'none'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
   <title>ClipBoy: The Unofficial DEFCON 34 Electronic Badge — Pre-Order</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png">
   <style>
@@ -536,6 +536,12 @@
     { id: '50s Silver',     swatch: '#b0b0b0' },
   ];
 
+  // ──────────────────────────────────────────────
+  // GitHub repo config for dynamic media
+  // ──────────────────────────────────────────────
+  const GITHUB_REPO = 'tropicsquirrel/shop';
+  const GITHUB_BRANCH = 'main';
+
   const PRODUCT_MEDIA = {
     'DC34-STD': {
       description: 'The ClipBoy Standard: your companion in the digital wasteland. '
@@ -543,29 +549,18 @@
         + 'hacking tools, radiation detector*, customizable LEDs, theremin, '
         + '90+ collectibles and more!'
         + '<br><br><span style="font-size:0.85em;font-style:italic">*Deauths are a form of radiation</span>',
-      images: [
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
-      ],
-      videos: [
-        { thumb: '▶ ClipBoy Std Demo', embed: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ' },
-      ],
+      imageFolder: 'images/standard',
+      images: [],  // populated dynamically
+      videos: [],  // populated from videos.json
     },
     'DC34-PRO': {
       description: 'The ClipBoy Pro has the same features as ClipBoy Standard '
         + 'but you can dazzle the wasteland denizens with your impeccable style. '
         + 'You get to pick your own color. Only 12 will be made. '
         + 'When they\'re gone, they\'re gone.',
-      images: [
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
-      ],
-      videos: [
-        { thumb: '▶ ClipBoy Pro Demo', embed: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ' },
-        { thumb: '▶ SAO Port Walkthrough', embed: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ' },
-      ],
+      imageFolder: 'images/pro',
+      images: [],
+      videos: [],
       hasColors: true,
       preorderDeadline: 'PRO PRE-ORDERS CLOSE JULY 31, 2026 — custom colors need printing time!',
     },
@@ -574,15 +569,62 @@
         + 'Same features as ClipBoy Standard but bathed head-to-toe in RADiation Green. '
         + 'Be the envy of every Fault-Dweller. '
         + 'Only 5 will ever exist. You can\'t pick the color. The color picked you.',
-      images: [
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
-        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
-      ],
-      videos: [
-        { thumb: '▶ RAD Edition Reveal', embed: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ' },
-      ],
+      imageFolder: 'images/rad',
+      images: [],
+      videos: [],
     },
   };
+
+  /**
+   * Load images from GitHub repo folders and videos from videos.json.
+   * Images: drop files into images/standard/, images/pro/, images/rad/
+   * Videos: edit videos.json in the repo root
+   */
+  async function loadMedia() {
+    const imageExts = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+
+    // Load images for each SKU from its GitHub folder
+    const imagePromises = Object.entries(PRODUCT_MEDIA).map(async ([sku, media]) => {
+      if (!media.imageFolder) return;
+      try {
+        const resp = await fetch(
+          'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + media.imageFolder + '?ref=' + GITHUB_BRANCH
+        );
+        if (!resp.ok) return;
+        const files = await resp.json();
+        if (!Array.isArray(files)) return;
+        media.images = files
+          .filter(f => f.type === 'file' && imageExts.some(ext => f.name.toLowerCase().endsWith(ext)))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(f => 'https://raw.githubusercontent.com/' + GITHUB_REPO + '/' + GITHUB_BRANCH + '/' + media.imageFolder + '/' + encodeURIComponent(f.name));
+      } catch (err) {
+        console.log('Could not load images for ' + sku + ': ' + err.message);
+      }
+    });
+
+    // Load videos from videos.json
+    const videoPromise = (async () => {
+      try {
+        const resp = await fetch(
+          'https://tropicsquirrel.github.io/shop/videos.json'
+        );
+        if (!resp.ok) return;
+        const videoData = await resp.json();
+        for (const [sku, vids] of Object.entries(videoData)) {
+          if (PRODUCT_MEDIA[sku] && Array.isArray(vids)) {
+            PRODUCT_MEDIA[sku].videos = vids.map(v => ({
+              thumb: '▶ ' + (v.title || 'Video'),
+              embed: 'https://www.youtube-nocookie.com/embed/' + v.id,
+            }));
+          }
+        }
+      } catch (err) {
+        console.log('Could not load videos.json: ' + err.message);
+      }
+    })();
+
+    await Promise.all([...imagePromises, videoPromise]);
+  }
 
   let state = {
     products: [],
@@ -605,8 +647,12 @@
 
   async function init() {
     try {
-      const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
-      const data = await resp.json();
+      // Load inventory and media in parallel
+      const [statusResp] = await Promise.all([
+        fetch(APPS_SCRIPT_URL + '?action=status'),
+        loadMedia(),
+      ]);
+      const data = await statusResp.json();
       state.products = data.products || [];
       state.maxPickup = data.max_pickup || 10;
       state.maxShip = data.max_ship || 5;
