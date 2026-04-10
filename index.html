@@ -91,47 +91,24 @@
       text-align: center;
       margin-bottom: 1rem;
       font-size: 0.95rem;
-      /* Uranium sweep: bright green hotspot moves across text */
       background: linear-gradient(
         90deg,
         var(--pip-dim) 0%,
-        var(--pip-dim) 35%,
-        #66ff66 45%,
-        #aaffaa 50%,
-        #66ff66 55%,
-        var(--pip-dim) 65%,
+        var(--pip-dim) 40%,
+        #88ff88 48%,
+        #ccffcc 50%,
+        #88ff88 52%,
+        var(--pip-dim) 60%,
         var(--pip-dim) 100%
       );
       background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: uranium-sweep 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 0px transparent);
-      position: relative;
-    }
-    .college-banner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        transparent 35%,
-        rgba(51, 255, 54, 0.15) 45%,
-        rgba(170, 255, 170, 0.2) 50%,
-        rgba(51, 255, 54, 0.15) 55%,
-        transparent 65%,
-        transparent 100%
-      );
-      background-size: 300% 100%;
-      animation: uranium-sweep 4s ease-in-out infinite;
-      pointer-events: none;
-      border-radius: 4px;
+      animation: uranium-sweep 6s linear infinite;
     }
     @keyframes uranium-sweep {
       0% { background-position: 100% 0; }
-      40% { background-position: -100% 0; }
       100% { background-position: -100% 0; }
     }
 
@@ -143,9 +120,6 @@
     }
     .product-card.has-qty { border-color: var(--pip-green); box-shadow: 0 0 8px var(--pip-glow); }
     .product-card.sold-out { opacity: 0.4; }
-    .product-card.rad-edition {
-      border-color: var(--pip-amber);
-    }
     .product-card.rad-edition .product-name {
       color: var(--pip-amber);
     }
@@ -741,7 +715,7 @@
           <div class="product-summary" onclick="${out ? '' : "toggleDetail('" + p.sku + "')"}">
             <div>
               <span class="product-toggle" id="toggle-${p.sku}">▶</span>
-              <span class="product-name">${p.name}</span>
+              <span class="product-name">${p.name} ${out ? '(SOLD OUT)' : '(' + p.available + '/' + p.total + ' Left)'}</span>
             </div>
             <span class="product-price">$${(p.price_cents / 100).toFixed(2)}</span>
           </div>
