@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com data:; frame-ancestors 'none'; base-uri 'self'">
+  <title>ClipBoy — Order Confirmed</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --pip-green: #33ff36;
+      --pip-dim: #1a9e1d;
+      --pip-bg: #000000;
+      --pip-border: #143314;
+      --pip-glow: rgba(51, 255, 54, 0.15);
+      --pip-amber: #ffb833;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.25rem;
+      background: var(--pip-bg);
+      color: var(--pip-green);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .terminal {
+      max-width: 620px;
+      width: 100%;
+      border: 2px solid var(--pip-dim);
+      padding: 2rem;
+      background: rgba(5, 15, 5, 0.85);
+      box-shadow:
+        0 0 30px var(--pip-glow),
+        0 0 60px rgba(51, 255, 54, 0.08),
+        inset 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .header-icon {
+      height: 80px;
+      width: auto;
+      margin-bottom: 1.5rem;
+      filter:
+        drop-shadow(0 0 4px rgba(51, 255, 54, 0.5))
+        drop-shadow(0 0 12px rgba(51, 255, 54, 0.25));
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.2rem;
+      text-shadow: 0 0 10px var(--pip-glow);
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+
+    .message-body {
+      color: var(--pip-dim);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .donation-message { display: none; }
+    .badge-message { display: block; }
+
+    .back-btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: transparent;
+      border: 2px solid var(--pip-green);
+      color: var(--pip-green);
+      font-family: inherit;
+      font-size: 1.15rem;
+      letter-spacing: 0.15rem;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      min-height: 56px;
+      transition: all 0.2s;
+    }
+    .back-btn:active {
+      background: var(--pip-green);
+      color: var(--pip-bg);
+    }
+
+    .flavor {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--pip-dim);
+      line-height: 1.6;
+    }
+
+    @media (hover: hover) {
+      .back-btn:hover {
+        background: var(--pip-green);
+        color: var(--pip-bg);
+        box-shadow: 0 0 20px var(--pip-glow);
+      }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 0.75rem; font-size: 1.15rem; }
+      .terminal { padding: 1.5rem; }
+      h1 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="terminal">
+  <img src="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png"
+       alt="ClipBoy" class="header-icon">
+
+  <div class="badge-message" id="badgeMsg">
+    <h1>REQUISITION CONFIRMED<span style="animation:blink 1s step-end infinite">_</span></h1>
+    <div class="message-body">
+      Your badge order has been received and is being processed.
+      You'll receive a confirmation email from Stripe shortly.
+      <br><br>
+      <span id="orderCodeDisplay" style="display:none">
+        Your pickup code:<br>
+        <span id="orderCode" style="font-size:2rem; color:var(--pip-green); letter-spacing:0.4rem"></span>
+        <br><br>
+        <span style="font-size:0.9rem">Save this code — you'll need it to pick up your badge at DEFCON.</span>
+        <br><br>
+      </span>
+      Thank you for supporting Bryce's college fund!
+    </div>
+  </div>
+
+  <div class="donation-message" id="donationMsg">
+    <h1>CONTRIBUTION RECEIVED<span style="animation:blink 1s step-end infinite">_</span></h1>
+    <div class="message-body">
+      Your contribution to Bryce's college fund has been received.
+      You'll receive a receipt from Stripe shortly.
+      <br><br>
+      Thank you for your generosity — it means the world.
+    </div>
+  </div>
+
+  <a href="https://tropicsquirrel.github.io/shop/" class="back-btn">
+    [ RETURN TO TERMINAL ]
+  </a>
+
+  <div class="flavor">
+    War never changes. But you just changed a kid's future.
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('donation') === 'true') {
+    document.getElementById('badgeMsg').style.display = 'none';
+    document.getElementById('donationMsg').style.display = 'block';
+  }
+  const code = params.get('code');
+  if (code) {
+    document.getElementById('orderCode').textContent = code;
+    document.getElementById('orderCodeDisplay').style.display = 'inline';
+  }
+</script>
+
+<style>
+  @keyframes blink { 50% { opacity: 0; } }
+</style>
+
+</body>
+</html>
