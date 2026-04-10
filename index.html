@@ -87,7 +87,17 @@
     }
     .subtitle { color: var(--pip-dim); font-size: 0.95rem; margin-top: 0.5rem; }
 
-    /* ── Product Cards ── */
+    .college-banner {
+      text-align: center;
+      padding: 0.7rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-green);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* ── Shared card pattern (products, donate, about) ── */
     .product-card {
       border: 1px solid var(--pip-border);
       margin-bottom: 1rem;
@@ -222,17 +232,10 @@
       flex-shrink: 0;
     }
     .color-label { flex: 1; font-size: 0.95rem; color: var(--pip-dim); }
-    .color-qty-row .qty-btn {
-      width: 40px; height: 40px;
-      font-size: 1.2rem;
-    }
-    .color-qty-row .qty-val {
-      font-size: 1.2rem;
-      min-width: 1.6rem;
-      text-align: center;
-    }
+    .color-qty-row .qty-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+    .color-qty-row .qty-val { font-size: 1.2rem; min-width: 1.6rem; text-align: center; }
 
-    /* ── Simple qty row (Std, RAD) ── */
+    /* ── Simple qty row ── */
     .qty-row {
       display: flex;
       align-items: center;
@@ -254,6 +257,78 @@
     .qty-btn:active { background: var(--pip-dim); }
     .qty-btn:disabled { opacity: 0.3; }
     .qty-val { font-size: 1.4rem; min-width: 2rem; text-align: center; }
+
+    /* ── Donate amounts (inside card) ── */
+    .donate-amounts {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+    .donate-btn {
+      padding: 0.7rem 1.2rem;
+      background: transparent;
+      border: 1px solid var(--pip-border);
+      color: var(--pip-dim);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      min-height: 48px;
+      transition: all 0.15s;
+    }
+    .donate-btn:active { border-color: var(--pip-dim); }
+    .donate-btn.selected {
+      border-color: var(--pip-green);
+      color: var(--pip-green);
+      box-shadow: 0 0 6px var(--pip-glow);
+    }
+    .donate-custom {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .donate-custom input {
+      width: 100px;
+      padding: 0.6rem;
+      background: transparent;
+      border: 1px solid var(--pip-border);
+      color: var(--pip-green);
+      font-family: inherit;
+      font-size: 1rem;
+      min-height: 48px;
+    }
+    .donate-custom input:focus { outline: none; border-color: var(--pip-green); }
+    .donate-submit {
+      width: 100%;
+      padding: 0.8rem;
+      background: transparent;
+      border: 1px solid var(--pip-amber);
+      color: var(--pip-amber);
+      font-family: inherit;
+      font-size: 1.05rem;
+      cursor: pointer;
+      min-height: 48px;
+      transition: all 0.2s;
+    }
+    .donate-submit:active:not(:disabled) { background: var(--pip-amber); color: var(--pip-bg); }
+    .donate-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── About links (horizontal) ── */
+    .about-links {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .about-links a {
+      color: var(--pip-green);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.3rem 0;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+    .about-links a:active { color: var(--pip-amber); }
 
     /* ── Delivery Toggle ── */
     .section-label {
@@ -317,11 +392,9 @@
       transition: all 0.2s;
       min-height: 56px;
     }
-    .buy-btn:active:not(:disabled) {
-      background: var(--pip-green);
-      color: var(--pip-bg);
-      box-shadow: 0 0 20px var(--pip-glow);
-    }
+    .buy-btn:active:not(:disabled) { background: var(--pip-green); color: var(--pip-bg); box-shadow: 0 0 20px var(--pip-glow); }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
     @media (hover: hover) {
       .buy-btn:hover:not(:disabled) { background: var(--pip-green); color: var(--pip-bg); box-shadow: 0 0 20px var(--pip-glow); }
       .product-summary:hover { background: rgba(51, 255, 54, 0.03); }
@@ -329,8 +402,10 @@
       .media-gallery img:hover { border-color: var(--pip-green); }
       .media-gallery .video-thumb:hover { border-color: var(--pip-green); color: var(--pip-green); }
       .delivery-btn:hover { border-color: var(--pip-dim); }
+      .donate-btn:hover { border-color: var(--pip-dim); }
+      .donate-submit:hover:not(:disabled) { background: var(--pip-amber); color: var(--pip-bg); }
+      .about-links a:hover { color: var(--pip-amber); }
     }
-    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .message { margin-top: 1rem; padding: 0.8rem; border: 1px solid var(--pip-dim); font-size: 1rem; display: none; }
     .message.error { border-color: #fe1414; color: #fe1414; }
@@ -349,6 +424,7 @@
       h1 { font-size: 1.3rem; letter-spacing: 0.1rem; }
       .header-icon { height: 64px; }
       .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
+      .about-links { flex-direction: column; gap: 0.3rem; }
     }
   </style>
 </head>
@@ -364,7 +440,73 @@
     </div>
   </div>
 
+  <div class="college-banner">
+    🎓 All proceeds support Bryce's college fund
+  </div>
+
+  <!-- Products rendered by JS -->
   <div id="products"><div style="color:var(--pip-dim)">LOADING INVENTORY DATA...</div></div>
+
+  <!-- Contribute card (expandable, inline with products) -->
+  <div class="product-card" id="card-donate">
+    <div class="product-summary" onclick="togglePanel('donate')">
+      <div>
+        <span class="product-name">🎓 Contribute to Bryce's College Fund (Optional)</span>
+        <span class="product-toggle" id="toggle-donate">▶</span>
+      </div>
+      <span class="product-price"></span>
+    </div>
+    <div class="product-detail" id="detail-donate">
+      <div class="product-detail-inner">
+        <div class="product-description">
+          Don't need a badge? You can still help. Every dollar goes
+          directly toward Bryce's college education.
+        </div>
+        <div class="donate-amounts">
+          <button class="donate-btn" onclick="event.stopPropagation(); selectDonation(1000)">$10</button>
+          <button class="donate-btn" onclick="event.stopPropagation(); selectDonation(2500)">$25</button>
+          <button class="donate-btn" onclick="event.stopPropagation(); selectDonation(5000)">$50</button>
+          <button class="donate-btn" onclick="event.stopPropagation(); selectDonation(10000)">$100</button>
+          <div class="donate-custom">
+            <span style="color:var(--pip-dim)">$</span>
+            <input type="number" id="donateCustom" min="1" placeholder="Other"
+                   oninput="selectDonation(0)" onclick="event.stopPropagation()">
+          </div>
+        </div>
+        <button class="donate-submit" id="donateBtn" onclick="event.stopPropagation(); handleDonate()" disabled>
+          SELECT AN AMOUNT ABOVE
+        </button>
+        <div class="message" id="donateMsg" style="margin-top:0.5rem"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About card (expandable) -->
+  <div class="product-card" id="card-about">
+    <div class="product-summary" onclick="togglePanel('about')">
+      <div>
+        <span class="product-name">About the Creator</span>
+        <span class="product-toggle" id="toggle-about">▶</span>
+      </div>
+    </div>
+    <div class="product-detail" id="detail-about">
+      <div class="product-detail-inner">
+        <div class="product-description">
+          ClipBoy is designed and built by Bryce, a high school junior
+          from San Antonio, TX. When he's not soldering or writing
+          firmware, he's leading his CyberPatriot team to a #3 national
+          finish out of 1,000+ teams (as team commander) and building
+          indie games. This is his second DEFCON badge — the first was
+          Space Badge, funded on Kickstarter.
+        </div>
+        <div class="about-links">
+          <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener">→ LinkedIn</a>
+          <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener">→ Space Badge</a>
+          <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener">→ itch.io</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
@@ -399,9 +541,6 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
 
-  // ──────────────────────────────────────────────
-  // Pro color options
-  // ──────────────────────────────────────────────
   const PRO_COLORS = [
     { id: 'Red',            swatch: '#cc2222' },
     { id: 'Blue',           swatch: '#2255cc' },
@@ -411,9 +550,6 @@
     { id: '50s Silver',     swatch: '#b0b0b0' },
   ];
 
-  // ──────────────────────────────────────────────
-  // Product media config
-  // ──────────────────────────────────────────────
   const PRODUCT_MEDIA = {
     'DC34-STD': {
       description: 'The ClipBoy Standard — your entry into the wasteland. '
@@ -430,10 +566,7 @@
       ],
     },
     'DC34-PRO': {
-      description: 'The ClipBoy Pro — for those who require additional firepower. '
-        + 'Everything in Standard, plus expanded SAO port, '
-        + 'upgraded enclosure in your choice of custom color, '
-        + 'and bonus pre-loaded games. '
+      description: 'The ClipBoy Pro allows you to pick your own color/style. '
         + 'Limited run. When they\'re gone, they\'re gone.',
       images: [
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
@@ -462,28 +595,17 @@
     },
   };
 
-  // ──────────────────────────────────────────────
-  // State
-  // ──────────────────────────────────────────────
   let state = {
     products: [],
     maxPickup: 10,
     maxShip: 5,
-    // Cart uses keys like "DC34-STD", "DC34-PRO:Red", "DC34-PRO:Blue", "DC34-RAD"
     cart: {},
     delivery: 'pickup',
     expanded: {},
   };
 
-  function currentMax() {
-    return state.delivery === 'pickup' ? state.maxPickup : state.maxShip;
-  }
-
-  function cartTotal() {
-    return Object.values(state.cart).reduce((a, b) => a + b, 0);
-  }
-
-  // Sum qty for a base SKU across all color variants
+  function currentMax() { return state.delivery === 'pickup' ? state.maxPickup : state.maxShip; }
+  function cartTotal() { return Object.values(state.cart).reduce((a, b) => a + b, 0); }
   function cartQtyForSku(baseSku) {
     let total = 0;
     for (const [key, qty] of Object.entries(state.cart)) {
@@ -502,19 +624,14 @@
       state.products = data.products || [];
       state.maxPickup = data.max_pickup || 10;
       state.maxShip = data.max_ship || 5;
-
-      // Init cart keys
       for (const p of state.products) {
         const media = PRODUCT_MEDIA[p.sku] || {};
         if (media.hasColors) {
-          for (const c of PRO_COLORS) {
-            state.cart[p.sku + ':' + c.id] = 0;
-          }
+          for (const c of PRO_COLORS) state.cart[p.sku + ':' + c.id] = 0;
         } else {
           state.cart[p.sku] = 0;
         }
       }
-
       renderProducts();
       updateCart();
     } catch (err) {
@@ -523,7 +640,7 @@
   }
 
   // ──────────────────────────────────────────────
-  // Render
+  // Render product cards
   // ──────────────────────────────────────────────
   function renderProducts() {
     const c = document.getElementById('products');
@@ -539,15 +656,12 @@
         `<div class="video-thumb" onclick="event.stopPropagation(); openLightbox('video','${v.embed}')">${v.thumb || '▶ Video'}</div>`
       ).join('');
 
-      // Deadline notice (Pro only)
       const deadlineHtml = media.preorderDeadline
         ? `<div class="pro-deadline">⏳ ${media.preorderDeadline}</div>` : '';
 
-      // Qty controls
       let qtyHtml = '';
       if (!out) {
         if (media.hasColors) {
-          // Per-color qty rows
           const rows = PRO_COLORS.map(clr => {
             const cartKey = p.sku + ':' + clr.id;
             const borderStyle = clr.border ? 'border-color:' + clr.border : '';
@@ -564,7 +678,6 @@
             ${rows}
           </div>`;
         } else {
-          // Simple qty row
           qtyHtml = `<div class="qty-row">
             <label>QTY:</label>
             <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',-1)">−</button>
@@ -598,12 +711,20 @@
   }
 
   // ──────────────────────────────────────────────
-  // Expand / collapse
+  // Expand / collapse (products)
   // ──────────────────────────────────────────────
   function toggleDetail(sku) {
     state.expanded[sku] = !state.expanded[sku];
     document.getElementById('detail-' + sku).classList.toggle('open', state.expanded[sku]);
     document.getElementById('toggle-' + sku).textContent = state.expanded[sku] ? '▼' : '▶';
+  }
+
+  // Expand / collapse (static panels: donate, about)
+  function togglePanel(id) {
+    const detail = document.getElementById('detail-' + id);
+    const toggle = document.getElementById('toggle-' + id);
+    const isOpen = detail.classList.toggle('open');
+    toggle.textContent = isOpen ? '▼' : '▶';
   }
 
   // ──────────────────────────────────────────────
@@ -624,11 +745,6 @@
   // ──────────────────────────────────────────────
   // Cart logic
   // ──────────────────────────────────────────────
-  /**
-   * @param {string} cartKey  e.g. "DC34-STD" or "DC34-PRO:Red"
-   * @param {string} baseSku  e.g. "DC34-STD" or "DC34-PRO"
-   * @param {number} delta    +1 or -1
-   */
   function adjustQty(cartKey, baseSku, delta) {
     const p = state.products.find(x => x.sku === baseSku);
     if (!p) return;
@@ -636,22 +752,15 @@
     const current = state.cart[cartKey] || 0;
     let desired = current + delta;
     desired = Math.max(0, desired);
-
-    // Can't exceed available stock for this base SKU
     const othersForSku = cartQtyForSku(baseSku) - current;
     desired = Math.min(desired, p.available - othersForSku);
-
-    // Can't exceed global limit
     const othersTotal = cartTotal() - current;
     desired = Math.min(desired, currentMax() - othersTotal);
 
     state.cart[cartKey] = desired;
-
-    // Update display
     const el = document.getElementById('qty-' + CSS.escape(cartKey));
     if (el) el.textContent = desired;
 
-    // Highlight card if any qty for this base SKU
     const skuTotal = cartQtyForSku(baseSku);
     document.getElementById('card-' + baseSku).classList.toggle('has-qty', skuTotal > 0);
 
@@ -664,11 +773,8 @@
     document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
     document.getElementById('btn-ship').classList.toggle('active', method === 'ship');
 
-    // If switching to ship and cart exceeds 5, trim excess
     if (method === 'ship' && cartTotal() > state.maxShip) {
-      // Simple approach: reset cart
       for (const key of Object.keys(state.cart)) state.cart[key] = 0;
-      // Re-render qty displays
       for (const key of Object.keys(state.cart)) {
         const el = document.getElementById('qty-' + CSS.escape(key));
         if (el) el.textContent = '0';
@@ -689,12 +795,9 @@
     let subtotal = 0;
     let lines = '';
 
-    // Group cart entries for display
     for (const p of state.products) {
       const media = PRODUCT_MEDIA[p.sku] || {};
-
       if (media.hasColors) {
-        // Show each color with qty
         for (const clr of PRO_COLORS) {
           const cartKey = p.sku + ':' + clr.id;
           const qty = state.cart[cartKey] || 0;
@@ -777,7 +880,6 @@
     btn.classList.add('loading');
     hideMessage();
 
-    // Build cart with only non-zero entries
     const cart = {};
     for (const [key, qty] of Object.entries(state.cart)) {
       if (qty > 0) cart[key] = qty;
@@ -816,6 +918,66 @@
     el.className = 'message visible' + (isError ? ' error' : '');
   }
   function hideMessage() { document.getElementById('msg').className = 'message'; }
+
+  // ──────────────────────────────────────────────
+  // Contributions
+  // ──────────────────────────────────────────────
+  let donationCents = 0;
+
+  function selectDonation(cents) {
+    document.querySelectorAll('.donate-btn').forEach(el => el.classList.remove('selected'));
+    if (cents > 0) {
+      donationCents = cents;
+      document.getElementById('donateCustom').value = '';
+      document.querySelectorAll('.donate-btn').forEach(el => {
+        if (el.textContent.trim() === '$' + (cents / 100)) el.classList.add('selected');
+      });
+    } else {
+      const val = parseFloat(document.getElementById('donateCustom').value) || 0;
+      donationCents = Math.round(val * 100);
+    }
+    const btn = document.getElementById('donateBtn');
+    if (donationCents >= 100) {
+      btn.disabled = false;
+      btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'SELECT AN AMOUNT ABOVE';
+    }
+  }
+
+  async function handleDonate() {
+    if (donationCents < 100) return;
+    const btn = document.getElementById('donateBtn');
+    const msgEl = document.getElementById('donateMsg');
+    btn.disabled = true;
+    btn.textContent = 'PROCESSING';
+    btn.classList.add('loading');
+    msgEl.className = 'message';
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=donate&amount=' + donationCents);
+      const data = await resp.json();
+      if (data.error) {
+        msgEl.textContent = '> ' + data.error;
+        msgEl.className = 'message visible error';
+        btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        return;
+      }
+      if (data.checkout_url) {
+        btn.textContent = 'REDIRECTING';
+        window.location.href = data.checkout_url;
+      }
+    } catch (err) {
+      msgEl.textContent = 'ERROR: Contribution failed. Try again.';
+      msgEl.className = 'message visible error';
+      btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
 
   init();
 </script>
