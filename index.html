@@ -131,6 +131,7 @@
     }
     @keyframes uranium-sweep {
       0% { background-position: 100% 0; }
+      40% { background-position: -100% 0; }
       100% { background-position: -100% 0; }
     }
 
@@ -144,11 +145,12 @@
     .product-card.sold-out { opacity: 0.4; }
     .product-card.rad-edition {
       border-color: var(--pip-amber);
-      animation: rad-pulse 2s ease-in-out infinite;
     }
-    @keyframes rad-pulse {
-      0%, 100% { border-color: var(--pip-amber); box-shadow: 0 0 4px rgba(255, 184, 51, 0.1); }
-      50% { border-color: var(--pip-amber); box-shadow: 0 0 14px rgba(255, 184, 51, 0.3); }
+    .product-card.rad-edition .product-name {
+      color: var(--pip-amber);
+    }
+    .product-card.rad-edition .product-price {
+      color: var(--pip-amber);
     }
 
     .product-summary {
