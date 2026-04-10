@@ -21,7 +21,7 @@
 
     body {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       background: var(--pip-bg);
       color: var(--pip-green);
       min-height: 100vh;
@@ -80,39 +80,40 @@
     .header-text { text-align: center; }
 
     h1 {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       letter-spacing: 0.2rem;
       text-shadow: 0 0 10px var(--pip-glow);
       line-height: 1.3;
     }
-    .subtitle { color: var(--pip-dim); font-size: 0.95rem; margin-top: 0.5rem; }
+    .subtitle { color: var(--pip-dim); font-size: 1rem; margin-top: 0.5rem; }
 
+    /* ── Uranium sweep ── */
     .college-banner {
       text-align: center;
       margin-bottom: 1rem;
-      font-size: 0.95rem;
+      font-size: 1rem;
       background: linear-gradient(
         90deg,
         var(--pip-dim) 0%,
-        var(--pip-dim) 40%,
-        #88ff88 48%,
+        var(--pip-dim) 45%,
+        #88ff88 49%,
         #ccffcc 50%,
-        #88ff88 52%,
-        var(--pip-dim) 60%,
+        #88ff88 51%,
+        var(--pip-dim) 55%,
         var(--pip-dim) 100%
       );
-      background-size: 300% 100%;
+      background-size: 500% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: uranium-sweep 6s linear infinite;
     }
     @keyframes uranium-sweep {
-      0% { background-position: 100% 0; }
-      100% { background-position: -100% 0; }
+      from { background-position: 100% 0; }
+      to { background-position: 0% 0; }
     }
 
-    /* ── Shared card pattern (products, donate, about) ── */
+    /* ── Shared card pattern ── */
     .product-card {
       border: 1px solid var(--pip-border);
       margin-bottom: 1rem;
@@ -120,12 +121,8 @@
     }
     .product-card.has-qty { border-color: var(--pip-green); box-shadow: 0 0 8px var(--pip-glow); }
     .product-card.sold-out { opacity: 0.4; }
-    .product-card.rad-edition .product-name {
-      color: var(--pip-amber);
-    }
-    .product-card.rad-edition .product-price {
-      color: var(--pip-amber);
-    }
+    .product-card.rad-edition .product-name { color: var(--pip-amber); }
+    .product-card.rad-edition .product-price { color: var(--pip-amber); }
 
     .product-summary {
       display: flex;
@@ -139,8 +136,8 @@
     }
     .product-summary:active { background: rgba(51, 255, 54, 0.06); }
 
-    .product-name { font-size: 1.15rem; }
-    .product-price { color: var(--pip-green); font-size: 1.15rem; }
+    .product-name { font-size: 1.2rem; }
+    .product-price { color: var(--pip-green); font-size: 1.2rem; }
     .product-toggle { color: var(--pip-dim); font-size: 1rem; margin-right: 0.5rem; }
 
     .product-detail {
@@ -154,14 +151,14 @@
 
     .product-description {
       color: var(--pip-dim);
-      font-size: 1rem;
+      font-size: 1.05rem;
       margin-bottom: 1rem;
       line-height: 1.6;
     }
 
     .pro-deadline {
       color: var(--pip-amber);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       margin-bottom: 1rem;
       padding: 0.5rem;
       border: 1px dashed var(--pip-amber);
@@ -189,7 +186,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--pip-dim);
       text-align: center;
       padding: 0.5rem;
@@ -218,25 +215,15 @@
       border: 2px solid var(--pip-green);
       color: var(--pip-green);
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 1.05rem;
       cursor: pointer;
       min-height: 48px;
     }
     .lightbox-close:active { background: var(--pip-green); color: var(--pip-bg); }
 
-    .stock-bar-bg {
-      width: 100%;
-      height: 14px;
-      background: var(--pip-border);
-      border: 1px solid var(--pip-dim);
-      margin-bottom: 0.3rem;
-    }
-    .stock-bar-fill { height: 100%; background: var(--pip-green); box-shadow: 0 0 6px var(--pip-glow); transition: width 0.5s; }
-    .stock-label { font-size: 0.9rem; color: var(--pip-dim); margin-bottom: 0.8rem; }
-
     /* ── Per-color qty rows (Pro) ── */
     .color-qty-section { margin-top: 0.5rem; }
-    .color-qty-header { color: var(--pip-dim); font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .color-qty-header { color: var(--pip-dim); font-size: 1rem; margin-bottom: 0.5rem; }
     .color-qty-row {
       display: flex;
       align-items: center;
@@ -252,8 +239,8 @@
       border-radius: 2px;
       flex-shrink: 0;
     }
-    .color-label { flex: 1; font-size: 0.95rem; color: var(--pip-dim); }
-    .color-qty-row .qty-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+    .color-label { flex: 1; font-size: 1rem; color: var(--pip-dim); }
+    .color-qty-row .qty-btn { width: 44px; height: 44px; font-size: 1.2rem; }
     .color-qty-row .qty-val { font-size: 1.2rem; min-width: 1.6rem; text-align: center; }
 
     /* ── Simple qty row ── */
@@ -263,7 +250,7 @@
       gap: 1rem;
       margin-top: 0.8rem;
     }
-    .qty-row label { color: var(--pip-dim); font-size: 1rem; }
+    .qty-row label { color: var(--pip-dim); font-size: 1.05rem; }
     .qty-btn {
       background: var(--pip-border);
       border: 1px solid var(--pip-dim);
@@ -279,12 +266,11 @@
     .qty-btn:disabled { opacity: 0.3; }
     .qty-val { font-size: 1.4rem; min-width: 2rem; text-align: center; }
 
-    /* ── Donate amounts (inside card) ── */
+    /* ── Donate amounts ── */
     .donate-amounts {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
-      margin-bottom: 0.8rem;
     }
     .donate-btn {
       padding: 0.7rem 1.2rem;
@@ -292,7 +278,7 @@
       border: 1px solid var(--pip-border);
       color: var(--pip-dim);
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 1.05rem;
       cursor: pointer;
       min-height: 48px;
       transition: all 0.15s;
@@ -315,26 +301,12 @@
       border: 1px solid var(--pip-border);
       color: var(--pip-green);
       font-family: inherit;
-      font-size: 1rem;
+      font-size: 1.05rem;
       min-height: 48px;
     }
     .donate-custom input:focus { outline: none; border-color: var(--pip-green); }
-    .donate-submit {
-      width: 100%;
-      padding: 0.8rem;
-      background: transparent;
-      border: 1px solid var(--pip-amber);
-      color: var(--pip-amber);
-      font-family: inherit;
-      font-size: 1.05rem;
-      cursor: pointer;
-      min-height: 48px;
-      transition: all 0.2s;
-    }
-    .donate-submit:active:not(:disabled) { background: var(--pip-amber); color: var(--pip-bg); }
-    .donate-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── About links (horizontal) ── */
+    /* ── About links ── */
     .about-links {
       display: flex;
       gap: 1.2rem;
@@ -343,7 +315,7 @@
     .about-links a {
       color: var(--pip-green);
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 1rem;
       padding: 0.3rem 0;
       min-height: 44px;
       display: flex;
@@ -354,8 +326,8 @@
     /* ── Delivery Toggle ── */
     .section-label {
       color: var(--pip-dim);
-      font-size: 1rem;
-      margin: 1.5rem 0 0.5rem;
+      font-size: 1.05rem;
+      margin: 2rem 0 0.6rem;
       border-bottom: 1px dashed var(--pip-border);
       padding-bottom: 0.3rem;
     }
@@ -374,7 +346,7 @@
       border: 1px solid var(--pip-border);
       color: var(--pip-dim);
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 1rem;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
@@ -392,12 +364,12 @@
       border: 1px solid var(--pip-border);
       padding: 1rem;
       margin-bottom: 1rem;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
     }
     .cart-line { display: flex; justify-content: space-between; padding: 0.3rem 0; }
     .cart-line.total { border-top: 1px solid var(--pip-dim); margin-top: 0.5rem; padding-top: 0.5rem; }
     .cart-line .label { color: var(--pip-dim); }
-    .cart-note { color: var(--pip-amber); font-size: 0.9rem; margin-top: 0.5rem; }
+    .cart-note { color: var(--pip-amber); font-size: 0.95rem; margin-top: 0.5rem; }
 
     .buy-btn {
       width: 100%;
@@ -406,7 +378,7 @@
       border: 2px solid var(--pip-green);
       color: var(--pip-green);
       font-family: inherit;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       letter-spacing: 0.15rem;
       cursor: pointer;
       text-transform: uppercase;
@@ -424,15 +396,14 @@
       .media-gallery .video-thumb:hover { border-color: var(--pip-green); color: var(--pip-green); }
       .delivery-btn:hover { border-color: var(--pip-dim); }
       .donate-btn:hover { border-color: var(--pip-dim); }
-      .donate-submit:hover:not(:disabled) { background: var(--pip-amber); color: var(--pip-bg); }
       .about-links a:hover { color: var(--pip-amber); }
     }
 
-    .message { margin-top: 1rem; padding: 0.8rem; border: 1px solid var(--pip-dim); font-size: 1rem; display: none; }
+    .message { margin-top: 1rem; padding: 0.8rem; border: 1px solid var(--pip-dim); font-size: 1.05rem; display: none; }
     .message.error { border-color: #fe1414; color: #fe1414; }
     .message.visible { display: block; }
 
-    .flavor { margin-top: 1.5rem; font-size: 0.9rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
+    .flavor { margin-top: 1.5rem; font-size: 0.95rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
 
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
@@ -440,9 +411,9 @@
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
 
     @media (max-width: 480px) {
-      body { padding: 0.75rem; font-size: 1.1rem; }
+      body { padding: 0.75rem; font-size: 1.15rem; }
       .terminal { padding: 1rem; }
-      h1 { font-size: 1.3rem; letter-spacing: 0.1rem; }
+      h1 { font-size: 1.4rem; letter-spacing: 0.1rem; }
       .header-icon { height: 64px; }
       .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
       .about-links { flex-direction: column; gap: 0.3rem; }
@@ -461,14 +432,11 @@
     </div>
   </div>
 
-  <div class="college-banner">
-    All proceeds support Bryce's college fund
-  </div>
+  <div class="college-banner">All proceeds support Bryce's college fund</div>
 
-  <!-- Products rendered by JS -->
   <div id="products"><div style="color:var(--pip-dim)">LOADING INVENTORY DATA...</div></div>
 
-  <!-- Contribute card (expandable, inline with products) -->
+  <!-- Contribute card (expandable, no submit — uses main buy button) -->
   <div class="product-card" id="card-donate">
     <div class="product-summary" onclick="togglePanel('donate')">
       <div>
@@ -494,10 +462,6 @@
                    oninput="selectDonation(0)" onclick="event.stopPropagation()">
           </div>
         </div>
-        <button class="donate-submit" id="donateBtn" onclick="event.stopPropagation(); handleDonate()" disabled>
-          SELECT AN AMOUNT ABOVE
-        </button>
-        <div class="message" id="donateMsg" style="margin-top:0.5rem"></div>
       </div>
     </div>
   </div>
@@ -505,10 +469,10 @@
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
     <button class="delivery-btn active" onclick="setDelivery('pickup')" id="btn-pickup">
-      >> PICKUP AT DEFCON<br><span style="font-size:0.85rem">Free · No sales tax · Up to 10</span>
+      >> PICKUP AT DEFCON<br><span style="font-size:0.9rem">Free · No sales tax · Up to 10</span>
     </button>
     <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">
-      >> SHIP TO US ADDRESS<br><span style="font-size:0.85rem">$20–$30 + tax · Up to 5</span>
+      >> SHIP TO US ADDRESS<br><span style="font-size:0.9rem">$20–$30 + tax · Up to 5</span>
     </button>
   </div>
 
@@ -576,7 +540,7 @@
         + 'Wrist-mounted ESP32-S3 electronic badge with Wi-Fi and Bluetooth '
         + 'hacking tools, radiation detector*, customizable LEDs, theremin, '
         + '90+ collectibles and more!'
-        + '<br><br><span style="font-size:0.85rem;font-style:italic">*Deauths are a form of radiation</span>',
+        + '<br><br><span style="font-size:0.85em;font-style:italic">*Deauths are a form of radiation</span>',
       images: [
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
@@ -623,21 +587,18 @@
     cart: {},
     delivery: 'pickup',
     expanded: {},
+    donationCents: 0,
   };
 
   function currentMax() { return state.delivery === 'pickup' ? state.maxPickup : state.maxShip; }
   function cartTotal() { return Object.values(state.cart).reduce((a, b) => a + b, 0); }
   function cartQtyForSku(baseSku) {
     let total = 0;
-    for (const [key, qty] of Object.entries(state.cart)) {
+    for (const [key, qty] of Object.entries(state.cart))
       if (key === baseSku || key.startsWith(baseSku + ':')) total += qty;
-    }
     return total;
   }
 
-  // ──────────────────────────────────────────────
-  // Init
-  // ──────────────────────────────────────────────
   async function init() {
     try {
       const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
@@ -661,14 +622,15 @@
   }
 
   // ──────────────────────────────────────────────
-  // Render product cards
+  // Render product cards (no stock bars — count is in the title)
   // ──────────────────────────────────────────────
   function renderProducts() {
     const c = document.getElementById('products');
     c.innerHTML = state.products.map(p => {
-      const pct = p.total > 0 ? (p.available / p.total * 100) : 0;
       const out = p.available === 0;
       const media = PRODUCT_MEDIA[p.sku] || {};
+      const radClass = p.sku === 'DC34-RAD' ? ' rad-edition' : '';
+      const stockText = out ? '(SOLD OUT)' : '(' + p.available + '/' + p.total + ' Left)';
 
       const imgs = (media.images || []).map(url =>
         `<img src="${url}" alt="${p.name}" onclick="event.stopPropagation(); openLightbox('image','${url}')">`
@@ -708,14 +670,12 @@
         }
       }
 
-      const radClass = p.sku === 'DC34-RAD' ? ' rad-edition' : '';
-
       return `
         <div class="product-card${out ? ' sold-out' : ''}${radClass}" id="card-${p.sku}" data-sku="${p.sku}">
           <div class="product-summary" onclick="${out ? '' : "toggleDetail('" + p.sku + "')"}">
             <div>
               <span class="product-toggle" id="toggle-${p.sku}">▶</span>
-              <span class="product-name">${p.name} ${out ? '(SOLD OUT)' : '(' + p.available + '/' + p.total + ' Left)'}</span>
+              <span class="product-name">${p.name} ${stockText}</span>
             </div>
             <span class="product-price">$${(p.price_cents / 100).toFixed(2)}</span>
           </div>
@@ -724,8 +684,6 @@
               ${media.description ? '<div class="product-description">' + media.description + '</div>' : ''}
               ${deadlineHtml}
               ${(imgs || vids) ? '<div class="media-gallery">' + imgs + vids + '</div>' : ''}
-              <div class="stock-bar-bg"><div class="stock-bar-fill" style="width:${pct}%"></div></div>
-              <div class="stock-label">${out ? '*** STOCK DEPLETED ***' : p.available + ' of ' + p.total + ' remaining'}</div>
               ${qtyHtml}
             </div>
           </div>
@@ -733,16 +691,12 @@
     }).join('');
   }
 
-  // ──────────────────────────────────────────────
-  // Expand / collapse (products)
-  // ──────────────────────────────────────────────
   function toggleDetail(sku) {
     state.expanded[sku] = !state.expanded[sku];
     document.getElementById('detail-' + sku).classList.toggle('open', state.expanded[sku]);
     document.getElementById('toggle-' + sku).textContent = state.expanded[sku] ? '▼' : '▶';
   }
 
-  // Expand / collapse (static panels: donate, about)
   function togglePanel(id) {
     const detail = document.getElementById('detail-' + id);
     const toggle = document.getElementById('toggle-' + id);
@@ -750,9 +704,6 @@
     toggle.textContent = isOpen ? '▼' : '▶';
   }
 
-  // ──────────────────────────────────────────────
-  // Lightbox
-  // ──────────────────────────────────────────────
   function openLightbox(type, src) {
     const content = document.getElementById('lightboxContent');
     content.innerHTML = type === 'image'
@@ -771,7 +722,6 @@
   function adjustQty(cartKey, baseSku, delta) {
     const p = state.products.find(x => x.sku === baseSku);
     if (!p) return;
-
     const current = state.cart[cartKey] || 0;
     let desired = current + delta;
     desired = Math.max(0, desired);
@@ -779,14 +729,11 @@
     desired = Math.min(desired, p.available - othersForSku);
     const othersTotal = cartTotal() - current;
     desired = Math.min(desired, currentMax() - othersTotal);
-
     state.cart[cartKey] = desired;
     const el = document.getElementById('qty-' + CSS.escape(cartKey));
     if (el) el.textContent = desired;
-
     const skuTotal = cartQtyForSku(baseSku);
     document.getElementById('card-' + baseSku).classList.toggle('has-qty', skuTotal > 0);
-
     hideMessage();
     updateCart();
   }
@@ -795,22 +742,40 @@
     state.delivery = method;
     document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
     document.getElementById('btn-ship').classList.toggle('active', method === 'ship');
-
     if (method === 'ship' && cartTotal() > state.maxShip) {
       for (const key of Object.keys(state.cart)) state.cart[key] = 0;
       for (const key of Object.keys(state.cart)) {
         const el = document.getElementById('qty-' + CSS.escape(key));
         if (el) el.textContent = '0';
       }
-      for (const p of state.products) {
+      for (const p of state.products)
         document.getElementById('card-' + p.sku).classList.remove('has-qty');
-      }
       showMessage('> Cart cleared — shipped orders limited to ' + state.maxShip + ' badges. Please re-select.', true);
     }
-
     updateCart();
   }
 
+  // ──────────────────────────────────────────────
+  // Donation selection (no separate button — drives main buy btn)
+  // ──────────────────────────────────────────────
+  function selectDonation(cents) {
+    document.querySelectorAll('.donate-btn').forEach(el => el.classList.remove('selected'));
+    if (cents > 0) {
+      state.donationCents = cents;
+      document.getElementById('donateCustom').value = '';
+      document.querySelectorAll('.donate-btn').forEach(el => {
+        if (el.textContent.trim() === '$' + (cents / 100)) el.classList.add('selected');
+      });
+    } else {
+      const val = parseFloat(document.getElementById('donateCustom').value) || 0;
+      state.donationCents = Math.round(val * 100);
+    }
+    updateCart();
+  }
+
+  // ──────────────────────────────────────────────
+  // Update cart summary + buy button
+  // ──────────────────────────────────────────────
   function updateCart() {
     const summaryEl = document.getElementById('cartSummary');
     const btn = document.getElementById('buyBtn');
@@ -822,15 +787,13 @@
       const media = PRODUCT_MEDIA[p.sku] || {};
       if (media.hasColors) {
         for (const clr of PRO_COLORS) {
-          const cartKey = p.sku + ':' + clr.id;
-          const qty = state.cart[cartKey] || 0;
+          const qty = state.cart[p.sku + ':' + clr.id] || 0;
           if (qty > 0) {
             totalQty += qty;
-            const lineTotal = qty * p.price_cents;
-            subtotal += lineTotal;
+            subtotal += qty * p.price_cents;
             lines += `<div class="cart-line">
               <span class="label">${p.name} (${clr.id}) × ${qty}</span>
-              <span>$${(lineTotal / 100).toFixed(2)}</span>
+              <span>$${(qty * p.price_cents / 100).toFixed(2)}</span>
             </div>`;
           }
         }
@@ -838,75 +801,111 @@
         const qty = state.cart[p.sku] || 0;
         if (qty > 0) {
           totalQty += qty;
-          const lineTotal = qty * p.price_cents;
-          subtotal += lineTotal;
+          subtotal += qty * p.price_cents;
           lines += `<div class="cart-line">
             <span class="label">${p.name} × ${qty}</span>
-            <span>$${(lineTotal / 100).toFixed(2)}</span>
+            <span>$${(qty * p.price_cents / 100).toFixed(2)}</span>
           </div>`;
         }
       }
     }
 
-    if (totalQty === 0) {
+    const hasBadges = totalQty > 0;
+    const hasDonation = state.donationCents >= 100;
+
+    if (!hasBadges && !hasDonation) {
       summaryEl.style.display = 'none';
       btn.disabled = true;
       btn.textContent = 'SELECT ITEMS ABOVE';
       return;
     }
 
-    let shipCost = 0;
-    let shipLabel = 'Pickup at DEFCON';
-    if (state.delivery === 'ship') {
-      shipCost = totalQty <= 3 ? 2000 : 3000;
-      shipLabel = 'Shipping (' + (totalQty <= 3 ? '1–3' : '4–5') + ' badges)';
-    }
+    if (hasBadges) {
+      // Badge checkout
+      let shipCost = 0;
+      let shipLabel = 'Pickup at DEFCON';
+      if (state.delivery === 'ship') {
+        shipCost = totalQty <= 3 ? 2000 : 3000;
+        shipLabel = 'Shipping (' + (totalQty <= 3 ? '1–3' : '4–5') + ' badges)';
+      }
+      lines += `<div class="cart-line">
+        <span class="label">${shipLabel}</span>
+        <span>${shipCost === 0 ? 'FREE' : '$' + (shipCost / 100).toFixed(2)}</span>
+      </div>`;
+      lines += `<div class="cart-line total">
+        <span>SUBTOTAL</span>
+        <span>$${((subtotal + shipCost) / 100).toFixed(2)}</span>
+      </div>`;
+      if (state.delivery === 'ship') {
+        lines += '<div class="cart-note">+ Sales tax calculated at checkout (if applicable)</div>';
+      } else {
+        lines += '<div class="cart-note">No sales tax for DEFCON pickup</div>';
+      }
+      const max = currentMax();
+      if (totalQty >= max)
+        lines += '<div class="cart-note">Maximum ' + max + ' badges per ' + (state.delivery === 'pickup' ? 'pickup' : 'shipped') + ' order reached</div>';
+      lines += '<div class="cart-note" style="color:var(--pip-dim)">⏱ 30 minutes to complete checkout</div>';
 
-    lines += `<div class="cart-line">
-      <span class="label">${shipLabel}</span>
-      <span>${shipCost === 0 ? 'FREE' : '$' + (shipCost / 100).toFixed(2)}</span>
-    </div>`;
+      btn.disabled = false;
+      btn.textContent = '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
 
-    const preTotal = subtotal + shipCost;
-    lines += `<div class="cart-line total">
-      <span>SUBTOTAL</span>
-      <span>$${(preTotal / 100).toFixed(2)}</span>
-    </div>`;
-
-    if (state.delivery === 'ship') {
-      lines += '<div class="cart-note">+ Sales tax calculated at checkout (if applicable)</div>';
     } else {
-      lines += '<div class="cart-note">No sales tax for DEFCON pickup</div>';
-    }
+      // Contribution only
+      lines += `<div class="cart-line total">
+        <span>CONTRIBUTION</span>
+        <span>$${(state.donationCents / 100).toFixed(2)}</span>
+      </div>`;
 
-    const max = currentMax();
-    if (totalQty >= max) {
-      lines += '<div class="cart-note">Maximum ' + max + ' badges per ' + (state.delivery === 'pickup' ? 'pickup' : 'shipped') + ' order reached</div>';
+      btn.disabled = false;
+      btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
     }
-
-    lines += '<div class="cart-note" style="color:var(--pip-dim)">⏱ You will have 30 minutes to complete checkout once you click Requisition</div>';
 
     summaryEl.innerHTML = lines;
     summaryEl.style.display = 'block';
-
-    btn.disabled = false;
-    btn.textContent = '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
   }
 
   // ──────────────────────────────────────────────
-  // Checkout
+  // Checkout — badges or contribution
   // ──────────────────────────────────────────────
   async function handleBuy() {
     const btn = document.getElementById('buyBtn');
     btn.disabled = true;
-    btn.textContent = 'PROCESSING REQUISITION';
     btn.classList.add('loading');
     hideMessage();
 
-    const cart = {};
-    for (const [key, qty] of Object.entries(state.cart)) {
-      if (qty > 0) cart[key] = qty;
+    const hasBadges = cartTotal() > 0;
+
+    if (!hasBadges && state.donationCents >= 100) {
+      // Contribution only
+      btn.textContent = 'PROCESSING';
+      try {
+        const resp = await fetch(APPS_SCRIPT_URL + '?action=donate&amount=' + state.donationCents);
+        const data = await resp.json();
+        if (data.error) {
+          showMessage('> ' + data.error, true);
+          btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          return;
+        }
+        if (data.checkout_url) {
+          btn.textContent = 'REDIRECTING';
+          window.location.href = data.checkout_url;
+        }
+      } catch (err) {
+        showMessage('ERROR: Contribution failed. Try again.', true);
+        btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+      return;
     }
+
+    // Badge checkout
+    btn.textContent = 'PROCESSING REQUISITION';
+    const cart = {};
+    for (const [key, qty] of Object.entries(state.cart))
+      if (qty > 0) cart[key] = qty;
 
     try {
       const url = APPS_SCRIPT_URL
@@ -915,7 +914,6 @@
         + '&delivery=' + state.delivery;
       const resp = await fetch(url);
       const data = await resp.json();
-
       if (data.error) {
         showMessage('> ' + data.error, true);
         btn.textContent = '[ REQUISITION BADGE ]';
@@ -941,66 +939,6 @@
     el.className = 'message visible' + (isError ? ' error' : '');
   }
   function hideMessage() { document.getElementById('msg').className = 'message'; }
-
-  // ──────────────────────────────────────────────
-  // Contributions
-  // ──────────────────────────────────────────────
-  let donationCents = 0;
-
-  function selectDonation(cents) {
-    document.querySelectorAll('.donate-btn').forEach(el => el.classList.remove('selected'));
-    if (cents > 0) {
-      donationCents = cents;
-      document.getElementById('donateCustom').value = '';
-      document.querySelectorAll('.donate-btn').forEach(el => {
-        if (el.textContent.trim() === '$' + (cents / 100)) el.classList.add('selected');
-      });
-    } else {
-      const val = parseFloat(document.getElementById('donateCustom').value) || 0;
-      donationCents = Math.round(val * 100);
-    }
-    const btn = document.getElementById('donateBtn');
-    if (donationCents >= 100) {
-      btn.disabled = false;
-      btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
-    } else {
-      btn.disabled = true;
-      btn.textContent = 'SELECT AN AMOUNT ABOVE';
-    }
-  }
-
-  async function handleDonate() {
-    if (donationCents < 100) return;
-    const btn = document.getElementById('donateBtn');
-    const msgEl = document.getElementById('donateMsg');
-    btn.disabled = true;
-    btn.textContent = 'PROCESSING';
-    btn.classList.add('loading');
-    msgEl.className = 'message';
-
-    try {
-      const resp = await fetch(APPS_SCRIPT_URL + '?action=donate&amount=' + donationCents);
-      const data = await resp.json();
-      if (data.error) {
-        msgEl.textContent = '> ' + data.error;
-        msgEl.className = 'message visible error';
-        btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
-        btn.disabled = false;
-        btn.classList.remove('loading');
-        return;
-      }
-      if (data.checkout_url) {
-        btn.textContent = 'REDIRECTING';
-        window.location.href = data.checkout_url;
-      }
-    } catch (err) {
-      msgEl.textContent = 'ERROR: Contribution failed. Try again.';
-      msgEl.className = 'message visible error';
-      btn.textContent = '[ CONTRIBUTE $' + (donationCents / 100).toFixed(2) + ' ]';
-      btn.disabled = false;
-      btn.classList.remove('loading');
-    }
-  }
 
   init();
 </script>
