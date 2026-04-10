@@ -3,31 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DECON 34 — Badge Pre-Order</title>
+  <title>ClipBoy: The Unofficial DEFCON 34 Electronic Badge — Pre-Order</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
     :root {
-      --pip-green: #14fe17;
-      --pip-dim: #0a7a0b;
-      --pip-bg: #0c1a0c;
-      --pip-border: #1a3a1a;
-      --pip-glow: rgba(20, 254, 23, 0.15);
-      --pip-amber: #fe9a14;
-      --scanline-opacity: 0.04;
+      --pip-green: #33ff36;
+      --pip-dim: #1a9e1d;
+      --pip-bg: #000000;
+      --pip-border: #143314;
+      --pip-glow: rgba(51, 255, 54, 0.15);
+      --pip-amber: #ffb833;
+      --scanline-opacity: 0.03;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Share Tech Mono', monospace;
+      font-size: 1.2rem;
       background: var(--pip-bg);
       color: var(--pip-green);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
+      padding: 1.5rem;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body::after {
@@ -44,12 +46,15 @@
     }
 
     .terminal {
-      max-width: 680px;
+      max-width: 720px;
       width: 100%;
       border: 2px solid var(--pip-dim);
-      padding: 2rem;
-      background: rgba(10, 30, 10, 0.9);
-      box-shadow: 0 0 20px var(--pip-glow), inset 0 0 20px rgba(0,0,0,0.5);
+      padding: 1.5rem;
+      background: rgba(5, 15, 5, 0.85);
+      box-shadow:
+        0 0 30px var(--pip-glow),
+        0 0 60px rgba(51, 255, 54, 0.08),
+        inset 0 0 20px rgba(0,0,0,0.5);
     }
 
     .terminal-header {
@@ -57,10 +62,29 @@
       padding-bottom: 1rem;
       margin-bottom: 1.5rem;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
     }
 
-    h1 { font-size: 1.5rem; letter-spacing: 0.3rem; text-shadow: 0 0 10px var(--pip-glow); }
-    .subtitle { color: var(--pip-dim); font-size: 0.85rem; margin-top: 0.5rem; }
+    .header-icon {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 6px var(--pip-glow));
+    }
+
+    .header-text { text-align: center; }
+
+    h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.2rem;
+      text-shadow: 0 0 10px var(--pip-glow);
+      line-height: 1.3;
+    }
+    .subtitle { color: var(--pip-dim); font-size: 0.95rem; margin-top: 0.5rem; }
 
     /* ── Product Cards ── */
     .product-card {
@@ -77,12 +101,15 @@
       align-items: center;
       padding: 1rem;
       cursor: pointer;
+      min-height: 56px; /* touch target */
+      -webkit-user-select: none;
+      user-select: none;
     }
-    .product-summary:hover { background: rgba(20, 254, 23, 0.03); }
+    .product-summary:active { background: rgba(20, 254, 23, 0.06); }
 
-    .product-name { font-size: 1rem; }
-    .product-price { color: var(--pip-green); }
-    .product-toggle { color: var(--pip-dim); font-size: 0.9rem; margin-left: 0.5rem; }
+    .product-name { font-size: 1.1rem; }
+    .product-price { color: var(--pip-green); font-size: 1.1rem; }
+    .product-toggle { color: var(--pip-dim); font-size: 1rem; margin-left: 0.5rem; }
 
     /* Expandable detail section */
     .product-detail {
@@ -91,47 +118,47 @@
       transition: max-height 0.4s ease;
       border-top: 1px solid var(--pip-border);
     }
-    .product-detail.open { max-height: 800px; }
+    .product-detail.open { max-height: 1200px; }
     .product-detail-inner { padding: 1rem; }
 
     .product-description {
       color: var(--pip-dim);
-      font-size: 0.8rem;
-      margin-bottom: 0.8rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      line-height: 1.6;
     }
 
     .media-gallery {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
       margin-bottom: 1rem;
     }
     .media-gallery img {
-      width: 120px;
-      height: 90px;
+      width: 140px;
+      height: 105px;
       object-fit: cover;
       border: 1px solid var(--pip-border);
       cursor: pointer;
       transition: border-color 0.2s;
     }
-    .media-gallery img:hover { border-color: var(--pip-green); }
+    .media-gallery img:active { border-color: var(--pip-green); }
     .media-gallery .video-thumb {
-      width: 120px;
-      height: 90px;
+      width: 140px;
+      height: 105px;
       border: 1px solid var(--pip-border);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.7rem;
+      font-size: 0.85rem;
       color: var(--pip-dim);
       text-align: center;
-      padding: 0.3rem;
+      padding: 0.5rem;
     }
-    .media-gallery .video-thumb:hover { border-color: var(--pip-green); color: var(--pip-green); }
+    .media-gallery .video-thumb:active { border-color: var(--pip-green); color: var(--pip-green); }
 
-    /* Lightbox for full-size images / embedded video */
+    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
@@ -140,66 +167,88 @@
       z-index: 2000;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      flex-direction: column;
+      padding: 1rem;
     }
     .lightbox.open { display: flex; }
-    .lightbox img { max-width: 90vw; max-height: 85vh; border: 2px solid var(--pip-dim); }
-    .lightbox iframe { width: 80vw; max-width: 720px; height: 45vw; max-height: 405px; border: 2px solid var(--pip-dim); }
+    .lightbox img { max-width: 95vw; max-height: 80vh; border: 2px solid var(--pip-dim); }
+    .lightbox iframe { width: 90vw; max-width: 720px; aspect-ratio: 16/9; border: 2px solid var(--pip-dim); }
+    .lightbox-close {
+      margin-top: 1rem;
+      padding: 0.8rem 2rem;
+      background: transparent;
+      border: 2px solid var(--pip-green);
+      color: var(--pip-green);
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      min-height: 48px;
+    }
+    .lightbox-close:active { background: var(--pip-green); color: var(--pip-bg); }
 
     .stock-bar-bg {
       width: 100%;
-      height: 12px;
+      height: 14px;
       background: var(--pip-border);
       border: 1px solid var(--pip-dim);
       margin-bottom: 0.3rem;
     }
     .stock-bar-fill { height: 100%; background: var(--pip-green); box-shadow: 0 0 6px var(--pip-glow); transition: width 0.5s; }
-    .stock-label { font-size: 0.7rem; color: var(--pip-dim); }
+    .stock-label { font-size: 0.85rem; color: var(--pip-dim); }
 
-    /* Qty controls inside the expanded card */
+    /* Qty controls — touch-friendly */
     .qty-row {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
-      margin-top: 0.8rem;
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .qty-row label { color: var(--pip-dim); font-size: 0.85rem; }
+    .qty-row label { color: var(--pip-dim); font-size: 1rem; }
     .qty-btn {
       background: var(--pip-border);
       border: 1px solid var(--pip-dim);
       color: var(--pip-green);
-      width: 32px; height: 32px;
-      font-size: 1.1rem;
+      width: 48px; height: 48px;
+      font-size: 1.4rem;
       cursor: pointer;
       font-family: inherit;
+      -webkit-user-select: none;
+      user-select: none;
     }
-    .qty-btn:hover { background: var(--pip-dim); }
-    .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .qty-val { font-size: 1.2rem; min-width: 1.6rem; text-align: center; }
+    .qty-btn:active { background: var(--pip-dim); }
+    .qty-btn:disabled { opacity: 0.3; }
+    .qty-val { font-size: 1.4rem; min-width: 2rem; text-align: center; }
 
     /* ── Delivery Toggle ── */
     .section-label {
       color: var(--pip-dim);
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       margin: 1.5rem 0 0.5rem;
       border-bottom: 1px dashed var(--pip-border);
       padding-bottom: 0.3rem;
     }
 
-    .delivery-options { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .delivery-options {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
     .delivery-btn {
       flex: 1;
-      padding: 0.7rem 0.5rem;
+      min-width: 140px;
+      padding: 0.9rem 0.6rem;
       background: transparent;
       border: 1px solid var(--pip-border);
       color: var(--pip-dim);
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
+      min-height: 56px;
     }
-    .delivery-btn:hover { border-color: var(--pip-dim); }
+    .delivery-btn:active { border-color: var(--pip-dim); }
     .delivery-btn.active {
       border-color: var(--pip-green);
       color: var(--pip-green);
@@ -209,53 +258,80 @@
     /* ── Cart Summary ── */
     .cart-summary {
       border: 1px solid var(--pip-border);
-      padding: 0.8rem;
+      padding: 1rem;
       margin-bottom: 1rem;
-      font-size: 0.85rem;
+      font-size: 1rem;
     }
-    .cart-line { display: flex; justify-content: space-between; padding: 0.2rem 0; }
-    .cart-line.total { border-top: 1px solid var(--pip-dim); margin-top: 0.4rem; padding-top: 0.4rem; }
+    .cart-line { display: flex; justify-content: space-between; padding: 0.3rem 0; }
+    .cart-line.total { border-top: 1px solid var(--pip-dim); margin-top: 0.5rem; padding-top: 0.5rem; }
     .cart-line .label { color: var(--pip-dim); }
-    .cart-note { color: var(--pip-amber); font-size: 0.75rem; margin-top: 0.4rem; }
+    .cart-note { color: var(--pip-amber); font-size: 0.85rem; margin-top: 0.5rem; }
 
     .buy-btn {
       width: 100%;
-      padding: 1rem;
+      padding: 1.1rem;
       background: transparent;
       border: 2px solid var(--pip-green);
       color: var(--pip-green);
       font-family: inherit;
-      font-size: 1.1rem;
-      letter-spacing: 0.2rem;
+      font-size: 1.15rem;
+      letter-spacing: 0.15rem;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.2s;
+      min-height: 56px;
     }
-    .buy-btn:hover:not(:disabled) {
+    .buy-btn:active:not(:disabled) {
       background: var(--pip-green);
       color: var(--pip-bg);
       box-shadow: 0 0 20px var(--pip-glow);
     }
+    /* keep hover for desktop */
+    @media (hover: hover) {
+      .buy-btn:hover:not(:disabled) {
+        background: var(--pip-green);
+        color: var(--pip-bg);
+        box-shadow: 0 0 20px var(--pip-glow);
+      }
+      .product-summary:hover { background: rgba(20, 254, 23, 0.03); }
+      .qty-btn:hover { background: var(--pip-dim); }
+      .media-gallery img:hover { border-color: var(--pip-green); }
+      .media-gallery .video-thumb:hover { border-color: var(--pip-green); color: var(--pip-green); }
+      .delivery-btn:hover { border-color: var(--pip-dim); }
+    }
     .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .message { margin-top: 1rem; padding: 0.8rem; border: 1px solid var(--pip-dim); font-size: 0.85rem; display: none; }
+    .message { margin-top: 1rem; padding: 0.8rem; border: 1px solid var(--pip-dim); font-size: 1rem; display: none; }
     .message.error { border-color: #fe1414; color: #fe1414; }
     .message.visible { display: block; }
 
-    .flavor { margin-top: 1.5rem; font-size: 0.75rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
+    .flavor { margin-top: 1.5rem; font-size: 0.85rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
 
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
     .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      body { padding: 0.75rem; font-size: 1.1rem; }
+      .terminal { padding: 1rem; }
+      h1 { font-size: 1.3rem; letter-spacing: 0.1rem; }
+      .header-icon { width: 48px; height: 48px; }
+      .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
+    }
   </style>
 </head>
 <body>
 
 <div class="terminal">
   <div class="terminal-header">
-    <h1>DECON 34<span class="blink">_</span></h1>
-    <div class="subtitle">VAULT-TEC AUTHORIZED BADGE REQUISITION TERMINAL</div>
+    <img src="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png"
+         alt="ClipBoy" class="header-icon">
+    <div class="header-text">
+      <h1>ClipBoy: The Unofficial<br>DEFCON 34 Electronic Badge<span class="blink">_</span></h1>
+      <div class="subtitle">FAULT-TEC AUTHORIZED BADGE REQUISITION TERMINAL</div>
+    </div>
   </div>
 
   <div id="products"><div style="color:var(--pip-dim)">LOADING INVENTORY DATA...</div></div>
@@ -263,10 +339,10 @@
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
     <button class="delivery-btn active" onclick="setDelivery('pickup')" id="btn-pickup">
-      📍 PICKUP AT DEFCON<br><span style="font-size:0.7rem">Free · No sales tax</span>
+      📍 PICKUP AT DEFCON<br><span style="font-size:0.8rem">Free · No sales tax</span>
     </button>
     <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">
-      📦 SHIP TO US ADDRESS<br><span style="font-size:0.7rem">$20–$30 + tax if applicable</span>
+      📦 SHIP TO US ADDRESS<br><span style="font-size:0.8rem">$20–$30 + tax if applicable</span>
     </button>
   </div>
 
@@ -280,21 +356,24 @@
 
   <div class="flavor">
     ⚠ NOTICE: Badge contains no actual radioactive material.<br>
-    Vault-Tec assumes no liability for spontaneous hacking incidents.<br>
+    Fault-Tec assumes no liability for spontaneous hacking incidents.<br>
     War never changes. But our stock does. Buy now.
   </div>
 </div>
 
-<!-- Lightbox overlay -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+<!-- Lightbox overlay — tap close button (not background) to dismiss on mobile -->
+<div class="lightbox" id="lightbox">
   <div id="lightboxContent"></div>
+  <button class="lightbox-close" onclick="closeLightbox()">[ CLOSE ]</button>
 </div>
 
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
 
+  const MAX_TOTAL_BADGES = 5;
+
   // ──────────────────────────────────────────────
-  // Product media config — update URLs as needed
+  // Product media config
   // ──────────────────────────────────────────────
   const PRODUCT_MEDIA = {
     'DC34-STD': {
@@ -303,14 +382,12 @@
         + 'and enough flash to hold all your Pip-Boy apps. '
         + 'Comes with a 2200mAh LiPo battery. Fully moddable via USB-C.',
       images: [
-        // Host images at: https://<username>.github.io/<repo>/images/std-front.jpg
-        'https://YOURUSER.github.io/decon34/images/std-front.jpg',
-        'https://YOURUSER.github.io/decon34/images/std-back.jpg',
-        'https://YOURUSER.github.io/decon34/images/std-screen.jpg',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Back.png',
       ],
       videos: [
-        // Use YouTube embed URLs (not watch URLs): https://www.youtube.com/embed/<VIDEO_ID>
-        { thumb: '▶ ClipBoy Std Demo', embed: 'https://www.youtube.com/embed/REPLACE_VIDEO_ID' },
+        { thumb: '▶ ClipBoy Std Demo', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
       ],
     },
     'DC34-PRO': {
@@ -319,23 +396,22 @@
         + 'upgraded enclosure, and bonus pre-loaded games. '
         + 'Limited run. When they\'re gone, they\'re gone.',
       images: [
-        'https://YOURUSER.github.io/decon34/images/pro-front.jpg',
-        'https://YOURUSER.github.io/decon34/images/pro-back.jpg',
-        'https://YOURUSER.github.io/decon34/images/pro-detail.jpg',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
+        'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
       ],
       videos: [
-        { thumb: '▶ ClipBoy Pro Demo', embed: 'https://www.youtube.com/embed/REPLACE_VIDEO_ID' },
-        { thumb: '▶ SAO Port Walkthrough', embed: 'https://www.youtube.com/embed/REPLACE_VIDEO_ID' },
+        { thumb: '▶ ClipBoy Pro Demo', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+        { thumb: '▶ SAO Port Walkthrough', embed: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
       ],
     },
   };
 
   let state = {
     products: [],
-    maxPerSku: 5,
-    cart: {},       // { 'DC34-STD': 2, 'DC34-PRO': 0 }
+    cart: {},
     delivery: 'pickup',
-    expanded: {},   // { 'DC34-STD': true }
+    expanded: {},
   };
 
   // ──────────────────────────────────────────────
@@ -346,13 +422,19 @@
       const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
       const data = await resp.json();
       state.products = data.products || [];
-      state.maxPerSku = data.max_per_sku || 5;
       for (const p of state.products) state.cart[p.sku] = 0;
       renderProducts();
       updateCart();
     } catch (err) {
       showMessage('ERROR: Terminal connection failed. Try again later.', true);
     }
+  }
+
+  // ──────────────────────────────────────────────
+  // Total badges in cart
+  // ──────────────────────────────────────────────
+  function cartTotal() {
+    return Object.values(state.cart).reduce((a, b) => a + b, 0);
   }
 
   // ──────────────────────────────────────────────
@@ -400,7 +482,7 @@
   }
 
   // ──────────────────────────────────────────────
-  // Expand / collapse product detail
+  // Expand / collapse
   // ──────────────────────────────────────────────
   function toggleDetail(sku) {
     state.expanded[sku] = !state.expanded[sku];
@@ -412,32 +494,38 @@
   // Lightbox
   // ──────────────────────────────────────────────
   function openLightbox(type, src) {
-    const lb = document.getElementById('lightbox');
     const content = document.getElementById('lightboxContent');
     if (type === 'image') {
       content.innerHTML = `<img src="${src}">`;
     } else {
       content.innerHTML = `<iframe src="${src}" frameborder="0" allowfullscreen></iframe>`;
     }
-    lb.classList.add('open');
+    document.getElementById('lightbox').classList.add('open');
   }
   function closeLightbox() {
-    const lb = document.getElementById('lightbox');
-    lb.classList.remove('open');
+    document.getElementById('lightbox').classList.remove('open');
     document.getElementById('lightboxContent').innerHTML = '';
   }
 
   // ──────────────────────────────────────────────
-  // Cart logic
+  // Cart logic — 5 badge total limit
   // ──────────────────────────────────────────────
   function adjustQty(sku, delta) {
     const p = state.products.find(x => x.sku === sku);
     if (!p) return;
-    state.cart[sku] = Math.min(Math.max(0, (state.cart[sku] || 0) + delta), state.maxPerSku, p.available);
-    document.getElementById('qty-' + sku).textContent = state.cart[sku];
 
-    // Highlight card if qty > 0
-    document.getElementById('card-' + sku).classList.toggle('has-qty', state.cart[sku] > 0);
+    const current = state.cart[sku] || 0;
+    let desired = current + delta;
+    desired = Math.max(0, desired);
+    desired = Math.min(desired, p.available);
+
+    // Enforce global limit: total across all SKUs <= MAX_TOTAL_BADGES
+    const othersTotal = cartTotal() - current;
+    desired = Math.min(desired, MAX_TOTAL_BADGES - othersTotal);
+
+    state.cart[sku] = desired;
+    document.getElementById('qty-' + sku).textContent = desired;
+    document.getElementById('card-' + sku).classList.toggle('has-qty', desired > 0);
     updateCart();
   }
 
@@ -500,6 +588,12 @@
       lines += '<div class="cart-note">No sales tax for DEFCON pickup</div>';
     }
 
+    if (totalQty >= MAX_TOTAL_BADGES) {
+      lines += '<div class="cart-note">Maximum ' + MAX_TOTAL_BADGES + ' badges per order reached</div>';
+    }
+
+    lines += '<div class="cart-note" style="color:var(--pip-dim)">⏱ You will have 30 minutes to complete checkout once you click Requisition</div>';
+
     summaryEl.innerHTML = lines;
     summaryEl.style.display = 'block';
 
@@ -517,7 +611,6 @@
     btn.classList.add('loading');
     hideMessage();
 
-    // Build cart object with only non-zero quantities
     const cart = {};
     for (const [sku, qty] of Object.entries(state.cart)) {
       if (qty > 0) cart[sku] = qty;
