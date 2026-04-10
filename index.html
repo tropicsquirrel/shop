@@ -90,7 +90,7 @@
     /* ── Uranium sweep ── */
     .college-banner {
       text-align: center;
-      margin-bottom: 1rem;
+      margin: 0.8rem 0 0.5rem;
       font-size: 1rem;
       background: linear-gradient(
         90deg,
@@ -106,11 +106,11 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: uranium-sweep 6s linear infinite;
+      animation: uranium-sweep 4s ease-in-out infinite alternate;
     }
     @keyframes uranium-sweep {
-      from { background-position: 100% 0; }
-      to { background-position: 0% 0; }
+      from { background-position: 85% 0; }
+      to { background-position: 15% 0; }
     }
 
     /* ── Shared card pattern ── */
@@ -432,8 +432,6 @@
     </div>
   </div>
 
-  <div class="college-banner">All proceeds support Bryce's college fund</div>
-
   <div id="products"><div style="color:var(--pip-dim)">LOADING INVENTORY DATA...</div></div>
 
   <!-- Contribute card (expandable, no submit — uses main buy button) -->
@@ -465,6 +463,8 @@
       </div>
     </div>
   </div>
+
+  <div class="college-banner">All proceeds support Bryce's college fund</div>
 
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
@@ -551,8 +551,10 @@
       ],
     },
     'DC34-PRO': {
-      description: 'The ClipBoy Pro allows you to pick your own color/style. '
-        + 'Limited run. When they\'re gone, they\'re gone.',
+      description: 'The ClipBoy Pro has the same features as ClipBoy Standard '
+        + 'but you can dazzle the wasteland denizens with your impeccable style. '
+        + 'You get to pick your own color. Only 12 will be made. '
+        + 'When they\'re gone, they\'re gone.',
       images: [
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
@@ -566,10 +568,10 @@
       preorderDeadline: 'PRO PRE-ORDERS CLOSE JULY 31, 2026 — custom colors need printing time!',
     },
     'DC34-RAD': {
-      description: 'The ClipBoy RAD Edition — maximum radiation exposure. '
-        + 'Everything in Pro, bathed head-to-toe in RADiation Green. '
-        + 'Only 5 will ever exist. You can\'t pick the color. '
-        + 'The color picked you.',
+      description: 'The ClipBoy RAD Edition: maximum radiation exposure. '
+        + 'Same features as ClipBoy Standard but bathed head-to-toe in RADiation Green. '
+        + 'Be the envy of every Fault-Dweller. '
+        + 'Only 5 will ever exist. You can\'t pick the color. The color picked you.',
       images: [
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
         'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Preorder%20-%20Front.png',
