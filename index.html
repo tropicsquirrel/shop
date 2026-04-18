@@ -545,7 +545,7 @@
     <div class="product-summary" onclick="togglePanel('about')">
       <div>
         <span class="product-toggle" id="toggle-about">▶</span>
-        <span class="product-name">About the creator, Bryce</span>
+        <span class="product-name">About the creator: Bryce</span>
       </div>
     </div>
     <div class="product-detail" id="detail-about">
@@ -778,7 +778,7 @@
       const out = p.available === 0;
       const media = PRODUCT_MEDIA[p.sku] || {};
       const radClass = p.sku === 'DC34-RAD' ? ' rad-edition' : '';
-      const stockText = out ? '(SOLD OUT)' : '(' + p.available + '/' + p.total + ' Left)';
+      const stockText = out ? '(SOLD OUT)' : '(' + p.available + ' Left)';
 
       // Build gallery array for lightbox navigation
       const gallery = [
