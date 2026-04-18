@@ -718,7 +718,32 @@
     return total;
   }
 
+  // ──────────────────────────────────────────────
+  // Visit tracking — once per session, captures src from URL
+  // ──────────────────────────────────────────────
+  function trackVisit() {
+    try {
+      if (sessionStorage.getItem('visit_tracked')) return;
+      sessionStorage.setItem('visit_tracked', '1');
+
+      const params = new URLSearchParams(window.location.search);
+      const src = params.get('utm_source') || params.get('src') || 'direct';
+      const url = APPS_SCRIPT_URL
+        + '?action=track'
+        + '&src=' + encodeURIComponent(src)
+        + '&ref=' + encodeURIComponent(document.referrer || '')
+        + '&ua=' + encodeURIComponent((navigator.userAgent || '').substring(0, 120))
+        + '&path=' + encodeURIComponent(window.location.pathname + window.location.search);
+
+      // Fire-and-forget — don't block page load
+      fetch(url, { mode: 'no-cors', keepalive: true }).catch(() => {});
+    } catch (err) {
+      // Silent fail — never let tracking break the page
+    }
+  }
+
   async function init() {
+    trackVisit();
     try {
       // Load inventory and media in parallel
       const [statusResp] = await Promise.all([
