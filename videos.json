@@ -1,9 +1,11 @@
 {
   "DC34-STD": [
-    { "title": "ClipBoy Std Demo", "id": "ldytMBLuyR8" }
+    { "title": "ClipBoy Std Demo", "id": "V2kF-DMf-nk" }
   ],
-
+  "DC34-PRO": [
+    { "title": "ClipBoy Pro Edition", "id": "bOOsTHyxYwY" }
+  ],
   "DC34-RAD": [
-    { "title": "RAD Edition Reveal", "id": "vWxhT9Mg_Cc" }
+    { "title": "RAD Edition Reveal", "id": "iE2AzLDKAEU" }
   ]
 }
