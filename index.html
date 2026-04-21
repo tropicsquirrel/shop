@@ -126,6 +126,39 @@
     .product-card.rad-edition .product-name { color: var(--pip-amber); }
     .product-card.rad-edition .product-price { color: var(--pip-amber); }
 
+    /* Bryce avatar in About card */
+    .bryce-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--pip-dim);
+      flex-shrink: 0;
+      margin-left: 0.75rem;
+    }
+    .bryce-large {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--pip-dim);
+      float: left;
+      margin: 0 1rem 0.5rem 0;
+      box-shadow: 0 0 12px rgba(51, 255, 54, 0.15);
+    }
+
+    /* External link icon */
+    .ext-icon {
+      display: inline-block;
+      width: 0.75em;
+      height: 0.75em;
+      margin-left: 0.3em;
+      vertical-align: baseline;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
     .product-summary {
       display: flex;
       justify-content: space-between;
@@ -464,6 +497,7 @@
       .header-icon { height: 64px; }
       .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
       .about-links { flex-direction: column; gap: 0.3rem; }
+      .bryce-large { width: 100px; height: 100px; margin: 0 0.75rem 0.5rem 0; }
 
       /* Stack color rows: swatch+label on top, controls below */
       .color-qty-row {
@@ -543,14 +577,16 @@
 
   <div class="product-card" id="card-about" style="margin-top:1.5rem">
     <div class="product-summary" onclick="togglePanel('about')">
-      <div>
+      <div style="display:flex; align-items:center; flex:1;">
         <span class="product-toggle" id="toggle-about">▶</span>
         <span class="product-name">About the creator: Bryce</span>
       </div>
+      <img src="images/bryce.png" alt="Bryce" class="bryce-thumb">
     </div>
     <div class="product-detail" id="detail-about">
       <div class="product-detail-inner">
-        <div class="product-description">
+        <div class="product-description" style="overflow:auto">
+          <img src="images/bryce.png" alt="Bryce" class="bryce-large">
           ClipBoy is designed and built by Bryce, a high school junior
           from San Antonio, TX. When he's not soldering or writing
           firmware, he's leading his CyberPatriot team to a #3 national
@@ -559,9 +595,9 @@
           Space Badge, 218% funded on Kickstarter.
         </div>
         <div class="about-links">
-          <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener">→ LinkedIn</a>
-          <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener">→ Space Badge</a>
-          <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener">→ itch.io</a>
+          <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener">→ LinkedIn<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener">→ Space Badge<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener">→ itch.io<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
         </div>
       </div>
     </div>
