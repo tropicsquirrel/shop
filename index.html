@@ -806,6 +806,36 @@
   }
 
   // ──────────────────────────────────────────────
+  // Refresh stock when tab regains focus (after >2min idle)
+  // Updates card titles only — preserves cart state
+  // ──────────────────────────────────────────────
+  let lastRefresh = Date.now();
+  document.addEventListener('visibilitychange', async function() {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - lastRefresh < 120000) return; // skip if <2min ago
+    lastRefresh = Date.now();
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=status');
+      const data = await resp.json();
+      if (!data.products) return;
+      // Update stock counts, preserve cart
+      state.products = data.products;
+      // Re-render only the card titles — don't rebuild the DOM
+      for (const p of state.products) {
+        const card = document.getElementById('card-' + p.sku);
+        if (!card) continue;
+        const nameEl = card.querySelector('.product-name');
+        if (!nameEl) continue;
+        const stockText = p.available === 0 ? '(SOLD OUT)' : '(' + p.available + ' Left)';
+        nameEl.textContent = p.name + ' ' + stockText;
+        card.classList.toggle('sold-out', p.available === 0);
+      }
+    } catch (err) {
+      // Silent fail — stale stock will be caught at checkout
+    }
+  });
+
+  // ──────────────────────────────────────────────
   // Render product cards (no stock bars — count is in the title)
   // ──────────────────────────────────────────────
   function renderProducts() {
