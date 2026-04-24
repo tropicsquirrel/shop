@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
-  <title>Clip-Boy: The Unofficial DEFCON 34 Electronic Badge — Pre-Order</title>
+  <title>Clip-Boy: The Unofficial DEF CON 34 Electronic Badge — Pre-Order</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
@@ -518,7 +518,7 @@
     <img src="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png"
          alt="Clip-Boy" class="header-icon">
     <div class="header-text">
-      <h1>Clip-Boy: The Unofficial<br>DEFCON 34 Electronic Badge<span class="blink">_</span></h1>
+      <h1>Clip-Boy: The Unofficial<br>DEF CON 34 Electronic Badge<span class="blink">_</span></h1>
       <div class="subtitle">FAULT-TEC AUTHORIZED BADGE REQUISITION TERMINAL</div>
     </div>
   </div>
@@ -560,7 +560,7 @@
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
     <button class="delivery-btn active" onclick="setDelivery('pickup')" id="btn-pickup">
-      >> PICKUP AT DEFCON<br><span style="font-size:0.9rem">Free · No sales tax · Up to 10</span>
+      >> PICKUP AT DEF CON<br><span style="font-size:0.9rem">Free · No sales tax · Up to 10</span>
     </button>
     <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">
       >> SHIP TO US ADDRESS<br><span style="font-size:0.9rem">$20–$30 + tax · Up to 5</span>
@@ -591,7 +591,7 @@
           from San Antonio, TX. When he's not soldering or writing
           firmware, he's leading his CyberPatriot team to a #3 national
           finish out of 1,000+ teams (as team commander) and building
-          indie games. This is his second DEFCON badge — the first was
+          indie games. This is his second DEF CON badge — the first was
           Space Badge, 218% funded on Kickstarter.
         </div>
         <div class="about-links">
@@ -1101,7 +1101,7 @@
     if (hasBadges) {
       // Badge checkout
       let shipCost = 0;
-      let shipLabel = 'Pickup at DEFCON';
+      let shipLabel = 'Pickup at DEF CON';
       if (state.delivery === 'ship') {
         shipCost = totalQty <= 3 ? 2000 : 3000;
         shipLabel = 'Shipping (' + (totalQty <= 3 ? '1–3' : '4–5') + ' badges)';
@@ -1117,7 +1117,7 @@
       if (state.delivery === 'ship') {
         lines += '<div class="cart-note">+ Sales tax calculated at checkout (if applicable)</div>';
       } else {
-        lines += '<div class="cart-note">No sales tax for DEFCON pickup</div>';
+        lines += '<div class="cart-note">No sales tax for DEF CON pickup</div>';
       }
       const max = currentMax();
       if (totalQty >= max)
