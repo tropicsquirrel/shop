@@ -128,8 +128,8 @@
 
     /* Bryce avatar in About card */
     .bryce-thumb {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       object-fit: cover;
       border: 1px solid var(--pip-dim);
@@ -598,6 +598,42 @@
           <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener">→ LinkedIn<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
           <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener">→ Space Badge<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
           <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener">→ itch.io<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-card" id="card-ai" style="margin-top:1rem">
+    <div class="product-summary" onclick="togglePanel('ai')">
+      <div style="display:flex; align-items:center; flex:1;">
+        <span class="product-toggle" id="toggle-ai">▶</span>
+        <span class="product-name">AI &amp; Tooling Transparency</span>
+      </div>
+    </div>
+    <div class="product-detail" id="detail-ai">
+      <div class="product-detail-inner">
+        <div class="product-description">
+          Bryce designed the PCB and enclosure, defined the feature set, and made every call
+          about what ships and what gets cut. He tested on physical hardware (some of it
+          gloriously flaky).
+          <br><br>
+          Tools used along the way:
+          <br><br>
+          <span style="color:var(--pip-green)">→ Claude Code</span>
+          <span style="color:var(--pip-dim)"> — code review, PCB review, debugging partner</span>
+          <br>
+          <span style="color:var(--pip-green)">→ ESP32 Marauder by justcallmekoko</span>
+          <span style="color:var(--pip-dim)"> — base for the Wi-Fi/BLE security tooling,
+          ported to Clip-Boy with significant AI-assisted refactoring</span>
+          <br>
+          <span style="color:var(--pip-green)">→ Flux.1 Schnell</span>
+          <span style="color:var(--pip-dim)"> — collectible artwork (prompts written and curated by Bryce)</span>
+          <br>
+          <span style="color:var(--pip-green)">→ ChatGPT</span>
+          <span style="color:var(--pip-dim)"> — a handful of static graphics, including Clippy</span>
+          <br><br>
+          <span style="font-style:italic">Standard disclaimer: AI was used as a tool, like Git or a
+          multimeter. The decisions, the design, the bugs, and the jokes are all Bryce's.</span>
         </div>
       </div>
     </div>
