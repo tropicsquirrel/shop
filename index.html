@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
   <title>Clip-Boy: The Unofficial DEF CON 34 Electronic Badge — Pre-Order</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png">
   <style>
@@ -156,9 +156,21 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--pip-dim);
-      float: left;
-      margin: 0 1rem 0.5rem 0;
+      flex-shrink: 0;
       box-shadow: 0 0 12px rgba(51, 255, 54, 0.15);
+    }
+    .about-bio {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .about-bio-text {
+      color: var(--pip-dim);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      flex: 1;
+      min-width: 0;
     }
 
     /* External link icon */
@@ -414,6 +426,7 @@
       display: flex;
       gap: 1.2rem;
       flex-wrap: wrap;
+      justify-content: center;
     }
     .about-links a {
       color: var(--pip-amber);
@@ -508,6 +521,17 @@
 
     .flavor { margin-top: 1.5rem; font-size: 0.95rem; color: var(--pip-dim); text-align: center; line-height: 1.6; }
 
+    /* Full-bleed section divider — bridges to terminal border */
+    .section-divider {
+      border: 0;
+      border-top: 2px solid var(--pip-dim);
+      margin: 2rem -1.5rem;
+      box-shadow: 0 0 8px var(--pip-glow);
+    }
+    @media (max-width: 480px) {
+      .section-divider { margin: 1.5rem -1rem; }
+    }
+
     .blink { animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
     .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
@@ -520,7 +544,7 @@
       .header-icon { height: 64px; }
       .media-gallery img, .media-gallery .video-thumb { width: 100%; height: auto; aspect-ratio: 4/3; }
       .about-links { flex-direction: column; gap: 0.3rem; }
-      .bryce-large { width: 100px; height: 100px; margin: 0 0.75rem 0.5rem 0; }
+      .bryce-large { width: 100px; height: 100px; }
 
       /* Stack color rows: swatch+label on top, controls below */
       .color-qty-row {
@@ -590,7 +614,7 @@
 
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
-    <button class="delivery-btn active" onclick="setDelivery('pickup')" id="btn-pickup">
+    <button class="delivery-btn" onclick="setDelivery('pickup')" id="btn-pickup">
       >> PICKUP AT DEF CON<br><span style="font-size:0.9rem">Free · No sales tax · Up to 10</span>
     </button>
     <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">
@@ -606,30 +630,34 @@
 
   <div class="message" id="msg"></div>
 
+  <hr class="section-divider">
+
   <div class="product-card" id="card-about" style="margin-top:1.5rem">
     <div class="product-summary" onclick="togglePanel('about')">
       <div style="display:flex; align-items:center; flex:1;">
-        <span class="product-toggle" id="toggle-about">▶</span>
+        <span class="product-toggle" id="toggle-about">▼</span>
         <span class="product-name">About the creator: Bryce</span>
       </div>
       <img src="images/bryce.png" alt="Bryce" class="bryce-thumb">
     </div>
-    <div class="product-detail" id="detail-about">
+    <div class="product-detail open" id="detail-about">
       <div class="product-detail-inner">
-        <div class="product-description" style="overflow:auto">
+        <div class="about-bio">
           <img src="images/bryce.png" alt="Bryce" class="bryce-large">
-          Clip-Boy is designed and built by Bryce, a high school junior
-          from San Antonio, TX. When he's not soldering or writing
-          firmware, he's leading his CyberPatriot team to a #3 national
-          finish out of 1,000+ teams (as team commander) and building
-          indie games. This is his second DEF CON badge — the first was
-          Space Badge, 218% funded on Kickstarter.
+          <div class="about-bio-text">
+            Clip-Boy is designed and built by Bryce, a high school junior
+            from San Antonio, TX. When he's not soldering or writing
+            firmware, he's leading his CyberPatriot team to a #3 national
+            finish out of 1,000+ teams (as team commander) and building
+            indie games. This is his second DEF CON badge — the first was
+            Space Badge, 218% funded on Kickstarter.
+          </div>
         </div>
         <div class="about-links">
-          <a href="https://defcon.social/@clipboy" target="_blank" rel="noopener me"><img src="https://defcon.social/favicon.ico" alt="" class="link-icon">Defcon.Social<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
-          <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener">→ LinkedIn<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
-          <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener">→ Space Badge<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
-          <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener">→ itch.io<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://defcon.social/@clipboy" target="_blank" rel="noopener me"><img src="https://defcon.social/favicon.ico" alt="" class="link-icon">DefCon.Social<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener"><img src="https://www.linkedin.com/favicon.ico" alt="" class="link-icon">LinkedIn<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener"><img src="https://www.kickstarter.com/favicon.ico" alt="" class="link-icon">Space Badge<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+          <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener"><img src="https://itch.io/favicon.ico" alt="" class="link-icon">itch.io<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
         </div>
       </div>
     </div>
@@ -808,12 +836,17 @@
     maxPickup: 10,
     maxShip: 5,
     cart: {},
-    delivery: 'pickup',
+    delivery: null,
     expanded: {},
     donationCents: 0,
   };
 
-  function currentMax() { return state.delivery === 'pickup' ? state.maxPickup : state.maxShip; }
+  // When delivery isn't selected yet, allow the higher (pickup) cap so users
+  // can build their cart freely; we'll downgrade and re-check at checkout time.
+  function currentMax() {
+    if (state.delivery === 'ship') return state.maxShip;
+    return state.maxPickup;
+  }
   function cartTotal() { return Object.values(state.cart).reduce((a, b) => a + b, 0); }
   function cartQtyForSku(baseSku) {
     let total = 0;
@@ -1173,27 +1206,34 @@
       if (state.delivery === 'ship') {
         shipCost = totalQty <= 3 ? 2000 : 3000;
         shipLabel = 'Shipping (' + (totalQty <= 3 ? '1–3' : '4–5') + ' badges)';
+      } else if (state.delivery === null) {
+        shipLabel = '<span style="color:var(--pip-amber)">⚠ Select delivery method below</span>';
       }
       lines += `<div class="cart-line">
         <span class="label">${shipLabel}</span>
-        <span>${shipCost === 0 ? 'FREE' : '$' + (shipCost / 100).toFixed(2)}</span>
+        <span>${state.delivery === null ? '—' : (shipCost === 0 ? 'FREE' : '$' + (shipCost / 100).toFixed(2))}</span>
       </div>`;
       lines += `<div class="cart-line total">
         <span>SUBTOTAL</span>
-        <span>$${((subtotal + shipCost) / 100).toFixed(2)}</span>
+        <span>$${((subtotal + shipCost) / 100).toFixed(2)}${state.delivery === null ? '+' : ''}</span>
       </div>`;
       if (state.delivery === 'ship') {
         lines += '<div class="cart-note">+ Sales tax calculated at checkout (if applicable)</div>';
-      } else {
+      } else if (state.delivery === 'pickup') {
         lines += '<div class="cart-note">No sales tax for DEF CON pickup</div>';
       }
       const max = currentMax();
-      if (totalQty >= max)
+      if (state.delivery !== null && totalQty >= max)
         lines += '<div class="cart-note">Maximum ' + max + ' badges per ' + (state.delivery === 'pickup' ? 'pickup' : 'shipped') + ' order reached</div>';
       lines += '<div class="cart-note" style="color:var(--pip-dim)">⏱ 30 minutes to complete checkout</div>';
 
-      btn.disabled = false;
-      btn.textContent = '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
+      if (state.delivery === null) {
+        btn.disabled = true;
+        btn.textContent = 'SELECT DELIVERY METHOD';
+      } else {
+        btn.disabled = false;
+        btn.textContent = '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
+      }
 
     } else {
       // Contribution only
