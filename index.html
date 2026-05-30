@@ -1200,7 +1200,7 @@
     }
 
     if (hasBadges) {
-      // Badge checkout
+      // Badge checkout — may also include a contribution
       let shipCost = 0;
       let shipLabel = 'Pickup at DEF CON';
       if (state.delivery === 'ship') {
@@ -1213,12 +1213,19 @@
         <span class="label">${shipLabel}</span>
         <span>${state.delivery === null ? '—' : (shipCost === 0 ? 'FREE' : '$' + (shipCost / 100).toFixed(2))}</span>
       </div>`;
+      if (hasDonation) {
+        lines += `<div class="cart-line">
+          <span class="label">College Fund Contribution</span>
+          <span>$${(state.donationCents / 100).toFixed(2)}</span>
+        </div>`;
+      }
+      const grandTotal = subtotal + shipCost + (hasDonation ? state.donationCents : 0);
       lines += `<div class="cart-line total">
         <span>SUBTOTAL</span>
-        <span>$${((subtotal + shipCost) / 100).toFixed(2)}${state.delivery === null ? '+' : ''}</span>
+        <span>$${(grandTotal / 100).toFixed(2)}${state.delivery === null ? '+' : ''}</span>
       </div>`;
       if (state.delivery === 'ship') {
-        lines += '<div class="cart-note">+ Sales tax calculated at checkout (if applicable)</div>';
+        lines += '<div class="cart-note">+ Sales tax on badges &amp; shipping at checkout (if applicable)</div>';
       } else if (state.delivery === 'pickup') {
         lines += '<div class="cart-note">No sales tax for DEF CON pickup</div>';
       }
@@ -1232,7 +1239,10 @@
         btn.textContent = 'SELECT DELIVERY METHOD';
       } else {
         btn.disabled = false;
-        btn.textContent = '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
+        const label = hasDonation
+          ? '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' + CONTRIBUTE ]'
+          : '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
+        btn.textContent = label;
       }
 
     } else {
@@ -1297,7 +1307,8 @@
       const url = APPS_SCRIPT_URL
         + '?action=create_checkout'
         + '&cart=' + encodeURIComponent(JSON.stringify(cart))
-        + '&delivery=' + state.delivery;
+        + '&delivery=' + state.delivery
+        + (state.donationCents >= 100 ? '&donation=' + state.donationCents : '');
       const resp = await fetch(url);
       const data = await resp.json();
       if (data.error) {
