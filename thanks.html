@@ -148,12 +148,12 @@
     </div>
   </div>
 
-  <a href="https://tropicsquirrel.github.io/shop/" class="back-btn">
+  <a href="https://tropicsquirrel.github.io/shop/" class="back-btn" id="backBtn">
     [ RETURN TO TERMINAL ]
   </a>
 
   <div class="flavor">
-    War never changes. But you just changed a kid's future.
+    ROM. ROM never changes. But you just changed a kid's future.
   </div>
 </div>
 
@@ -167,6 +167,10 @@
   if (code) {
     document.getElementById('orderCode').textContent = code;
     document.getElementById('orderCodeDisplay').style.display = 'inline';
+  }
+  // If the buyer came from the Founding Backer flow, send them back there
+  if (params.get('src') === 'ks') {
+    document.getElementById('backBtn').href = 'https://tropicsquirrel.github.io/shop/ks/';
   }
 </script>
 

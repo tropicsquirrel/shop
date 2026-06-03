@@ -491,6 +491,21 @@
       box-shadow: 0 0 8px var(--pip-glow);
     }
 
+    @keyframes attention-pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 179, 64, 0);
+        border-color: var(--pip-dim);
+        color: var(--pip-dim);
+      }
+      50% {
+        box-shadow: 0 0 14px 4px rgba(255, 179, 64, 0.55);
+        border-color: var(--pip-amber);
+        color: var(--pip-amber);
+      }
+    }
+    .delivery-btn.attention { animation: attention-pulse 1.4s ease-in-out infinite; }
+    .delivery-btn.attention:hover { animation: none; border-color: var(--pip-green); color: var(--pip-green); }
+
     /* ── Cart Summary ── */
     .cart-summary {
       border: 1px solid var(--pip-border);
@@ -1215,6 +1230,8 @@
       summaryEl.style.display = 'none';
       btn.disabled = true;
       btn.textContent = 'SELECT ITEMS ABOVE';
+      document.getElementById('btn-pickup').classList.remove('attention');
+      document.getElementById('btn-ship').classList.remove('attention');
       return;
     }
 
@@ -1256,16 +1273,20 @@
       if (state.delivery === null) {
         btn.disabled = true;
         btn.textContent = 'SELECT DELIVERY METHOD';
+        document.getElementById('btn-pickup').classList.add('attention');
+        document.getElementById('btn-ship').classList.add('attention');
       } else {
         btn.disabled = false;
         const label = hasDonation
           ? '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' + CONTRIBUTE ]'
           : '[ REQUISITION ' + totalQty + (totalQty === 1 ? ' BADGE' : ' BADGES') + ' ]';
         btn.textContent = label;
+        document.getElementById('btn-pickup').classList.remove('attention');
+        document.getElementById('btn-ship').classList.remove('attention');
       }
 
     } else {
-      // Contribution only
+      // Contribution only — no delivery needed
       lines += `<div class="cart-line total">
         <span>CONTRIBUTION</span>
         <span>$${(state.donationCents / 100).toFixed(2)}</span>
@@ -1273,6 +1294,8 @@
 
       btn.disabled = false;
       btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+      document.getElementById('btn-pickup').classList.remove('attention');
+      document.getElementById('btn-ship').classList.remove('attention');
     }
 
     summaryEl.innerHTML = lines;

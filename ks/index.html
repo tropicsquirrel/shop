@@ -290,6 +290,21 @@
       box-shadow: 0 0 6px var(--pip-glow);
     }
 
+    @keyframes attention-pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 179, 64, 0);
+        border-color: var(--pip-dim);
+        color: var(--pip-dim);
+      }
+      50% {
+        box-shadow: 0 0 14px 4px rgba(255, 179, 64, 0.55);
+        border-color: var(--pip-amber);
+        color: var(--pip-amber);
+      }
+    }
+    .delivery-btn.attention { animation: attention-pulse 1.4s ease-in-out infinite; }
+    .delivery-btn.attention:hover { animation: none; border-color: var(--pip-green); color: var(--pip-green); }
+
     /* Cart */
     .cart-summary { margin-top: 1rem; padding: 1rem; border: 1px dashed var(--pip-dim); background: rgba(51, 255, 54, 0.03); }
     .cart-line { display: flex; justify-content: space-between; padding: 0.3rem 0; color: var(--pip-green); font-size: 0.95rem; }
@@ -892,14 +907,19 @@
         cartEl.style.display = 'none';
         btn.disabled = true;
         btn.textContent = 'SELECT ITEMS ABOVE';
+        clearDeliveryAttention();
         return;
       }
 
-      // If donation-only (no badges), still need to disable since KS flow requires a badge
+      // Donation-only flow (no badges): skip delivery, allow checkout straight to donate
       if (total === 0 && hasDonation) {
-        cartEl.style.display = 'none';
-        btn.disabled = true;
-        btn.textContent = 'ADD A BADGE TO CONTRIBUTE';
+        cartEl.innerHTML = '<div class="cart-line"><span class="label">College Fund Contribution</span><span>$' + (state.donationCents/100).toFixed(2) + '</span></div>'
+          + '<div class="cart-line total"><span>TOTAL</span><span>$' + (state.donationCents/100).toFixed(2) + '</span></div>'
+          + '<div class="cart-note">100% to Bryce\'s college fund · No delivery required</div>';
+        cartEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '[ CONTRIBUTE $' + (state.donationCents/100).toFixed(2) + ' ]';
+        clearDeliveryAttention();
         return;
       }
 
@@ -943,34 +963,54 @@
       if (state.delivery === null) {
         btn.disabled = true;
         btn.textContent = 'SELECT DELIVERY METHOD';
+        setDeliveryAttention();
       } else {
         btn.disabled = false;
         const label = hasDonation
           ? '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' + CONTRIBUTE ]'
           : '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' ]';
         btn.textContent = label;
+        clearDeliveryAttention();
       }
+    }
+
+    function setDeliveryAttention() {
+      document.getElementById('btn-pickup').classList.add('attention');
+      document.getElementById('btn-ship').classList.add('attention');
+    }
+    function clearDeliveryAttention() {
+      document.getElementById('btn-pickup').classList.remove('attention');
+      document.getElementById('btn-ship').classList.remove('attention');
     }
 
     async function handleBuy() {
       const btn = document.getElementById('buyBtn');
+      const isDonationOnly = totalQty() === 0 && state.donationCents >= 100;
       btn.disabled = true;
-      btn.textContent = 'PROCESSING REQUISITION';
+      btn.textContent = isDonationOnly ? 'PROCESSING CONTRIBUTION' : 'PROCESSING REQUISITION';
       hideMsg();
 
-      const cart = {};
-      for (const [sku, qty] of Object.entries(state.cart)) {
-        if (qty > 0) cart[sku] = qty;
-      }
-
       try {
-        const url = APPS_SCRIPT_URL
-          + '?action=create_checkout'
-          + '&cart=' + encodeURIComponent(JSON.stringify(cart))
-          + '&delivery=' + state.delivery
-          + (state.donationCents >= 100 ? '&donation=' + state.donationCents : '')
-          + '&ks_email=' + encodeURIComponent(state.ksEmail)
-          + '&ks_backer_id=' + encodeURIComponent(state.ksBackerId);
+        let url;
+        if (isDonationOnly) {
+          url = APPS_SCRIPT_URL
+            + '?action=donate'
+            + '&amount=' + state.donationCents
+            + '&ks_email=' + encodeURIComponent(state.ksEmail)
+            + '&ks_backer_id=' + encodeURIComponent(state.ksBackerId);
+        } else {
+          const cart = {};
+          for (const [sku, qty] of Object.entries(state.cart)) {
+            if (qty > 0) cart[sku] = qty;
+          }
+          url = APPS_SCRIPT_URL
+            + '?action=create_checkout'
+            + '&cart=' + encodeURIComponent(JSON.stringify(cart))
+            + '&delivery=' + state.delivery
+            + (state.donationCents >= 100 ? '&donation=' + state.donationCents : '')
+            + '&ks_email=' + encodeURIComponent(state.ksEmail)
+            + '&ks_backer_id=' + encodeURIComponent(state.ksBackerId);
+        }
         const resp = await fetch(url);
         const data = await resp.json();
 
