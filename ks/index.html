@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clip-Boy — Founding Backer Edition</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com data:; connect-src https://script.google.com https://script.googleusercontent.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --pip-green: #33ff36;
+      --pip-amber: #ffb340;
+      --pip-dim: #1a9e1d;
+      --pip-glow: rgba(51, 255, 54, 0.4);
+      --pip-bg: #0a0f0a;
+      --pip-bg-dim: #050805;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--pip-bg);
+      color: var(--pip-green);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+
+    /* CRT scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .terminal {
+      max-width: 720px;
+      margin: 0 auto;
+      border: 2px solid var(--pip-dim);
+      padding: 1.5rem;
+      box-shadow: 0 0 20px var(--pip-glow);
+      background: var(--pip-bg-dim);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header { text-align: center; margin-bottom: 1.5rem; }
+    .title {
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 8px var(--pip-glow);
+      color: var(--pip-amber);
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--pip-dim);
+      margin-top: 0.3rem;
+      letter-spacing: 0.1em;
+    }
+
+    .banner {
+      border: 1px solid var(--pip-amber);
+      background: rgba(255, 179, 64, 0.05);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--pip-amber);
+      font-size: 0.95rem;
+      text-align: center;
+      box-shadow: 0 0 6px rgba(255, 179, 64, 0.2);
+    }
+
+    /* Auth gate */
+    .auth-gate {
+      border: 1px solid var(--pip-dim);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(51, 255, 54, 0.03);
+    }
+    .auth-gate p { margin-bottom: 1rem; color: var(--pip-dim); line-height: 1.5; }
+    .auth-gate label {
+      display: block;
+      margin-top: 0.75rem;
+      margin-bottom: 0.3rem;
+      color: var(--pip-green);
+      font-size: 0.9rem;
+    }
+    .auth-gate input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+    }
+    .auth-gate input:focus { outline: none; border-color: var(--pip-green); box-shadow: 0 0 6px var(--pip-glow); }
+    .auth-gate button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-green);
+      color: var(--pip-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+    }
+    .auth-gate button:hover:not(:disabled) {
+      background: var(--pip-green);
+      color: var(--pip-bg);
+      box-shadow: 0 0 10px var(--pip-glow);
+    }
+    .auth-gate button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-status { margin-top: 0.75rem; font-size: 0.9rem; min-height: 1.2rem; }
+    .auth-status.error { color: var(--pip-amber); }
+    .auth-status.success { color: var(--pip-green); }
+
+    /* Welcome / status after auth */
+    .welcome-block {
+      border: 1px solid var(--pip-green);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      background: rgba(51, 255, 54, 0.05);
+    }
+    .welcome-block .greeting { font-size: 1.1rem; color: var(--pip-green); margin-bottom: 0.4rem; }
+    .welcome-block .remaining { color: var(--pip-amber); font-size: 0.95rem; }
+
+    /* Product cards */
+    .product-card {
+      border: 1px solid var(--pip-dim);
+      margin-bottom: 1rem;
+      background: rgba(51, 255, 54, 0.02);
+    }
+    .product-summary {
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.15s;
+    }
+    .product-summary:hover { background: rgba(51, 255, 54, 0.05); }
+    .product-toggle { color: var(--pip-amber); margin-right: 0.7rem; font-size: 1rem; transition: transform 0.2s; }
+    .product-toggle.open { transform: rotate(90deg); }
+    .product-name { font-size: 1.1rem; color: var(--pip-green); flex: 1; }
+    .product-price { color: var(--pip-amber); font-size: 1.1rem; margin-left: 1rem; }
+
+    .product-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .product-detail.open { max-height: 3000px; }
+    .product-detail-inner {
+      padding: 0 1.2rem 1.2rem;
+      border-top: 1px dashed var(--pip-dim);
+      padding-top: 1rem;
+    }
+    .product-image {
+      width: 100%;
+      margin: 0 auto 0.75rem;
+      display: block;
+      border: 1px solid var(--pip-dim);
+      background: #000;
+    }
+    .product-description {
+      color: var(--pip-dim);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+    .image-caption { font-size: 0.8rem; color: var(--pip-dim); text-align: center; font-style: italic; margin-bottom: 1rem; }
+
+    .qty-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+    .qty-row .qty-label { color: var(--pip-green); }
+    .qty-controls { display: flex; align-items: center; gap: 0.5rem; }
+    .qty-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-green);
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.2rem;
+    }
+    .qty-btn:hover:not(:disabled) { border-color: var(--pip-green); }
+    .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .qty-value { min-width: 28px; text-align: center; color: var(--pip-green); font-size: 1.1rem; }
+
+    /* Delivery */
+    .section-label { color: var(--pip-amber); font-size: 0.95rem; margin: 1.5rem 0 0.5rem; letter-spacing: 0.05em; }
+    .delivery-row { display: flex; gap: 0.5rem; }
+    .delivery-btn {
+      flex: 1;
+      padding: 0.8rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-dim);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .delivery-btn:hover { border-color: var(--pip-green); color: var(--pip-green); }
+    .delivery-btn.active {
+      background: var(--pip-green);
+      color: var(--pip-bg);
+      border-color: var(--pip-green);
+      box-shadow: 0 0 6px var(--pip-glow);
+    }
+
+    /* Cart */
+    .cart-summary { margin-top: 1rem; padding: 1rem; border: 1px dashed var(--pip-dim); background: rgba(51, 255, 54, 0.03); }
+    .cart-line { display: flex; justify-content: space-between; padding: 0.3rem 0; color: var(--pip-green); font-size: 0.95rem; }
+    .cart-line .label { color: var(--pip-dim); }
+    .cart-line.total { border-top: 1px solid var(--pip-dim); margin-top: 0.5rem; padding-top: 0.5rem; color: var(--pip-amber); font-size: 1.05rem; }
+    .cart-note { color: var(--pip-dim); font-size: 0.85rem; margin-top: 0.4rem; font-style: italic; }
+
+    /* Buy button */
+    .buy-btn {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--pip-bg);
+      border: 2px solid var(--pip-green);
+      color: var(--pip-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.15rem;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+    }
+    .buy-btn:hover:not(:disabled) {
+      background: var(--pip-green);
+      color: var(--pip-bg);
+      box-shadow: 0 0 14px var(--pip-glow);
+    }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: var(--pip-dim); color: var(--pip-dim); }
+
+    .message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border: 1px solid var(--pip-amber);
+      color: var(--pip-amber);
+      background: rgba(255, 179, 64, 0.05);
+      font-size: 0.95rem;
+      display: none;
+    }
+    .message.show { display: block; }
+
+    .flavor {
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--pip-dim);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .flavor a { color: var(--pip-amber); text-decoration: underline; }
+
+    @media (max-width: 480px) {
+      .terminal { padding: 1rem; }
+      .title { font-size: 1.4rem; }
+      .product-name { font-size: 1rem; }
+      .delivery-row { flex-direction: column; }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      max-width: 480px;
+      width: 100%;
+      background: var(--pip-bg-dim);
+      border: 2px solid var(--pip-amber);
+      padding: 1.5rem;
+      box-shadow: 0 0 30px rgba(255, 179, 64, 0.4);
+    }
+    .modal-title {
+      color: var(--pip-amber);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    .modal-body {
+      color: var(--pip-green);
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .modal-buttons button {
+      flex: 1;
+      padding: 0.7rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .modal-buttons button:hover { border-color: var(--pip-green); }
+    .modal-buttons button.confirm { border-color: var(--pip-amber); color: var(--pip-amber); }
+    .modal-buttons button.confirm:hover {
+      background: var(--pip-amber);
+      color: var(--pip-bg);
+      box-shadow: 0 0 10px rgba(255, 179, 64, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="header">
+      <div class="title">CLIP-BOY :: FOUNDING BACKER EDITION</div>
+      <div class="subtitle">VAULT-TEC AUTHORIZED · BACKER VERIFICATION REQUIRED</div>
+    </div>
+
+    <div class="banner" id="banner">
+      EXCLUSIVE TO THE 57 ORIGINAL SPACE BADGE BACKERS · $120 FLAT · COLORS NO ONE ELSE CAN BUY
+    </div>
+
+    <!-- Auth gate -->
+    <div class="auth-gate" id="auth-gate">
+      <p>
+        Welcome, founding backer! To access your exclusive offer, enter the email
+        you used on Kickstarter and your backer number from the SpaceBadge campaign.
+      </p>
+      <label for="auth-email">Email (used on Kickstarter)</label>
+      <input type="email" id="auth-email" autocomplete="email" placeholder="you@example.com">
+      <label for="auth-backer">Backer Number</label>
+      <input type="text" id="auth-backer" inputmode="numeric" placeholder="e.g. 42">
+      <button onclick="authenticate()" id="auth-btn">UNLOCK ACCESS</button>
+      <div class="auth-status" id="auth-status"></div>
+    </div>
+
+    <!-- Welcome (shown after auth) -->
+    <div class="welcome-block" id="welcome" style="display:none">
+      <div class="greeting" id="greeting"></div>
+      <div class="remaining" id="remaining"></div>
+    </div>
+
+    <!-- Products (shown after auth) -->
+    <div id="products" style="display:none">
+      <!-- Card: Space Badge -->
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('space')">
+          <span class="product-toggle" id="toggle-space">▶</span>
+          <span class="product-name">Founding Backer Edition (Space Badge colors)</span>
+          <span class="product-price" id="price-space">$120</span>
+        </div>
+        <div class="product-detail" id="detail-space">
+          <div class="product-detail-inner">
+            <img class="product-image" src="../images/ks/space-previs.png" alt="Space Badge color preview" loading="lazy">
+            <div class="image-caption">Pre-visualization. In low light, the trim glows soft blue-green for ~30 seconds after bright-light exposure.</div>
+            <div class="product-description">
+              The same color scheme as your original Space Badge, with glow-in-the-dark blue
+              and red trim. Hardware identical to Standard/Pro/RAD editions. Backer-exclusive
+              colorway — not sold to the public.
+            </div>
+            <div class="qty-row">
+              <span class="qty-label">Quantity:</span>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-SPACE', -1)">−</button>
+                <span class="qty-value" id="qty-DC34-KS-SPACE">0</span>
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-SPACE', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Overseer -->
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('overseer')">
+          <span class="product-toggle" id="toggle-overseer">▶</span>
+          <span class="product-name">Founding Backer Edition (Overseer colors)</span>
+          <span class="product-price" id="price-overseer">$120</span>
+        </div>
+        <div class="product-detail" id="detail-overseer">
+          <div class="product-detail-inner">
+            <img class="product-image" src="../images/ks/overseer-previs.png" alt="Overseer color preview" loading="lazy">
+            <div class="image-caption">Pre-visualization. In low light, the blue base glows soft blue-green for ~30 seconds after bright-light exposure.</div>
+            <div class="product-description">
+              A glow-in-the-dark blue base with yellow trim — perfect for ruling an underground
+              city. Hardware identical to Standard/Pro/RAD editions. Backer-exclusive
+              colorway — not sold to the public.
+            </div>
+            <div class="qty-row">
+              <span class="qty-label">Quantity:</span>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-OVERSEER', -1)">−</button>
+                <span class="qty-value" id="qty-DC34-KS-OVERSEER">0</span>
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-OVERSEER', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Standard (Gunmetal Gray) -->
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('std')">
+          <span class="product-toggle" id="toggle-std">▶</span>
+          <span class="product-name">Founding Backer Edition (Gunmetal Gray)</span>
+          <span class="product-price" id="price-std">$120</span>
+        </div>
+        <div class="product-detail" id="detail-std">
+          <div class="product-detail-inner">
+            <img class="product-image" src="../images/ks/std-production.png" alt="Standard Gunmetal Gray production photo" loading="lazy">
+            <div class="image-caption">Actual production photo of a Standard Edition in Gunmetal Gray.</div>
+            <div class="product-description">
+              Shiny gunmetal gray with black trim. Same as the public Standard Edition,
+              but at the Founding Backer price with custom firmware boot splash.
+            </div>
+            <div class="qty-row">
+              <span class="qty-label">Quantity:</span>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-STD', -1)">−</button>
+                <span class="qty-value" id="qty-DC34-KS-STD">0</span>
+                <button class="qty-btn" onclick="adjustQty('DC34-KS-STD', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">DELIVERY METHOD (select one)</div>
+      <div class="delivery-row">
+        <button class="delivery-btn" onclick="setDelivery('pickup')" id="btn-pickup">PICKUP AT DEF CON</button>
+        <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">SHIP TO ME (US)</button>
+      </div>
+
+      <div class="cart-summary" id="cart-summary" style="display:none"></div>
+
+      <button class="buy-btn" id="buyBtn" onclick="handleBuy()" disabled>SELECT ITEMS ABOVE</button>
+
+      <div class="message" id="msg"></div>
+    </div>
+
+    <div class="flavor">
+      Hardware and firmware are identical across all editions.<br>
+      <a href="#" onclick="event.preventDefault(); showLeaveModal()">← Back to public store</a>
+    </div>
+  </div>
+
+  <!-- Leave-the-backer-area modal -->
+  <div class="modal-overlay" id="leaveModal">
+    <div class="modal-box">
+      <div class="modal-title">⚠ LEAVING BACKER AREA</div>
+      <div class="modal-body">
+        You're about to leave the Founding Backer area and head to the public store.
+        The public store has different products, different pricing, and no backer-exclusive
+        colors. You can come back to this page anytime via your Kickstarter update email.
+      </div>
+      <div class="modal-buttons">
+        <button onclick="hideLeaveModal()">STAY HERE</button>
+        <button class="confirm" onclick="confirmLeave()">CONTINUE TO PUBLIC STORE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
+
+    const SKU_PRICES = {
+      'DC34-KS-SPACE': 12000,
+      'DC34-KS-OVERSEER': 12000,
+      'DC34-KS-STD': 12000,
+    };
+
+    const state = {
+      authed: false,
+      ksEmail: '',
+      ksBackerId: '',
+      ksName: '',
+      ksRemaining: 0,
+      ksCap: 5,
+      cart: {},
+      delivery: null,
+    };
+
+    // Restore from sessionStorage if available
+    function restoreSession() {
+      const raw = sessionStorage.getItem('ks_session');
+      if (!raw) return false;
+      try {
+        const s = JSON.parse(raw);
+        if (s.ksEmail && s.ksBackerId) {
+          state.authed = true;
+          state.ksEmail = s.ksEmail;
+          state.ksBackerId = s.ksBackerId;
+          state.ksName = s.ksName || '';
+          state.ksRemaining = parseInt(s.ksRemaining) || 0;
+          state.ksCap = parseInt(s.ksCap) || 5;
+          revealProducts();
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function saveSession() {
+      sessionStorage.setItem('ks_session', JSON.stringify({
+        ksEmail: state.ksEmail,
+        ksBackerId: state.ksBackerId,
+        ksName: state.ksName,
+        ksRemaining: state.ksRemaining,
+        ksCap: state.ksCap,
+      }));
+    }
+
+    async function authenticate() {
+      const email = document.getElementById('auth-email').value.trim();
+      const backerId = document.getElementById('auth-backer').value.trim();
+      const btn = document.getElementById('auth-btn');
+      const status = document.getElementById('auth-status');
+
+      if (!email || !backerId) {
+        status.textContent = 'Please enter both your email and backer number.';
+        status.className = 'auth-status error';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'VERIFYING…';
+      status.textContent = '';
+      status.className = 'auth-status';
+
+      try {
+        const url = APPS_SCRIPT_URL + '?action=ks_auth'
+          + '&email=' + encodeURIComponent(email)
+          + '&backer_id=' + encodeURIComponent(backerId);
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.ok) {
+          if (data.remaining <= 0) {
+            status.textContent = "You've already ordered your full allotment (" + data.cap + " units). Email us if you'd like more.";
+            status.className = 'auth-status error';
+            btn.disabled = false;
+            btn.textContent = 'UNLOCK ACCESS';
+            return;
+          }
+          state.authed = true;
+          state.ksEmail = email;
+          state.ksBackerId = backerId;
+          state.ksName = data.name || '';
+          state.ksRemaining = data.remaining;
+          state.ksCap = data.cap;
+          saveSession();
+          revealProducts();
+        } else {
+          status.textContent = data.message || 'Verification failed.';
+          status.className = 'auth-status error';
+          btn.disabled = false;
+          btn.textContent = 'UNLOCK ACCESS';
+        }
+      } catch (err) {
+        status.textContent = 'Network error. Please try again.';
+        status.className = 'auth-status error';
+        btn.disabled = false;
+        btn.textContent = 'UNLOCK ACCESS';
+      }
+    }
+
+    function revealProducts() {
+      document.getElementById('auth-gate').style.display = 'none';
+
+      const greet = state.ksName
+        ? 'WELCOME, ' + state.ksName.toUpperCase()
+        : 'ACCESS GRANTED';
+      document.getElementById('greeting').textContent = greet;
+
+      const remaining = state.ksRemaining;
+      const remainingMsg = remaining === 1
+        ? 'You can order 1 more Founding Backer unit.'
+        : 'You can order up to ' + remaining + ' more Founding Backer units.';
+      document.getElementById('remaining').textContent = remainingMsg;
+
+      document.getElementById('welcome').style.display = 'block';
+      document.getElementById('products').style.display = 'block';
+    }
+
+    function togglePanel(id) {
+      const detail = document.getElementById('detail-' + id);
+      const toggle = document.getElementById('toggle-' + id);
+      detail.classList.toggle('open');
+      toggle.classList.toggle('open');
+    }
+
+    function adjustQty(sku, delta) {
+      const current = state.cart[sku] || 0;
+      const newQty = current + delta;
+      if (newQty < 0) return;
+
+      const totalAfter = totalQty() - current + newQty;
+      if (totalAfter > state.ksRemaining) {
+        showMsg("That would exceed your remaining allotment of " + state.ksRemaining + ".");
+        return;
+      }
+
+      hideMsg();
+      if (newQty === 0) delete state.cart[sku];
+      else state.cart[sku] = newQty;
+      updateUI();
+    }
+
+    function totalQty() {
+      let t = 0;
+      for (const q of Object.values(state.cart)) t += q;
+      return t;
+    }
+
+    function setDelivery(method) {
+      state.delivery = method;
+      document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
+      document.getElementById('btn-ship').classList.toggle('active', method === 'ship');
+      updateUI();
+    }
+
+    function updateUI() {
+      // Update qty displays
+      for (const sku of Object.keys(SKU_PRICES)) {
+        document.getElementById('qty-' + sku).textContent = state.cart[sku] || 0;
+      }
+
+      const total = totalQty();
+      const cartEl = document.getElementById('cart-summary');
+      const btn = document.getElementById('buyBtn');
+
+      if (total === 0) {
+        cartEl.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'SELECT ITEMS ABOVE';
+        return;
+      }
+
+      // Cart subtotal
+      let subtotal = 0;
+      let lines = '';
+      for (const [sku, qty] of Object.entries(state.cart)) {
+        const price = SKU_PRICES[sku] * qty;
+        subtotal += price;
+        const label = sku === 'DC34-KS-SPACE' ? 'Space Badge colors'
+                    : sku === 'DC34-KS-OVERSEER' ? 'Overseer colors'
+                    : 'Gunmetal Gray';
+        lines += '<div class="cart-line"><span class="label">' + label + ' × ' + qty + '</span><span>$' + (price/100).toFixed(2) + '</span></div>';
+      }
+
+      let shipCost = 0;
+      let shipLabel = 'Pickup at DEF CON';
+      if (state.delivery === 'ship') {
+        shipCost = total <= 3 ? 2000 : 3000;
+        shipLabel = 'Shipping (' + (total <= 3 ? '1–3' : '4–5') + ' badges)';
+      } else if (state.delivery === null) {
+        shipLabel = '<span style="color:var(--pip-amber)">⚠ Select delivery method below</span>';
+      }
+      lines += '<div class="cart-line"><span class="label">' + shipLabel + '</span><span>' + (state.delivery === null ? '—' : (shipCost === 0 ? 'FREE' : '$' + (shipCost/100).toFixed(2))) + '</span></div>';
+
+      const grand = subtotal + shipCost;
+      lines += '<div class="cart-line total"><span>SUBTOTAL</span><span>$' + (grand/100).toFixed(2) + (state.delivery === null ? '+' : '') + '</span></div>';
+      if (state.delivery === 'ship') {
+        lines += '<div class="cart-note">+ Sales tax on badges &amp; shipping at checkout (if applicable)</div>';
+      } else if (state.delivery === 'pickup') {
+        lines += '<div class="cart-note">No sales tax for DEF CON pickup</div>';
+      }
+      lines += '<div class="cart-note">⏱ 30 minutes to complete checkout · You\'ll choose credits opt-in on the Stripe page</div>';
+
+      cartEl.innerHTML = lines;
+      cartEl.style.display = 'block';
+
+      if (state.delivery === null) {
+        btn.disabled = true;
+        btn.textContent = 'SELECT DELIVERY METHOD';
+      } else {
+        btn.disabled = false;
+        btn.textContent = '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' ]';
+      }
+    }
+
+    async function handleBuy() {
+      const btn = document.getElementById('buyBtn');
+      btn.disabled = true;
+      btn.textContent = 'PROCESSING REQUISITION';
+      hideMsg();
+
+      const cart = {};
+      for (const [sku, qty] of Object.entries(state.cart)) {
+        if (qty > 0) cart[sku] = qty;
+      }
+
+      try {
+        const url = APPS_SCRIPT_URL
+          + '?action=create_checkout'
+          + '&cart=' + encodeURIComponent(JSON.stringify(cart))
+          + '&delivery=' + state.delivery
+          + '&ks_email=' + encodeURIComponent(state.ksEmail)
+          + '&ks_backer_id=' + encodeURIComponent(state.ksBackerId);
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          showMsg(data.error || 'Unable to start checkout.');
+          btn.disabled = false;
+          updateUI();
+        }
+      } catch (err) {
+        showMsg('Network error. Please try again.');
+        btn.disabled = false;
+        updateUI();
+      }
+    }
+
+    function showMsg(text) {
+      const msg = document.getElementById('msg');
+      msg.textContent = text;
+      msg.classList.add('show');
+    }
+    function hideMsg() {
+      document.getElementById('msg').classList.remove('show');
+    }
+
+    function showLeaveModal() {
+      document.getElementById('leaveModal').classList.add('show');
+    }
+    function hideLeaveModal() {
+      document.getElementById('leaveModal').classList.remove('show');
+    }
+    function confirmLeave() {
+      window.location.href = 'https://get.brycebadges.com';
+    }
+
+    // Init
+    if (!restoreSession()) {
+      document.getElementById('auth-email').focus();
+    }
+  </script>
+</body>
+</html>
