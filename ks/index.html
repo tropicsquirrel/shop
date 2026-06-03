@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clip-Boy — Founding Backer Edition</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com data:; connect-src https://script.google.com https://script.googleusercontent.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,13 +69,16 @@
     .banner {
       border: 1px solid var(--pip-amber);
       background: rgba(255, 179, 64, 0.05);
-      padding: 0.75rem 1rem;
+      padding: 0.9rem 1rem;
       margin-bottom: 1.5rem;
       color: var(--pip-amber);
       font-size: 0.95rem;
       text-align: center;
+      line-height: 1.6;
       box-shadow: 0 0 6px rgba(255, 179, 64, 0.2);
     }
+    .banner .b-line { display: block; }
+    .banner .b-sep { color: var(--pip-dim); margin: 0 0.5em; }
 
     /* Auth gate */
     .auth-gate {
@@ -134,6 +137,16 @@
     .welcome-block .greeting { font-size: 1.1rem; color: var(--pip-green); margin-bottom: 0.4rem; }
     .welcome-block .remaining { color: var(--pip-amber); font-size: 0.95rem; }
 
+    /* Launch video */
+    .launch-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      margin-bottom: 1rem;
+      border: 1px solid var(--pip-dim);
+      box-shadow: 0 0 12px var(--pip-glow);
+    }
+    .launch-video iframe { width: 100%; height: 100%; display: block; }
+
     /* Product cards */
     .product-card {
       border: 1px solid var(--pip-dim);
@@ -158,7 +171,7 @@
       overflow: hidden;
       transition: max-height 0.3s ease-out;
     }
-    .product-detail.open { max-height: 3000px; }
+    .product-detail.open { max-height: 5000px; }
     .product-detail-inner {
       padding: 0 1.2rem 1.2rem;
       border-top: 1px dashed var(--pip-dim);
@@ -166,10 +179,11 @@
     }
     .product-image {
       width: 100%;
-      margin: 0 auto 0.75rem;
+      margin: 0 auto 0.4rem;
       display: block;
       border: 1px solid var(--pip-dim);
       background: #000;
+      cursor: zoom-in;
     }
     .product-description {
       color: var(--pip-dim);
@@ -177,6 +191,7 @@
       line-height: 1.55;
       margin-bottom: 1rem;
     }
+    .product-description strong { color: var(--pip-green); }
     .image-caption { font-size: 0.8rem; color: var(--pip-dim); text-align: center; font-style: italic; margin-bottom: 1rem; }
 
     .qty-row {
@@ -200,6 +215,43 @@
     .qty-btn:hover:not(:disabled) { border-color: var(--pip-green); }
     .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .qty-value { min-width: 28px; text-align: center; color: var(--pip-green); font-size: 1.1rem; }
+
+    /* Contribute section */
+    .contribute-block {
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
+      border: 1px dashed var(--pip-amber);
+      background: rgba(255, 179, 64, 0.03);
+    }
+    .contribute-block .label { color: var(--pip-amber); margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .contribute-presets { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .contribute-presets button {
+      flex: 1;
+      min-width: 60px;
+      padding: 0.5rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-dim);
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .contribute-presets button:hover { border-color: var(--pip-amber); color: var(--pip-amber); }
+    .contribute-presets button.active {
+      background: var(--pip-amber);
+      color: var(--pip-bg);
+      border-color: var(--pip-amber);
+    }
+    .contribute-custom { display: flex; align-items: center; gap: 0.4rem; }
+    .contribute-custom span { color: var(--pip-amber); }
+    .contribute-custom input {
+      flex: 1;
+      padding: 0.5rem;
+      background: var(--pip-bg);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-amber);
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .contribute-note { color: var(--pip-dim); font-size: 0.82rem; margin-top: 0.5rem; font-style: italic; }
 
     /* Delivery */
     .section-label { color: var(--pip-amber); font-size: 0.95rem; margin: 1.5rem 0 0.5rem; letter-spacing: 0.05em; }
@@ -260,6 +312,42 @@
     }
     .message.show { display: block; }
 
+    /* Section divider */
+    .section-divider {
+      border: 0;
+      border-top: 2px solid var(--pip-dim);
+      margin: 2rem -1.5rem;
+      box-shadow: 0 0 8px var(--pip-glow);
+    }
+    @media (max-width: 480px) {
+      .section-divider { margin: 1.5rem -1rem; }
+    }
+
+    /* About + AI transparency cards (reuse product-card styling) */
+    .about-bio { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+    .bryce-large {
+      width: 140px; height: 140px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--pip-dim);
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(51, 255, 54, 0.15);
+    }
+    .about-bio-text { color: var(--pip-dim); font-size: 1.05rem; line-height: 1.6; flex: 1; min-width: 0; }
+    .about-links {
+      display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .about-links a {
+      color: var(--pip-amber); text-decoration: underline; font-size: 1rem;
+      padding: 0.3rem 0; min-height: 44px; display: flex; align-items: center;
+    }
+    .about-links a:active { color: var(--pip-green); }
+    .link-icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; margin-right: 0.4em; border-radius: 2px; }
+    .ext-icon {
+      display: inline-block; width: 0.75em; height: 0.75em;
+      margin-left: 0.3em; vertical-align: baseline;
+      stroke: currentColor; fill: none; stroke-width: 2;
+    }
+
     .flavor {
       margin-top: 2rem;
       text-align: center;
@@ -274,47 +362,29 @@
       .title { font-size: 1.4rem; }
       .product-name { font-size: 1rem; }
       .delivery-row { flex-direction: column; }
+      .bryce-large { width: 100px; height: 100px; }
     }
 
     /* Modal */
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      padding: 1rem;
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000; padding: 1rem;
     }
     .modal-overlay.show { display: flex; }
     .modal-box {
-      max-width: 480px;
-      width: 100%;
+      max-width: 480px; width: 100%;
       background: var(--pip-bg-dim);
       border: 2px solid var(--pip-amber);
       padding: 1.5rem;
       box-shadow: 0 0 30px rgba(255, 179, 64, 0.4);
     }
-    .modal-title {
-      color: var(--pip-amber);
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      letter-spacing: 0.05em;
-    }
-    .modal-body {
-      color: var(--pip-green);
-      line-height: 1.55;
-      margin-bottom: 1.5rem;
-      font-size: 0.95rem;
-    }
-    .modal-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .modal-title { color: var(--pip-amber); font-size: 1.2rem; margin-bottom: 1rem; letter-spacing: 0.05em; }
+    .modal-body { color: var(--pip-green); line-height: 1.55; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .modal-buttons { display: flex; gap: 0.5rem; }
     .modal-buttons button {
-      flex: 1;
-      padding: 0.7rem;
+      flex: 1; padding: 0.7rem;
       background: var(--pip-bg);
       border: 1px solid var(--pip-dim);
       color: var(--pip-green);
@@ -325,9 +395,28 @@
     .modal-buttons button:hover { border-color: var(--pip-green); }
     .modal-buttons button.confirm { border-color: var(--pip-amber); color: var(--pip-amber); }
     .modal-buttons button.confirm:hover {
-      background: var(--pip-amber);
-      color: var(--pip-bg);
+      background: var(--pip-amber); color: var(--pip-bg);
       box-shadow: 0 0 10px rgba(255, 179, 64, 0.4);
+    }
+
+    /* Lightbox */
+    .lightbox-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.94);
+      display: none; align-items: center; justify-content: center;
+      z-index: 3000; padding: 1rem;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay.show { display: flex; }
+    .lightbox-overlay img { max-width: 95vw; max-height: 90vh; border: 1px solid var(--pip-dim); }
+    .lightbox-close {
+      position: absolute; top: 1rem; right: 1rem;
+      width: 44px; height: 44px;
+      background: var(--pip-bg-dim);
+      border: 1px solid var(--pip-dim);
+      color: var(--pip-amber);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.5rem; cursor: pointer;
     }
   </style>
 </head>
@@ -339,7 +428,8 @@
     </div>
 
     <div class="banner" id="banner">
-      EXCLUSIVE TO THE 57 ORIGINAL SPACE BADGE BACKERS · $120 FLAT · COLORS NO ONE ELSE CAN BUY
+      <span class="b-line">EXCLUSIVE TO THE 57 ORIGINAL SPACE BADGE BACKERS</span>
+      <span class="b-line">$120 FLAT <span class="b-sep">·</span> COLORS NO ONE ELSE CAN BUY</span>
     </div>
 
     <!-- Auth gate -->
@@ -356,29 +446,37 @@
       <div class="auth-status" id="auth-status"></div>
     </div>
 
-    <!-- Welcome (shown after auth) -->
-    <div class="welcome-block" id="welcome" style="display:none">
-      <div class="greeting" id="greeting"></div>
-      <div class="remaining" id="remaining"></div>
-    </div>
+    <!-- Post-auth content -->
+    <div id="post-auth" style="display:none">
+      <div class="welcome-block" id="welcome">
+        <div class="greeting" id="greeting"></div>
+        <div class="remaining" id="remaining"></div>
+      </div>
 
-    <!-- Products (shown after auth) -->
-    <div id="products" style="display:none">
+      <div class="launch-video">
+        <iframe src="https://www.youtube-nocookie.com/embed/bvcpd95C3bg"
+                title="Clip-Boy Launch Video"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+      </div>
+
       <!-- Card: Space Badge -->
       <div class="product-card">
         <div class="product-summary" onclick="togglePanel('space')">
           <span class="product-toggle" id="toggle-space">▶</span>
           <span class="product-name">Founding Backer Edition (Space Badge colors)</span>
-          <span class="product-price" id="price-space">$120</span>
+          <span class="product-price">$120</span>
         </div>
         <div class="product-detail" id="detail-space">
           <div class="product-detail-inner">
-            <img class="product-image" src="../images/ks/space-previs.png" alt="Space Badge color preview" loading="lazy">
-            <div class="image-caption">Pre-visualization. In low light, the trim glows soft blue-green for ~30 seconds after bright-light exposure.</div>
+            <img class="product-image" src="../images/ks/space-previs.png" alt="Space Badge color preview" onclick="openLightbox(this.src)" loading="lazy">
+            <div class="image-caption">Pre-visualization (left: glow, right: lit). Trim glows blue and red in low light for ~30 seconds after bright-light exposure.</div>
             <div class="product-description">
               The same color scheme as your original Space Badge, with glow-in-the-dark blue
-              and red trim. Hardware identical to Standard/Pro/RAD editions. Backer-exclusive
-              colorway — not sold to the public.
+              and red trim. Hardware identical to all other Clip-Boy editions; backer-exclusive
+              color scheme — not sold to the public. <strong>Includes the custom Founding Backer
+              boot screen.</strong>
             </div>
             <div class="qty-row">
               <span class="qty-label">Quantity:</span>
@@ -397,16 +495,17 @@
         <div class="product-summary" onclick="togglePanel('overseer')">
           <span class="product-toggle" id="toggle-overseer">▶</span>
           <span class="product-name">Founding Backer Edition (Overseer colors)</span>
-          <span class="product-price" id="price-overseer">$120</span>
+          <span class="product-price">$120</span>
         </div>
         <div class="product-detail" id="detail-overseer">
           <div class="product-detail-inner">
-            <img class="product-image" src="../images/ks/overseer-previs.png" alt="Overseer color preview" loading="lazy">
-            <div class="image-caption">Pre-visualization. In low light, the blue base glows soft blue-green for ~30 seconds after bright-light exposure.</div>
+            <img class="product-image" src="../images/ks/overseer-previs.png" alt="Overseer color preview" onclick="openLightbox(this.src)" loading="lazy">
+            <div class="image-caption">Pre-visualization (left: glow, right: lit). Blue base glows in low light for ~30 seconds after bright-light exposure.</div>
             <div class="product-description">
               A glow-in-the-dark blue base with yellow trim — perfect for ruling an underground
-              city. Hardware identical to Standard/Pro/RAD editions. Backer-exclusive
-              colorway — not sold to the public.
+              city. Hardware identical to all other Clip-Boy editions; backer-exclusive color
+              scheme — not sold to the public. <strong>Includes the custom Founding Backer
+              boot screen.</strong>
             </div>
             <div class="qty-row">
               <span class="qty-label">Quantity:</span>
@@ -425,15 +524,16 @@
         <div class="product-summary" onclick="togglePanel('std')">
           <span class="product-toggle" id="toggle-std">▶</span>
           <span class="product-name">Founding Backer Edition (Gunmetal Gray)</span>
-          <span class="product-price" id="price-std">$120</span>
+          <span class="product-price">$120</span>
         </div>
         <div class="product-detail" id="detail-std">
           <div class="product-detail-inner">
-            <img class="product-image" src="../images/ks/std-production.png" alt="Standard Gunmetal Gray production photo" loading="lazy">
-            <div class="image-caption">Actual production photo of a Standard Edition in Gunmetal Gray.</div>
+            <img class="product-image" src="../images/ks/std-previs.png" alt="Standard Gunmetal Gray preview" onclick="openLightbox(this.src)" loading="lazy">
+            <div class="image-caption">Two pre-visualization images and an actual photo of a production Clip-Boy.</div>
             <div class="product-description">
-              Shiny gunmetal gray with black trim. Same as the public Standard Edition,
-              but at the Founding Backer price with custom firmware boot splash.
+              Shiny gunmetal gray with black trim. Same color scheme as the public Standard
+              Edition, but at the Founding Backer price.
+              <strong>Includes the custom Founding Backer boot screen.</strong>
             </div>
             <div class="qty-row">
               <span class="qty-label">Quantity:</span>
@@ -447,10 +547,27 @@
         </div>
       </div>
 
+      <!-- Contribute -->
+      <div class="contribute-block">
+        <div class="label">★ ADD TO BRYCE'S COLLEGE FUND</div>
+        <div class="contribute-presets">
+          <button onclick="setContribution(0)" id="contrib-0" class="active">$0</button>
+          <button onclick="setContribution(1000)" id="contrib-1000">$10</button>
+          <button onclick="setContribution(2500)" id="contrib-2500">$25</button>
+          <button onclick="setContribution(5000)" id="contrib-5000">$50</button>
+          <button onclick="setContribution(10000)" id="contrib-10000">$100</button>
+        </div>
+        <div class="contribute-custom">
+          <span>$</span>
+          <input type="number" min="0" step="1" placeholder="Custom amount" id="contrib-custom" oninput="setCustomContribution(this.value)">
+        </div>
+        <div class="contribute-note">Added to your badge order — no separate transaction needed.</div>
+      </div>
+
       <div class="section-label">DELIVERY METHOD (select one)</div>
       <div class="delivery-row">
         <button class="delivery-btn" onclick="setDelivery('pickup')" id="btn-pickup">PICKUP AT DEF CON</button>
-        <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">SHIP TO ME (US)</button>
+        <button class="delivery-btn" onclick="setDelivery('ship')" id="btn-ship">SHIP TO ME (USA ONLY)</button>
       </div>
 
       <div class="cart-summary" id="cart-summary" style="display:none"></div>
@@ -458,6 +575,71 @@
       <button class="buy-btn" id="buyBtn" onclick="handleBuy()" disabled>SELECT ITEMS ABOVE</button>
 
       <div class="message" id="msg"></div>
+
+      <hr class="section-divider">
+
+      <!-- About card -->
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('about')">
+          <span class="product-toggle open" id="toggle-about">▼</span>
+          <span class="product-name">About the creator: Bryce</span>
+        </div>
+        <div class="product-detail open" id="detail-about">
+          <div class="product-detail-inner">
+            <div class="about-bio">
+              <img src="../images/bryce.png" alt="Bryce" class="bryce-large">
+              <div class="about-bio-text">
+                Clip-Boy is designed and built by Bryce, a high school junior from
+                San Antonio, TX. When he's not soldering or writing firmware, he's
+                leading his CyberPatriot team to a #3 national finish out of 1,000+
+                teams (as team commander) and building indie games. This is his second
+                DEF CON badge — the first was Space Badge, 218% funded on Kickstarter.
+              </div>
+            </div>
+            <div class="about-links">
+              <a href="https://defcon.social/@clipboy" target="_blank" rel="noopener me"><img src="https://defcon.social/favicon.ico" alt="" class="link-icon">DefCon.Social<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+              <a href="https://www.linkedin.com/in/b-r-y-c-e/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=linkedin.com&sz=64" alt="" class="link-icon">LinkedIn<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+              <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges" target="_blank" rel="noopener"><img src="https://www.kickstarter.com/favicon.ico" alt="" class="link-icon">Space Badge<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+              <a href="https://crazykittens-892-yt.itch.io/" target="_blank" rel="noopener"><img src="https://itch.io/favicon.ico" alt="" class="link-icon">itch.io<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Transparency card -->
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('ai')">
+          <span class="product-toggle" id="toggle-ai">▶</span>
+          <span class="product-name">AI &amp; Tooling Transparency</span>
+        </div>
+        <div class="product-detail" id="detail-ai">
+          <div class="product-detail-inner">
+            <div class="product-description">
+              Bryce designed the PCB and enclosure, defined the feature set, and made every
+              call about what ships and what gets cut. He tested on physical hardware (some
+              of it gloriously flaky).
+              <br><br>
+              Tools used along the way:
+              <br><br>
+              <span style="color:var(--pip-green)">→ Claude Code</span>
+              <span style="color:var(--pip-dim)"> — code review, PCB review, debugging partner</span>
+              <br>
+              <span style="color:var(--pip-green)">→ ESP32 Marauder by justcallmekoko</span>
+              <span style="color:var(--pip-dim)"> — base for the Wi-Fi/BLE security tooling,
+              ported to Clip-Boy with significant AI-assisted refactoring</span>
+              <br>
+              <span style="color:var(--pip-green)">→ Flux.1 Schnell</span>
+              <span style="color:var(--pip-dim)"> — collectible artwork (prompts written and curated by Bryce)</span>
+              <br>
+              <span style="color:var(--pip-green)">→ ChatGPT</span>
+              <span style="color:var(--pip-dim)"> — a handful of static graphics, including Clippy</span>
+              <br><br>
+              <span style="font-style:italic">Standard disclaimer: AI was used as a tool, like Git or a
+              multimeter. The decisions, the design, the bugs, and the jokes are all Bryce's.</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="flavor">
@@ -466,20 +648,26 @@
     </div>
   </div>
 
-  <!-- Leave-the-backer-area modal -->
+  <!-- Leave modal -->
   <div class="modal-overlay" id="leaveModal">
     <div class="modal-box">
       <div class="modal-title">⚠ LEAVING BACKER AREA</div>
       <div class="modal-body">
         You're about to leave the Founding Backer area and head to the public store.
         The public store has different products, different pricing, and no backer-exclusive
-        colors. You can come back to this page anytime via your Kickstarter update email.
+        color schemes. You can return here anytime via your Kickstarter update email.
       </div>
       <div class="modal-buttons">
         <button onclick="hideLeaveModal()">STAY HERE</button>
         <button class="confirm" onclick="confirmLeave()">CONTINUE TO PUBLIC STORE</button>
       </div>
     </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="">
   </div>
 
   <script>
@@ -500,9 +688,9 @@
       ksCap: 5,
       cart: {},
       delivery: null,
+      donationCents: 0,
     };
 
-    // Restore from sessionStorage if available
     function restoreSession() {
       const raw = sessionStorage.getItem('ks_session');
       if (!raw) return false;
@@ -558,7 +746,7 @@
 
         if (data.ok) {
           if (data.remaining <= 0) {
-            status.textContent = "You've already ordered your full allotment (" + data.cap + " units). Email us if you'd like more.";
+            status.textContent = "You've already ordered your full allotment (" + data.cap + " units). Email coruscantproductions@gmail.com if you'd like more.";
             status.className = 'auth-status error';
             btn.disabled = false;
             btn.textContent = 'UNLOCK ACCESS';
@@ -600,8 +788,7 @@
         : 'You can order up to ' + remaining + ' more Founding Backer units.';
       document.getElementById('remaining').textContent = remainingMsg;
 
-      document.getElementById('welcome').style.display = 'block';
-      document.getElementById('products').style.display = 'block';
+      document.getElementById('post-auth').style.display = 'block';
     }
 
     function togglePanel(id) {
@@ -634,6 +821,27 @@
       return t;
     }
 
+    function setContribution(cents) {
+      state.donationCents = cents;
+      document.querySelectorAll('.contribute-presets button').forEach(b => b.classList.remove('active'));
+      const el = document.getElementById('contrib-' + cents);
+      if (el) el.classList.add('active');
+      document.getElementById('contrib-custom').value = '';
+      updateUI();
+    }
+    function setCustomContribution(val) {
+      const n = parseFloat(val) || 0;
+      if (n < 0) return;
+      if (n > 1000) {
+        document.getElementById('contrib-custom').value = '1000';
+        state.donationCents = 100000;
+      } else {
+        state.donationCents = Math.round(n * 100);
+      }
+      document.querySelectorAll('.contribute-presets button').forEach(b => b.classList.remove('active'));
+      updateUI();
+    }
+
     function setDelivery(method) {
       state.delivery = method;
       document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
@@ -642,7 +850,6 @@
     }
 
     function updateUI() {
-      // Update qty displays
       for (const sku of Object.keys(SKU_PRICES)) {
         document.getElementById('qty-' + sku).textContent = state.cart[sku] || 0;
       }
@@ -650,15 +857,23 @@
       const total = totalQty();
       const cartEl = document.getElementById('cart-summary');
       const btn = document.getElementById('buyBtn');
+      const hasDonation = state.donationCents >= 100;
 
-      if (total === 0) {
+      if (total === 0 && !hasDonation) {
         cartEl.style.display = 'none';
         btn.disabled = true;
         btn.textContent = 'SELECT ITEMS ABOVE';
         return;
       }
 
-      // Cart subtotal
+      // If donation-only (no badges), still need to disable since KS flow requires a badge
+      if (total === 0 && hasDonation) {
+        cartEl.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'ADD A BADGE TO CONTRIBUTE';
+        return;
+      }
+
       let subtotal = 0;
       let lines = '';
       for (const [sku, qty] of Object.entries(state.cart)) {
@@ -680,7 +895,11 @@
       }
       lines += '<div class="cart-line"><span class="label">' + shipLabel + '</span><span>' + (state.delivery === null ? '—' : (shipCost === 0 ? 'FREE' : '$' + (shipCost/100).toFixed(2))) + '</span></div>';
 
-      const grand = subtotal + shipCost;
+      if (hasDonation) {
+        lines += '<div class="cart-line"><span class="label">College Fund Contribution</span><span>$' + (state.donationCents/100).toFixed(2) + '</span></div>';
+      }
+
+      const grand = subtotal + shipCost + (hasDonation ? state.donationCents : 0);
       lines += '<div class="cart-line total"><span>SUBTOTAL</span><span>$' + (grand/100).toFixed(2) + (state.delivery === null ? '+' : '') + '</span></div>';
       if (state.delivery === 'ship') {
         lines += '<div class="cart-note">+ Sales tax on badges &amp; shipping at checkout (if applicable)</div>';
@@ -697,7 +916,10 @@
         btn.textContent = 'SELECT DELIVERY METHOD';
       } else {
         btn.disabled = false;
-        btn.textContent = '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' ]';
+        const label = hasDonation
+          ? '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' + CONTRIBUTE ]'
+          : '[ REQUISITION ' + total + (total === 1 ? ' BADGE' : ' BADGES') + ' ]';
+        btn.textContent = label;
       }
     }
 
@@ -717,6 +939,7 @@
           + '?action=create_checkout'
           + '&cart=' + encodeURIComponent(JSON.stringify(cart))
           + '&delivery=' + state.delivery
+          + (state.donationCents >= 100 ? '&donation=' + state.donationCents : '')
           + '&ks_email=' + encodeURIComponent(state.ksEmail)
           + '&ks_backer_id=' + encodeURIComponent(state.ksBackerId);
         const resp = await fetch(url);
@@ -745,17 +968,41 @@
       document.getElementById('msg').classList.remove('show');
     }
 
-    function showLeaveModal() {
-      document.getElementById('leaveModal').classList.add('show');
+    function showLeaveModal() { document.getElementById('leaveModal').classList.add('show'); }
+    function hideLeaveModal() { document.getElementById('leaveModal').classList.remove('show'); }
+    function confirmLeave() { window.location.href = 'https://get.brycebadges.com'; }
+
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('show');
     }
-    function hideLeaveModal() {
-      document.getElementById('leaveModal').classList.remove('show');
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('show');
+      document.getElementById('lightbox-img').src = '';
     }
-    function confirmLeave() {
-      window.location.href = 'https://get.brycebadges.com';
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        hideLeaveModal();
+      }
+    });
+
+    // Visit tracking — fire and forget
+    function trackVisit() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const src = params.get('utm_source') || params.get('src') || 'ks-direct';
+        const url = APPS_SCRIPT_URL + '?action=track'
+          + '&src=' + encodeURIComponent(src.substring(0, 50))
+          + '&ref=' + encodeURIComponent((document.referrer || '').substring(0, 200))
+          + '&ua=' + encodeURIComponent(navigator.userAgent.substring(0, 200))
+          + '&path=' + encodeURIComponent('/ks/');
+        fetch(url, { mode: 'no-cors' }).catch(function(){});
+      } catch (e) {}
     }
 
     // Init
+    trackVisit();
     if (!restoreSession()) {
       document.getElementById('auth-email').focus();
     }
