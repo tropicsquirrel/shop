@@ -749,10 +749,45 @@
           state.ksRemaining = parseInt(s.ksRemaining) || 0;
           state.ksCap = parseInt(s.ksCap) || 5;
           revealProducts();
+          // Fire a silent re-auth to refresh the remaining count from the server.
+          // Catches case where the user just completed a purchase and returned.
+          refreshRemainingCount();
           return true;
         }
       } catch (e) {}
       return false;
+    }
+
+    async function refreshRemainingCount() {
+      try {
+        const url = APPS_SCRIPT_URL + '?action=ks_auth'
+          + '&email=' + encodeURIComponent(state.ksEmail)
+          + '&backer_id=' + encodeURIComponent(state.ksBackerId);
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data.ok) {
+          state.ksRemaining = data.remaining;
+          state.ksCap = data.cap;
+          saveSession();
+          updateRemainingDisplay();
+        }
+      } catch (e) {
+        // Silent failure — keep stale cached state, will be caught at create_checkout server-side
+      }
+    }
+
+    function updateRemainingDisplay() {
+      const remaining = state.ksRemaining;
+      let msg;
+      if (remaining <= 0) {
+        msg = "You've used your full allotment of " + state.ksCap + " Founding Backer units. Email coruscantproductions@gmail.com if you'd like more.";
+      } else if (remaining === 1) {
+        msg = 'You can order 1 more Founding Backer unit.';
+      } else {
+        msg = 'You can order up to ' + remaining + ' more Founding Backer units.';
+      }
+      const el = document.getElementById('remaining');
+      if (el) el.textContent = msg;
     }
 
     function saveSession() {
@@ -827,11 +862,7 @@
         : 'ACCESS GRANTED';
       document.getElementById('greeting').textContent = greet;
 
-      const remaining = state.ksRemaining;
-      const remainingMsg = remaining === 1
-        ? 'You can order 1 more Founding Backer unit.'
-        : 'You can order up to ' + remaining + ' more Founding Backer units.';
-      document.getElementById('remaining').textContent = remainingMsg;
+      updateRemainingDisplay();
 
       document.getElementById('post-auth').style.display = 'block';
     }
