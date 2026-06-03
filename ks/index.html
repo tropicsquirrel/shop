@@ -6,6 +6,22 @@
   <title>Clip-Boy — Founding Backer Edition</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/favicon.png">
+
+  <!-- Open Graph (social previews) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Clip-Boy">
+  <meta property="og:title" content="Clip-Boy — Founding Backer Edition">
+  <meta property="og:description" content="Exclusive to the 57 original Space Badge backers. $120 flat, in colors no one else can buy.">
+  <meta property="og:url" content="https://ks.brycebadges.com">
+  <meta property="og:image" content="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/og-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Clip-Boy — Founding Backer Edition">
+  <meta name="twitter:description" content="Exclusive to the 57 original Space Badge backers. $120 flat, in colors no one else can buy.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/og-preview.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -424,7 +440,7 @@
   <div class="terminal">
     <div class="header">
       <div class="title">CLIP-BOY :: FOUNDING BACKER EDITION</div>
-      <div class="subtitle">VAULT-TEC AUTHORIZED · BACKER VERIFICATION REQUIRED</div>
+      <div class="subtitle">RESTRICTED ACCESS · BACKER VERIFICATION REQUIRED</div>
     </div>
 
     <div class="banner" id="banner">
@@ -548,20 +564,30 @@
       </div>
 
       <!-- Contribute -->
-      <div class="contribute-block">
-        <div class="label">★ ADD TO BRYCE'S COLLEGE FUND</div>
-        <div class="contribute-presets">
-          <button onclick="setContribution(0)" id="contrib-0" class="active">$0</button>
-          <button onclick="setContribution(1000)" id="contrib-1000">$10</button>
-          <button onclick="setContribution(2500)" id="contrib-2500">$25</button>
-          <button onclick="setContribution(5000)" id="contrib-5000">$50</button>
-          <button onclick="setContribution(10000)" id="contrib-10000">$100</button>
+      <div class="product-card">
+        <div class="product-summary" onclick="togglePanel('donate')">
+          <span class="product-toggle" id="toggle-donate">▶</span>
+          <span class="product-name">Contribute to Bryce's College Fund (Optional)</span>
         </div>
-        <div class="contribute-custom">
-          <span>$</span>
-          <input type="number" min="0" step="1" placeholder="Custom amount" id="contrib-custom" oninput="setCustomContribution(this.value)">
+        <div class="product-detail" id="detail-donate">
+          <div class="product-detail-inner">
+            <div class="product-description">
+              Adds your contribution to this badge order — no separate transaction needed.
+              Bundled into your Stripe checkout total below.
+            </div>
+            <div class="contribute-presets">
+              <button onclick="setContribution(0)" id="contrib-0" class="active">$0</button>
+              <button onclick="setContribution(1000)" id="contrib-1000">$10</button>
+              <button onclick="setContribution(2500)" id="contrib-2500">$25</button>
+              <button onclick="setContribution(5000)" id="contrib-5000">$50</button>
+              <button onclick="setContribution(10000)" id="contrib-10000">$100</button>
+            </div>
+            <div class="contribute-custom">
+              <span>$</span>
+              <input type="number" min="0" step="1" placeholder="Custom amount" id="contrib-custom" oninput="setCustomContribution(this.value)">
+            </div>
+          </div>
         </div>
-        <div class="contribute-note">Added to your badge order — no separate transaction needed.</div>
       </div>
 
       <div class="section-label">DELIVERY METHOD (select one)</div>
@@ -581,7 +607,7 @@
       <!-- About card -->
       <div class="product-card">
         <div class="product-summary" onclick="togglePanel('about')">
-          <span class="product-toggle open" id="toggle-about">▼</span>
+          <span class="product-toggle open" id="toggle-about">▶</span>
           <span class="product-name">About the creator: Bryce</span>
         </div>
         <div class="product-detail open" id="detail-about">
