@@ -184,6 +184,29 @@
       box-shadow: none;
     }
 
+    /* When sales deadline expires, lock down all badge-purchase controls.
+       Contribution controls intentionally stay enabled so backers can still donate. */
+    body.deadline-locked .qty-btn,
+    body.deadline-locked .delivery-btn {
+      opacity: 0.35;
+      pointer-events: none;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+    body.deadline-locked .product-card .qty-row,
+    body.deadline-locked .delivery-row {
+      position: relative;
+    }
+    body.deadline-locked .delivery-row::after {
+      content: '🔒 SALES CLOSED';
+      position: absolute;
+      right: 0;
+      top: -1.5rem;
+      font-size: 0.8rem;
+      color: var(--pip-amber);
+      letter-spacing: 0.05em;
+    }
+
     /* Launch video */
     .launch-video {
       width: 100%;
@@ -870,8 +893,16 @@
 
       if (remaining <= 0) {
         banner.classList.add('expired');
-        banner.innerHTML = '⏰ FOUNDING BACKER ORDERING HAS CLOSED. Email coruscantproductions@gmail.com if you need an exception.';
+        banner.innerHTML = '⏰ FOUNDING BACKER ORDERING HAS CLOSED. Email coruscantproductions@gmail.com if you need an exception. Contributions to Bryce\'s college fund are still welcome below.';
         state.deadlineExpired = true;
+        document.body.classList.add('deadline-locked');
+        // Auto-expand the contribute card so the still-available path is visible
+        const cDetail = document.getElementById('detail-donate');
+        const cToggle = document.getElementById('toggle-donate');
+        if (cDetail && !cDetail.classList.contains('open')) {
+          cDetail.classList.add('open');
+          if (cToggle) cToggle.classList.add('open');
+        }
         if (countdownInterval) clearInterval(countdownInterval);
         updateUI();
         return;
@@ -1023,6 +1054,7 @@
     }
 
     function adjustQty(sku, delta) {
+      if (state.deadlineExpired) return;
       const current = state.cart[sku] || 0;
       const newQty = current + delta;
       if (newQty < 0) return;
@@ -1067,6 +1099,7 @@
     }
 
     function setDelivery(method) {
+      if (state.deadlineExpired) return;
       state.delivery = method;
       document.getElementById('btn-pickup').classList.toggle('active', method === 'pickup');
       document.getElementById('btn-ship').classList.toggle('active', method === 'ship');
