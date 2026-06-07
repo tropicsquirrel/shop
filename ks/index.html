@@ -165,6 +165,18 @@
       letter-spacing: 0.05em;
     }
     .deadline-banner #countdown { font-weight: bold; font-size: 1.05em; }
+    .deadline-banner .cd-part {
+      display: inline-block;
+      min-width: 0.6em;
+      transition: none;
+    }
+    @keyframes cd-flash {
+      0% { color: var(--pip-green); text-shadow: 0 0 10px var(--pip-green); transform: scale(1.2); }
+      100% { color: var(--pip-amber); text-shadow: none; transform: scale(1); }
+    }
+    .deadline-banner .cd-part.pulsing {
+      animation: cd-flash 0.5s ease-out;
+    }
     .deadline-banner.expired {
       border-color: var(--pip-dim);
       color: var(--pip-dim);
@@ -198,6 +210,16 @@
     .product-summary:hover { background: rgba(51, 255, 54, 0.05); }
     .product-toggle { color: var(--pip-amber); margin-right: 0.7rem; font-size: 1rem; transition: transform 0.2s; }
     .product-toggle.open { transform: rotate(90deg); }
+    .product-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      margin-right: 0.7rem;
+      border: 1px solid var(--pip-dim);
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #000;
+    }
     .product-name { font-size: 1.1rem; color: var(--pip-green); flex: 1; }
     .product-price { color: var(--pip-amber); font-size: 1.1rem; margin-left: 1rem; }
 
@@ -509,7 +531,7 @@
       </div>
 
       <div class="deadline-banner" id="deadlineBanner">
-        ⏰ FOUNDING BACKER PRICING ENDS IN: <span id="countdown">…</span>
+        ⏰ FOUNDING BACKER SALES END IN: <span id="countdown"><span id="cd-days">…</span></span>
       </div>
 
       <div class="launch-video">
@@ -525,6 +547,7 @@
       <div class="product-card">
         <div class="product-summary" onclick="togglePanel('space')">
           <span class="product-toggle" id="toggle-space">▶</span>
+          <img src="../images/ks/thumb-space.png" alt="" class="product-thumb">
           <span class="product-name">Founding Backer Edition (Space Badge colors)</span>
           <span class="product-price">$120</span>
         </div>
@@ -554,6 +577,7 @@
       <div class="product-card">
         <div class="product-summary" onclick="togglePanel('overseer')">
           <span class="product-toggle" id="toggle-overseer">▶</span>
+          <img src="../images/ks/thumb-overseer.png" alt="" class="product-thumb">
           <span class="product-name">Founding Backer Edition (Overseer colors)</span>
           <span class="product-price">$120</span>
         </div>
@@ -583,6 +607,7 @@
       <div class="product-card">
         <div class="product-summary" onclick="togglePanel('std')">
           <span class="product-toggle" id="toggle-std">▶</span>
+          <img src="../images/ks/thumb-std.png" alt="" class="product-thumb">
           <span class="product-name">Founding Backer Edition (Gunmetal Gray)</span>
           <span class="product-price">$120</span>
         </div>
@@ -828,9 +853,13 @@
     function startCountdown() {
       if (!state.deadlineMs) return;
       if (countdownInterval) clearInterval(countdownInterval);
-      updateCountdown(); // immediate paint, no 1-second lag
+      // Reset previous values so the first paint doesn't pulse everything
+      lastCountdownParts = {};
+      updateCountdown();
       countdownInterval = setInterval(updateCountdown, 1000);
     }
+
+    let lastCountdownParts = {};
 
     function updateCountdown() {
       const banner = document.getElementById('deadlineBanner');
@@ -853,11 +882,57 @@
       const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
 
-      let text;
-      if (days > 0) text = days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
-      else if (hours > 0) text = hours + 'h ' + minutes + 'm ' + seconds + 's';
-      else text = minutes + 'm ' + seconds + 's';
-      countdownEl.textContent = text;
+      // Render only the parts we need based on what's left
+      let html;
+      if (days > 0) {
+        html = '<span class="cd-part" id="cd-d">' + days + '</span>d '
+             + '<span class="cd-part" id="cd-h">' + hours + '</span>h '
+             + '<span class="cd-part" id="cd-m">' + minutes + '</span>m '
+             + '<span class="cd-part" id="cd-s">' + seconds + '</span>s';
+      } else if (hours > 0) {
+        html = '<span class="cd-part" id="cd-h">' + hours + '</span>h '
+             + '<span class="cd-part" id="cd-m">' + minutes + '</span>m '
+             + '<span class="cd-part" id="cd-s">' + seconds + '</span>s';
+      } else {
+        html = '<span class="cd-part" id="cd-m">' + minutes + '</span>m '
+             + '<span class="cd-part" id="cd-s">' + seconds + '</span>s';
+      }
+
+      const previous = lastCountdownParts;
+      const current = { d: days, h: hours, m: minutes, s: seconds };
+
+      // If the structure changed (e.g., we dropped the days segment), reset.
+      const structureChanged =
+        (previous.hasD !== (days > 0)) ||
+        (previous.hasH !== (hours > 0 || days > 0));
+
+      countdownEl.innerHTML = html;
+
+      // Pulse any part whose displayed value just changed.
+      // Skip pulsing on the very first paint (previous values empty).
+      if (!structureChanged && Object.keys(previous).length > 0) {
+        const parts = [
+          { key: 'd', id: 'cd-d' },
+          { key: 'h', id: 'cd-h' },
+          { key: 'm', id: 'cd-m' },
+          { key: 's', id: 'cd-s' },
+        ];
+        parts.forEach(({ key, id }) => {
+          if (current[key] !== previous[key]) {
+            const el = document.getElementById(id);
+            if (el) {
+              el.classList.remove('pulsing');
+              void el.offsetWidth; // force reflow to restart animation
+              el.classList.add('pulsing');
+            }
+          }
+        });
+      }
+
+      lastCountdownParts = Object.assign({}, current, {
+        hasD: days > 0,
+        hasH: hours > 0 || days > 0,
+      });
     }
 
     function saveSession() {
