@@ -976,11 +976,18 @@
   // ──────────────────────────────────────────────
   function renderProducts() {
     const c = document.getElementById('products');
-    c.innerHTML = state.products.map(p => {
-      const out = p.available === 0;
+
+    // Hide sold-out products from the live shop, but mention them in a note
+    // so the social-proof signal isn't lost.
+    const available = state.products.filter(p => p.available > 0);
+    const soldOut = state.products.filter(p => p.available === 0);
+    const autoExpand = available.length === 1;
+
+    c.innerHTML = available.map(p => {
+      const out = false; // available list is non-empty by definition
       const media = PRODUCT_MEDIA[p.sku] || {};
       const radClass = p.sku === 'DC34-RAD' ? ' rad-edition' : '';
-      const stockText = out ? '(SOLD OUT)' : '(' + p.available + ' Left)';
+      const stockText = '(' + p.available + ' Left)';
 
       // Build gallery array for lightbox navigation
       const gallery = [
@@ -1004,43 +1011,44 @@
         ? `<div class="pro-deadline">⏳ ${media.preorderDeadline}</div>` : '';
 
       let qtyHtml = '';
-      if (!out) {
-        if (media.hasColors) {
-          const rows = PRO_COLORS.map(clr => {
-            const cartKey = p.sku + ':' + clr.id;
-            const borderStyle = clr.border ? 'border-color:' + clr.border : '';
-            return `<div class="color-qty-row">
-              <span class="color-swatch" style="background:${clr.swatch};${borderStyle}"></span>
-              <span class="color-label">${clr.id}</span>
-              <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',-1)">−</button>
-              <span class="qty-val" id="qty-${CSS.escape(cartKey)}">0</span>
-              <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',1)">+</button>
-            </div>`;
-          }).join('');
-          qtyHtml = `<div class="color-qty-section">
-            <div class="color-qty-header">SELECT COLOR & QUANTITY:</div>
-            ${rows}
+      if (media.hasColors) {
+        const rows = PRO_COLORS.map(clr => {
+          const cartKey = p.sku + ':' + clr.id;
+          const borderStyle = clr.border ? 'border-color:' + clr.border : '';
+          return `<div class="color-qty-row">
+            <span class="color-swatch" style="background:${clr.swatch};${borderStyle}"></span>
+            <span class="color-label">${clr.id}</span>
+            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',-1)">−</button>
+            <span class="qty-val" id="qty-${CSS.escape(cartKey)}">0</span>
+            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${cartKey}','${p.sku}',1)">+</button>
           </div>`;
-        } else {
-          qtyHtml = `<div class="qty-row">
-            <label>QTY:</label>
-            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',-1)">−</button>
-            <span class="qty-val" id="qty-${p.sku}">0</span>
-            <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',1)">+</button>
-          </div>`;
-        }
+        }).join('');
+        qtyHtml = `<div class="color-qty-section">
+          <div class="color-qty-header">SELECT COLOR & QUANTITY:</div>
+          ${rows}
+        </div>`;
+      } else {
+        qtyHtml = `<div class="qty-row">
+          <label>QTY:</label>
+          <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',-1)">−</button>
+          <span class="qty-val" id="qty-${p.sku}">0</span>
+          <button class="qty-btn" onclick="event.stopPropagation(); adjustQty('${p.sku}','${p.sku}',1)">+</button>
+        </div>`;
       }
 
+      const openClass = autoExpand ? ' open' : '';
+      const initialArrow = autoExpand ? '▼' : '▶';
+      if (autoExpand) state.expanded[p.sku] = true;
       return `
-        <div class="product-card${out ? ' sold-out' : ''}${radClass}" id="card-${p.sku}" data-sku="${p.sku}">
-          <div class="product-summary" onclick="${out ? '' : "toggleDetail('" + p.sku + "')"}">
+        <div class="product-card${radClass}" id="card-${p.sku}" data-sku="${p.sku}">
+          <div class="product-summary" onclick="toggleDetail('${p.sku}')">
             <div>
-              <span class="product-toggle" id="toggle-${p.sku}">▶</span>
+              <span class="product-toggle${openClass}" id="toggle-${p.sku}">${initialArrow}</span>
               <span class="product-name">${p.name} ${stockText}</span>
             </div>
             <span class="product-price">$${(p.price_cents / 100).toFixed(2)}</span>
           </div>
-          <div class="product-detail" id="detail-${p.sku}">
+          <div class="product-detail${openClass}" id="detail-${p.sku}">
             <div class="product-detail-inner">
               ${media.description ? '<div class="product-description">' + media.description + '</div>' : ''}
               ${deadlineHtml}
@@ -1050,6 +1058,31 @@
           </div>
         </div>`;
     }).join('');
+
+    // Append a small flavor note about previously-available variants
+    if (soldOut.length > 0) {
+      const soldNames = soldOut.map(p => {
+        return p.name.replace(/^Clip-Boy\s+/, '').replace(/\s+Edition$/, '');
+      });
+      let phrase;
+      if (soldNames.length === 1) phrase = soldNames[0] + ' Edition';
+      else if (soldNames.length === 2) phrase = soldNames[0] + ' and ' + soldNames[1] + ' editions';
+      else phrase = soldNames.slice(0, -1).join(', ') + ', and ' + soldNames.slice(-1) + ' editions';
+
+      let suffix = '';
+      if (available.length === 1) {
+        const availName = available[0].name.replace(/^Clip-Boy\s+/, '').replace(/\s+Edition$/, '');
+        suffix = ' ' + availName + ' is the only edition still available.';
+      } else if (available.length === 0) {
+        suffix = ' All editions are sold out.';
+      }
+
+      const note = document.createElement('div');
+      note.className = 'sold-out-note';
+      note.style.cssText = 'margin: 0.5rem 0 1rem; padding: 0.75rem 1rem; border: 1px dashed var(--pip-dim); color: var(--pip-dim); font-size: 0.9rem; font-style: italic; text-align: center;';
+      note.textContent = phrase + ' sold out earlier this year.' + suffix;
+      c.appendChild(note);
+    }
   }
 
   function toggleDetail(sku) {

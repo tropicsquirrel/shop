@@ -153,6 +153,25 @@
     .welcome-block .greeting { font-size: 1.1rem; color: var(--pip-green); margin-bottom: 0.4rem; }
     .welcome-block .remaining { color: var(--pip-amber); font-size: 0.95rem; }
 
+    .deadline-banner {
+      border: 1px solid var(--pip-amber);
+      background: rgba(255, 179, 64, 0.05);
+      padding: 0.7rem 1rem;
+      margin-bottom: 1rem;
+      color: var(--pip-amber);
+      font-size: 0.95rem;
+      text-align: center;
+      box-shadow: 0 0 6px rgba(255, 179, 64, 0.2);
+      letter-spacing: 0.05em;
+    }
+    .deadline-banner #countdown { font-weight: bold; font-size: 1.05em; }
+    .deadline-banner.expired {
+      border-color: var(--pip-dim);
+      color: var(--pip-dim);
+      background: rgba(0,0,0,0.3);
+      box-shadow: none;
+    }
+
     /* Launch video */
     .launch-video {
       width: 100%;
@@ -489,6 +508,10 @@
         <div class="remaining" id="remaining"></div>
       </div>
 
+      <div class="deadline-banner" id="deadlineBanner">
+        ⏰ FOUNDING BACKER PRICING ENDS IN: <span id="countdown">…</span>
+      </div>
+
       <div class="launch-video">
         <iframe src="https://www.youtube-nocookie.com/embed/bvcpd95C3bg"
                 title="Clip-Boy Launch Video"
@@ -739,7 +762,11 @@
       cart: {},
       delivery: null,
       donationCents: 0,
+      deadlineMs: 0,        // Server-provided KS deadline as Unix ms
+      deadlineExpired: false,
     };
+
+    let countdownInterval = null;
 
     function restoreSession() {
       const raw = sessionStorage.getItem('ks_session');
@@ -753,9 +780,10 @@
           state.ksName = s.ksName || '';
           state.ksRemaining = parseInt(s.ksRemaining) || 0;
           state.ksCap = parseInt(s.ksCap) || 5;
+          state.deadlineMs = parseInt(s.deadlineMs) || 0;
           revealProducts();
+          startCountdown();
           // Fire a silent re-auth to refresh the remaining count from the server.
-          // Catches case where the user just completed a purchase and returned.
           refreshRemainingCount();
           return true;
         }
@@ -773,8 +801,10 @@
         if (data.ok) {
           state.ksRemaining = data.remaining;
           state.ksCap = data.cap;
+          if (data.deadline) state.deadlineMs = new Date(data.deadline).getTime();
           saveSession();
           updateRemainingDisplay();
+          startCountdown();
         }
       } catch (e) {
         // Silent failure — keep stale cached state, will be caught at create_checkout server-side
@@ -795,6 +825,41 @@
       if (el) el.textContent = msg;
     }
 
+    function startCountdown() {
+      if (!state.deadlineMs) return;
+      if (countdownInterval) clearInterval(countdownInterval);
+      updateCountdown(); // immediate paint, no 1-second lag
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function updateCountdown() {
+      const banner = document.getElementById('deadlineBanner');
+      const countdownEl = document.getElementById('countdown');
+      if (!banner || !countdownEl) return;
+
+      const remaining = state.deadlineMs - Date.now();
+
+      if (remaining <= 0) {
+        banner.classList.add('expired');
+        banner.innerHTML = '⏰ FOUNDING BACKER ORDERING HAS CLOSED. Email coruscantproductions@gmail.com if you need an exception.';
+        state.deadlineExpired = true;
+        if (countdownInterval) clearInterval(countdownInterval);
+        updateUI();
+        return;
+      }
+
+      const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+      let text;
+      if (days > 0) text = days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's';
+      else if (hours > 0) text = hours + 'h ' + minutes + 'm ' + seconds + 's';
+      else text = minutes + 'm ' + seconds + 's';
+      countdownEl.textContent = text;
+    }
+
     function saveSession() {
       sessionStorage.setItem('ks_session', JSON.stringify({
         ksEmail: state.ksEmail,
@@ -802,6 +867,7 @@
         ksName: state.ksName,
         ksRemaining: state.ksRemaining,
         ksCap: state.ksCap,
+        deadlineMs: state.deadlineMs,
       }));
     }
 
@@ -843,8 +909,10 @@
           state.ksName = data.name || '';
           state.ksRemaining = data.remaining;
           state.ksCap = data.cap;
+          if (data.deadline) state.deadlineMs = new Date(data.deadline).getTime();
           saveSession();
           revealProducts();
+          startCountdown();
         } else {
           status.textContent = data.message || 'Verification failed.';
           status.className = 'auth-status error';
@@ -1001,6 +1069,10 @@
         btn.disabled = true;
         btn.textContent = 'SELECT DELIVERY METHOD';
         setDeliveryAttention();
+      } else if (state.deadlineExpired) {
+        btn.disabled = true;
+        btn.textContent = 'FOUNDING BACKER ORDERING CLOSED';
+        clearDeliveryAttention();
       } else {
         btn.disabled = false;
         const label = hasDonation
