@@ -178,18 +178,31 @@
       animation: cd-flash 0.5s ease-out;
     }
     .deadline-banner.expired {
-      border-color: var(--pip-dim);
-      color: var(--pip-dim);
-      background: rgba(0,0,0,0.3);
-      box-shadow: none;
+      border-color: var(--pip-amber);
+      color: var(--pip-amber);
+      background: rgba(255, 179, 64, 0.08);
+      animation: expired-pulse 2s ease-in-out infinite;
+      font-weight: bold;
+    }
+    @keyframes expired-pulse {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(255, 179, 64, 0.3);
+        border-color: rgba(255, 179, 64, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(255, 179, 64, 0.75), 0 0 4px rgba(255, 179, 64, 0.9) inset;
+        border-color: var(--pip-amber);
+      }
     }
 
     /* When sales deadline expires, lock down all badge-purchase controls.
-       Contribution controls intentionally stay enabled so backers can still donate. */
+       Contribution controls intentionally stay enabled so backers can still donate.
+       Note: we DON'T set pointer-events:none on qty buttons — we want hover events
+       to fire so the tooltip can show. The JS handlers (adjustQty, setDelivery)
+       early-return when deadlineExpired is true, blocking the actual action. */
     body.deadline-locked .qty-btn,
     body.deadline-locked .delivery-btn {
       opacity: 0.35;
-      pointer-events: none;
       cursor: not-allowed;
       filter: grayscale(0.6);
     }
@@ -205,6 +218,34 @@
       font-size: 0.8rem;
       color: var(--pip-amber);
       letter-spacing: 0.05em;
+    }
+
+    /* Tooltip on hover of a qty-row when sales are closed. */
+    body.deadline-locked .qty-row::before {
+      content: 'Sales closed.\A Email coruscantproductions@gmail.com for exceptions.';
+      white-space: pre-line;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      background: var(--pip-bg-dim);
+      border: 1px solid var(--pip-amber);
+      color: var(--pip-amber);
+      padding: 0.6rem 0.9rem;
+      font-size: 0.82rem;
+      width: max-content;
+      max-width: 280px;
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 0 14px rgba(255, 179, 64, 0.5);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.18s, transform 0.18s;
+    }
+    body.deadline-locked .qty-row:hover::before {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     /* Launch video */
