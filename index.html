@@ -675,7 +675,7 @@
     <div class="product-detail open" id="detail-about">
       <div class="product-detail-inner">
         <div class="about-bio">
-          <img src="images/bryce.png" alt="Bryce" class="bryce-large">
+          <img src="images/bryce.png" alt="Bryce" class="bryce-large" style="cursor:pointer" title="Click to enlarge" onclick="event.stopPropagation(); openImageLightbox('images/bryce.png')">
           <div class="about-bio-text">
             Clip-Boy is designed and built by Bryce, a high school junior
             from San Antonio, TX. When he's not soldering or writing
@@ -1121,6 +1121,14 @@
     lbGallery = [];
   }
 
+  // Open a single image fullscreen (e.g. the creator headshot) — no gallery nav
+  function openImageLightbox(src) {
+    lbGallery = [{ type: 'image', src: src }];
+    lbIndex = 0;
+    renderLightboxItem();
+    document.getElementById('lightbox').classList.add('open');
+  }
+
   function lightboxNav(delta) {
     lbIndex = Math.max(0, Math.min(lbGallery.length - 1, lbIndex + delta));
     renderLightboxItem();
@@ -1136,9 +1144,12 @@
       media.innerHTML = `<iframe src="${item.src}" frameborder="0" allowfullscreen></iframe>`;
     }
 
-    // Update counter
+    // Single-image view (e.g. the creator headshot): hide counter + nav arrows
+    const single = lbGallery.length <= 1;
+    document.querySelector('.lightbox-prev').style.display = single ? 'none' : '';
+    document.querySelector('.lightbox-next').style.display = single ? 'none' : '';
     document.getElementById('lightboxCounter').textContent =
-      (lbIndex + 1) + ' / ' + lbGallery.length;
+      single ? '' : (lbIndex + 1) + ' / ' + lbGallery.length;
 
     // Update nav button states
     document.querySelector('.lightbox-prev').disabled = lbIndex === 0;
