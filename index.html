@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io; frame-ancestors 'none'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io https://clipboy-api.left4rss.workers.dev; frame-ancestors 'none'; base-uri 'self'">
   <title>Clip-Boy: The Unofficial DEF CON 34 Electronic Badge — Pre-Order</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png">
 
@@ -758,6 +758,7 @@
 
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
+  const API_PROXY_URL = 'https://clipboy-api.left4rss.workers.dev'; // CF per-IP rate-limit proxy — track + ks_auth only (DC34-112 Phase 1); checkout/donate/status stay direct
 
   const PRO_COLORS = [
     { id: 'Red',            swatch: '#cc2222' },
@@ -904,9 +905,9 @@
 
       const params = new URLSearchParams(window.location.search);
       const src = params.get('utm_source') || params.get('src') || 'direct';
-      const url = APPS_SCRIPT_URL
-        + '?action=track'
-        + '&src=' + encodeURIComponent(src)
+      const url = API_PROXY_URL
+        + '/track'
+        + '?src=' + encodeURIComponent(src)
         + '&ref=' + encodeURIComponent(document.referrer || '')
         + '&ua=' + encodeURIComponent((navigator.userAgent || '').substring(0, 120))
         + '&path=' + encodeURIComponent(window.location.pathname + window.location.search);
