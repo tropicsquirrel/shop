@@ -758,6 +758,7 @@
 
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
+  const API_PROXY_URL = 'https://clipboy-api.left4rss.workers.dev'; // CF per-IP rate-limit proxy — track + ks_auth only (DC34-112 Phase 1); checkout/donate/status stay direct
 
   const PRO_COLORS = [
     { id: 'Red',            swatch: '#cc2222' },
@@ -904,9 +905,9 @@
 
       const params = new URLSearchParams(window.location.search);
       const src = params.get('utm_source') || params.get('src') || 'direct';
-      const url = APPS_SCRIPT_URL
-        + '?action=track'
-        + '&src=' + encodeURIComponent(src)
+      const url = API_PROXY_URL
+        + '/track'
+        + '?src=' + encodeURIComponent(src)
         + '&ref=' + encodeURIComponent(document.referrer || '')
         + '&ua=' + encodeURIComponent((navigator.userAgent || '').substring(0, 120))
         + '&path=' + encodeURIComponent(window.location.pathname + window.location.search);
