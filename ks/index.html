@@ -577,7 +577,7 @@
       <label for="auth-email">Email (used on Kickstarter to back Space Badge)</label>
       <input type="email" id="auth-email" autocomplete="email" placeholder="you@example.com">
       <label for="auth-backer">Backer Number <a href="https://www.kickstarter.com/projects/o-n/space-badge-the-next-generation-of-defcon-badges/backing/details" target="_blank" rel="noopener" style="color:var(--pip-amber); font-size:0.85rem; margin-left:0.3em; text-decoration:underline; font-weight:normal;">(find yours)<svg class="ext-icon" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4L10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a></label>
-      <input type="text" id="auth-backer" inputmode="numeric" placeholder="e.g. 42">
+      <input type="text" id="auth-backer" inputmode="numeric" placeholder="e.g. 42" onkeydown="if (event.key === 'Enter') authenticate();">
       <div style="margin-top:0.4rem; font-size:0.82rem; color:var(--pip-dim);">
         Still can't find it?
         <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20Founding%20Backer%20%E2%80%94%20help%20finding%20my%20backer%20number&amp;body=Hi%2C%20I%20backed%20Space%20Badge%20on%20Kickstarter%20but%20I%20can't%20find%20my%20backer%20number.%20The%20email%20I%20used%20on%20Kickstarter%20was%3A%20%0A%0AThanks!" style="color:var(--pip-amber); text-decoration:underline;" id="emailHelpLink">Email us</a>
@@ -734,8 +734,8 @@
       <div style="font-size:0.78rem; color:var(--pip-dim); line-height:1.5; margin:0.75rem 0;">
         Clip-Boy is sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education only. It ships in a passive, listen-only mode; an optional research build with additional capabilities can be loaded by the user and is for authorized testing only. Provided <strong>as is, without warranty</strong>. You are responsible for complying with all applicable laws &mdash; including computer-misuse, wiretap/interception, and radio-frequency / spectrum rules &mdash; wherever you use it. Ships hardware only; no shipment to OFAC-embargoed destinations or parties.
       </div>
-      <label style="display:flex; gap:0.5rem; align-items:flex-start; font-size:0.8rem; color:var(--pip-green); line-height:1.5; margin-bottom:0.75rem; cursor:pointer;">
-        <input type="checkbox" id="consentChk" style="margin-top:0.2rem; flex-shrink:0;">
+      <label id="consentRow" style="display:flex; gap:0.5rem; align-items:flex-start; font-size:0.8rem; color:var(--pip-green); line-height:1.5; margin-bottom:0.75rem; cursor:pointer;">
+        <input type="checkbox" id="consentChk" onchange="this.style.outline='';document.getElementById('consentRow').style.color='var(--pip-green)';" style="margin-top:0.2rem; flex-shrink:0;">
         <span>I understand Clip-Boy is sold for lawful security research and education only, as-is, with no warranty; I'm responsible for how I use it and for following the laws where I am. I am 18+ or have a parent/guardian's permission.</span>
       </label>
 
@@ -1258,6 +1258,8 @@
       if (totalQty() > 0) {
         const consent = document.getElementById('consentChk');
         if (!consent || !consent.checked) {
+          const row = document.getElementById('consentRow');
+          if (row) { row.style.color = 'var(--pip-amber)'; consent.style.outline = '2px solid var(--pip-amber)'; consent.style.outlineOffset = '2px'; }
           showMsg('Please tick the acknowledgment box to continue.');
           return;
         }
