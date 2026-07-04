@@ -654,6 +654,10 @@
     </button>
   </div>
 
+  <button class="delivery-btn" onclick="openIntlDialog()" id="btn-intl" style="width:100%; margin-top:0.5rem;">
+    >> SHIP TO GLOBAL ADDRESS<br><span style="font-size:0.9rem">Contact us for best rates</span>
+  </button>
+
   <div id="cartSummary" class="cart-summary" style="display:none"></div>
 
   <div style="font-size:0.78rem; color:var(--pip-dim); line-height:1.5; margin:0.75rem 0;">
@@ -764,9 +768,93 @@
   </div>
 </div>
 
+<!-- International shipping inquiry modal -->
+<style>
+  .intl-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .intl-box { background: var(--pip-bg); border: 2px solid var(--pip-green); box-shadow: 0 0 30px var(--pip-glow); max-width: 440px; width: 100%; padding: 1.5rem; color: var(--pip-green); position: relative; }
+  .intl-box h3 { letter-spacing: 0.1rem; margin-bottom: 0.75rem; }
+  .intl-box p { color: var(--pip-dim); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem; }
+  .intl-box label { display: block; font-size: 0.8rem; margin-bottom: 1rem; color: var(--pip-dim); }
+  .intl-box select, .intl-box input[type=email] { width: 100%; margin-top: 0.3rem; padding: 0.6rem; background: #000; color: var(--pip-green); border: 1px solid var(--pip-dim); font-family: inherit; font-size: 1rem; }
+  .intl-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .intl-close { position: absolute; top: 0.4rem; right: 0.6rem; background: none; border: none; color: var(--pip-dim); font-size: 1.5rem; cursor: pointer; line-height: 1; }
+  #intlMsg { min-height: 1.2rem; font-size: 0.85rem; margin-bottom: 0.5rem; }
+</style>
+<div class="intl-overlay" id="intlOverlay" onclick="if(event.target===this)closeIntlDialog()">
+  <div class="intl-box">
+    <button class="intl-close" onclick="closeIntlDialog()" aria-label="Close">×</button>
+    <h3>SHIP TO GLOBAL ADDRESS</h3>
+    <p>Tell us where you are and how to reach you, and we'll email you the best shipping rate. (We keep our address off the page to spare it from spam bots.)</p>
+    <label>Country
+      <select id="intlCountry"><option value="">— Select country —</option></select>
+    </label>
+    <label>Your email
+      <input type="email" id="intlEmail" placeholder="you@example.com" autocomplete="email">
+    </label>
+    <input type="text" id="intlHp" class="intl-hp" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Leave this blank">
+    <div id="intlMsg"></div>
+    <button class="buy-btn" id="intlSubmit" onclick="submitIntl()">[ SEND INQUIRY ]</button>
+  </div>
+</div>
+
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
   const API_PROXY_URL = 'https://clipboy-api.left4rss.workers.dev'; // CF per-IP rate-limit proxy — track + ks_auth only (DC34-112 Phase 1); checkout/donate/status stay direct
+
+  // ── International shipping inquiry ──────────────────────────────
+  // OFAC comprehensively-embargoed countries (Cuba, Iran, North Korea, Syria)
+  // are intentionally omitted. Still OFAC-screen each inquiry before shipping.
+  const INTL_COUNTRIES = ['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (Brazzaville)','Congo (Kinshasa)','Costa Rica','Cote d\'Ivoire','Croatia','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Macedonia','Norway','Oman','Pakistan','Palau','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
+
+  function openIntlDialog() {
+    const sel = document.getElementById('intlCountry');
+    if (sel.options.length <= 1) {
+      INTL_COUNTRIES.forEach(function(c) {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        sel.appendChild(o);
+      });
+    }
+    document.getElementById('intlMsg').textContent = '';
+    document.getElementById('intlOverlay').style.display = 'flex';
+  }
+
+  function closeIntlDialog() {
+    document.getElementById('intlOverlay').style.display = 'none';
+  }
+
+  async function submitIntl() {
+    const country = document.getElementById('intlCountry').value;
+    const email = document.getElementById('intlEmail').value.trim();
+    const hp = document.getElementById('intlHp').value;
+    const msg = document.getElementById('intlMsg');
+    if (!country) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Please choose a country.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Please enter a valid email address.'; return; }
+    const btn = document.getElementById('intlSubmit');
+    btn.disabled = true; msg.style.color = 'var(--pip-dim)'; msg.textContent = 'Sending…';
+    try {
+      const url = APPS_SCRIPT_URL + '?action=intl_inquiry'
+        + '&country=' + encodeURIComponent(country)
+        + '&email=' + encodeURIComponent(email)
+        + '&hp=' + encodeURIComponent(hp);
+      const resp = await fetch(url);
+      const data = await resp.json();
+      if (data.ok) {
+        msg.style.color = 'var(--pip-green)';
+        msg.textContent = 'Thanks! We\'ll email you shipping rates soon.';
+        document.getElementById('intlEmail').value = '';
+        setTimeout(closeIntlDialog, 2500);
+      } else {
+        msg.style.color = 'var(--pip-amber)';
+        msg.textContent = data.error || 'Something went wrong. Please try again.';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      msg.style.color = 'var(--pip-amber)';
+      msg.textContent = 'Network error. Please try again.';
+      btn.disabled = false;
+    }
+  }
 
   const PRO_COLORS = [
     { id: 'Red',            swatch: '#cc2222' },
@@ -1078,22 +1166,24 @@
         return p.name.replace(/^Clip-Boy\s+/, '').replace(/\s+Edition$/, '');
       });
       let phrase;
-      if (soldNames.length === 1) phrase = soldNames[0] + ' Edition';
-      else if (soldNames.length === 2) phrase = soldNames[0] + ' and ' + soldNames[1] + ' editions';
-      else phrase = soldNames.slice(0, -1).join(', ') + ', and ' + soldNames.slice(-1) + ' editions';
+      if (soldNames.length === 1) phrase = soldNames[0];
+      else if (soldNames.length === 2) phrase = soldNames[0] + ' and ' + soldNames[1];
+      else phrase = soldNames.slice(0, -1).join(', ') + ', and ' + soldNames.slice(-1);
+      const colorWord = soldNames.length === 1 ? ' color' : ' colors';
 
       let suffix = '';
       if (available.length === 1) {
         const availName = available[0].name.replace(/^Clip-Boy\s+/, '').replace(/\s+Edition$/, '');
-        suffix = ' ' + availName + ' is the only edition still available.';
+        const colorDesc = availName === 'Standard' ? 'The Standard gunmetal gray color' : ('The ' + availName + ' color');
+        suffix = ' ' + colorDesc + ' is still available. All editions are functionally identical so you haven\'t missed anything.';
       } else if (available.length === 0) {
-        suffix = ' All editions are sold out.';
+        suffix = ' All colors are sold out.';
       }
 
       const note = document.createElement('div');
       note.className = 'sold-out-note';
       note.style.cssText = 'margin: 0.5rem 0 1rem; padding: 0.75rem 1rem; border: 1px dashed var(--pip-dim); color: var(--pip-dim); font-size: 0.9rem; font-style: italic; text-align: center;';
-      note.textContent = phrase + ' sold out earlier this year.' + suffix;
+      note.textContent = phrase + colorWord + ' sold out earlier this year.' + suffix;
       c.appendChild(note);
     }
   }
