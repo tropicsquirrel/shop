@@ -644,6 +644,7 @@
 
   <div class="college-banner">All proceeds support Bryce's college fund</div>
 
+  <div id="purchaseArea">
   <div class="section-label">DELIVERY METHOD</div>
   <div class="delivery-options">
     <button class="delivery-btn" onclick="setDelivery('pickup')" id="btn-pickup">
@@ -671,6 +672,57 @@
   <button class="buy-btn" id="buyBtn" onclick="handleBuy()" disabled>
     SELECT ITEMS ABOVE
   </button>
+  </div><!-- /purchaseArea -->
+
+  <style>
+    .interest-panel { border:1px dashed var(--pip-dim); padding:1.5rem; box-shadow:0 0 12px var(--pip-glow); margin-bottom:1rem; }
+    .interest-eyebrow { color:var(--pip-amber); font-size:0.9rem; letter-spacing:0.15rem; margin-bottom:0.75rem; }
+    .interest-head { color:var(--pip-green); font-size:1.3rem; letter-spacing:0.08rem; text-shadow:0 0 10px var(--pip-glow); margin-bottom:0.6rem; line-height:1.3; }
+    .interest-blurb { color:var(--pip-dim); font-size:0.95rem; line-height:1.6; margin-bottom:1rem; }
+    .interest-status { color:var(--pip-amber); font-size:0.85rem; letter-spacing:0.05rem; margin-bottom:1.25rem; }
+    .interest-form label { display:block; font-size:0.8rem; color:var(--pip-dim); letter-spacing:0.05rem; margin-bottom:1rem; }
+    .interest-form input[type=text], .interest-form input[type=email], .interest-form select { width:100%; margin-top:0.3rem; padding:0.6rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1rem; }
+    .interest-form input:focus, .interest-form select:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
+    .interest-privacy { color:var(--pip-dim); opacity:0.85; font-size:0.8rem; line-height:1.5; margin:0 0 1rem; }
+    .interest-fine { color:var(--pip-dim); opacity:0.7; font-size:0.75rem; text-align:center; margin-top:0.5rem; }
+    .interest-success { text-align:center; padding:1rem 0; }
+    .interest-success-glyph { color:var(--pip-green); font-size:1.15rem; letter-spacing:0.2rem; text-shadow:0 0 12px var(--pip-glow); margin-bottom:0.75rem; }
+    .interest-success-body { color:var(--pip-dim); font-size:1rem; line-height:1.7; }
+    @keyframes blink { 50% { opacity:0; } }
+  </style>
+  <section class="interest-panel" id="interestPanel" style="display:none" aria-labelledby="interestHead">
+    <div class="interest-eyebrow">&#9622; INCOMING TRANSMISSION<span style="animation:blink 1s step-end infinite">_</span></div>
+    <h3 class="interest-head" id="interestHead">SOLD OUT &mdash; GAUGING INTEREST IN A SECOND RUN</h3>
+    <p class="interest-blurb">First run's gone &mdash; all 152 shipped. We might build more. This is <strong>just an interest count</strong> &mdash; no payment, no pre-order, nothing owed. Tell us you'd want one; if enough people do, we'll email the group the real numbers (badge + shipping + tax) and you decide then.</p>
+    <div class="interest-status">&gt; RUN 2 STATUS: GAUGING DEMAND</div>
+    <form class="interest-form" id="interestForm" onsubmit="return submitInterest(event)">
+      <label>Name / Handle
+        <input type="text" id="interestName" placeholder="wastelander_07" autocomplete="nickname" maxlength="60" required>
+      </label>
+      <label>Email
+        <input type="email" id="interestEmail" placeholder="you@example.com" autocomplete="email" required>
+      </label>
+      <label>Where'd we ship? <span style="opacity:0.7">(optional)</span>
+        <select id="interestRegion">
+          <option value="">&mdash; optional &mdash;</option>
+          <option value="US">United States</option>
+          <option value="Canada">Canada</option>
+          <option value="Europe">Europe</option>
+          <option value="Asia-Pacific">Asia-Pacific</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
+      <input type="text" id="interestHp" class="intl-hp" tabindex="-1" autocomplete="off" aria-hidden="true" placeholder="Leave this blank">
+      <p class="interest-privacy">We use this only to email you about a possible second run. No spam, no sharing, no charge. Unsubscribe anytime.</p>
+      <button type="submit" class="buy-btn" id="interestSubmit">[ COUNT ME IN ]</button>
+      <div id="interestMsg" role="status" aria-live="polite" style="min-height:1.2rem; font-size:0.85rem; margin:0.5rem 0;"></div>
+      <p class="interest-fine">Adding your name reserves nothing and charges nothing.</p>
+    </form>
+    <div class="interest-success" id="interestSuccess" style="display:none">
+      <div class="interest-success-glyph">&#9671; SIGNAL LOCKED &#9671;</div>
+      <p class="interest-success-body" id="interestSuccessBody"></p>
+    </div>
+  </section>
 
   <div class="message" id="msg"></div>
 
@@ -1015,6 +1067,76 @@
     }
   }
 
+  // ── Run-2 interest mode (auto-switch when sellable stock hits 0) ──
+  var interestForcePreview = new URLSearchParams(location.search).get('preview') === 'interest';
+
+  function sellableTotal() {
+    return (state.products || []).reduce(function(n, p) { return n + (parseInt(p.available) || 0); }, 0);
+  }
+  function syncInterestMode() {
+    if (interestForcePreview) { enterInterestMode(); return; }
+    if ((state.products || []).length > 0 && sellableTotal() === 0) enterInterestMode();
+    else exitInterestMode();
+  }
+  function enterInterestMode() {
+    if (state.interestMode) return;
+    state.interestMode = true;
+    var pa = document.getElementById('purchaseArea');
+    if (pa) pa.style.display = 'none';
+    var panel = document.getElementById('interestPanel');
+    if (panel) panel.style.display = 'block';
+    if (sessionStorage.getItem('cb_interest') === '1') showInterestSuccess(true);
+  }
+  function exitInterestMode() {
+    if (!state.interestMode) return;
+    state.interestMode = false;
+    var pa = document.getElementById('purchaseArea');
+    if (pa) pa.style.display = '';
+    var panel = document.getElementById('interestPanel');
+    if (panel) panel.style.display = 'none';
+  }
+  function showInterestSuccess(already) {
+    var form = document.getElementById('interestForm');
+    if (form) form.style.display = 'none';
+    var body = document.getElementById('interestSuccessBody');
+    if (body) body.textContent = already
+      ? "You're already on the second-run list — thanks. Check spam if you haven't seen our confirmation."
+      : "You're on the list. Check your inbox (and spam) for a confirmation from Coruscant Productions — it carries your unsubscribe link. Didn't arrive in a few minutes? Submit the same email again to resend.";
+    var succ = document.getElementById('interestSuccess');
+    if (succ) succ.style.display = 'block';
+  }
+  function submitInterest(e) {
+    if (e) e.preventDefault();
+    var name = document.getElementById('interestName').value.trim();
+    var email = document.getElementById('interestEmail').value.trim();
+    var region = document.getElementById('interestRegion').value;
+    var hp = document.getElementById('interestHp').value;
+    var msg = document.getElementById('interestMsg');
+    if (!name) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Add a name or handle so we know who you are.'; document.getElementById('interestName').focus(); return false; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Please enter a valid email address.'; document.getElementById('interestEmail').focus(); return false; }
+    var btn = document.getElementById('interestSubmit');
+    btn.disabled = true; btn.textContent = '[ SENDING... ]';
+    msg.style.color = 'var(--pip-dim)'; msg.textContent = '';
+    var url = APPS_SCRIPT_URL + '?action=interest'
+      + '&name=' + encodeURIComponent(name)
+      + '&email=' + encodeURIComponent(email)
+      + '&region=' + encodeURIComponent(region)
+      + '&hp=' + encodeURIComponent(hp);
+    fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+      if (data && data.ok) {
+        sessionStorage.setItem('cb_interest', '1');
+        showInterestSuccess(false);
+      } else {
+        btn.disabled = false; btn.textContent = '[ COUNT ME IN ]';
+        msg.style.color = 'var(--pip-amber)'; msg.textContent = (data && data.error) || 'Something went wrong. Please try again.';
+      }
+    }).catch(function() {
+      btn.disabled = false; btn.textContent = '[ COUNT ME IN ]';
+      msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Network error. Please try again.';
+    });
+    return false;
+  }
+
   async function init() {
     trackVisit();
     try {
@@ -1037,6 +1159,7 @@
       }
       renderProducts();
       updateCart();
+      syncInterestMode();
     } catch (err) {
       showMessage('ERROR: Terminal connection failed. Try again later.', true);
     }
@@ -1067,6 +1190,7 @@
         nameEl.textContent = p.name + ' ' + stockText;
         card.classList.toggle('sold-out', p.available === 0);
       }
+      syncInterestMode();
     } catch (err) {
       // Silent fail — stale stock will be caught at checkout
     }
