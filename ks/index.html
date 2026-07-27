@@ -770,6 +770,7 @@
         <div class="interest-success" id="interestSuccess" style="display:none">
           <div class="interest-success-glyph">&#9671; SIGNAL LOCKED &#9671;</div>
           <p class="interest-success-body" id="interestSuccessBody"></p>
+          <p style="margin-top:0.75rem;"><a href="#" onclick="reopenInterestForm();return false;" style="color:var(--pip-amber);text-decoration:underline;">Didn't get the email, or want to change your info? Sign up again</a></p>
         </div>
       </section>
 
@@ -1081,6 +1082,16 @@
         : "You're on the list. Check your inbox (and spam) for a confirmation from Coruscant Productions — it carries your unsubscribe link. Didn't arrive in a few minutes? Submit the same email again to resend.";
       var succ = document.getElementById('interestSuccess');
       if (succ) succ.style.display = 'block';
+    }
+    function reopenInterestForm() {
+      var succ = document.getElementById('interestSuccess');
+      if (succ) succ.style.display = 'none';
+      var form = document.getElementById('interestForm');
+      if (form) form.style.display = '';
+      var btn = document.getElementById('interestSubmit');
+      if (btn) { btn.disabled = false; btn.textContent = '[ COUNT ME IN ]'; }
+      var msg = document.getElementById('interestMsg');
+      if (msg) msg.textContent = '';
     }
     function submitInterest(e) {
       if (e) e.preventDefault();
