@@ -1070,8 +1070,21 @@
     function syncInterestMode() {
       var show = interestForcePreview || state.deadlineExpired;
       var panel = document.getElementById('interestPanel');
-      if (panel) panel.style.display = show ? 'block' : 'none';
-      if (show && sessionStorage.getItem('cb_interest') === '1') showInterestSuccess(true);
+      // The 3 badge cards (leave the Contribute card + donation flow alone).
+      var badgeCards = ['space', 'overseer', 'std'].map(function(x) {
+        var d = document.getElementById('detail-' + x);
+        return d ? d.closest('.product-card') : null;
+      });
+      if (show) {
+        var first = badgeCards[0];
+        if (panel && first && first.parentNode) first.parentNode.insertBefore(panel, first); // panel to the top
+        badgeCards.forEach(function(c) { if (c) c.style.display = 'none'; });                 // hide closed badge cards
+        if (panel) panel.style.display = 'block';
+        if (sessionStorage.getItem('cb_interest') === '1') showInterestSuccess(true);
+      } else {
+        badgeCards.forEach(function(c) { if (c) c.style.display = ''; });
+        if (panel) panel.style.display = 'none';
+      }
     }
     function showInterestSuccess(already) {
       var form = document.getElementById('interestForm');
