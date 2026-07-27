@@ -1082,15 +1082,21 @@
   function enterInterestMode() {
     if (state.interestMode) return;
     state.interestMode = true;
-    var pa = document.getElementById('purchaseArea');
-    if (pa) pa.style.display = 'none';
     var panel = document.getElementById('interestPanel');
+    var products = document.getElementById('products');
+    var pa = document.getElementById('purchaseArea');
+    // Move the panel up to where the product-order cards are, then hide the ordering UI.
+    if (panel && products && products.parentNode) products.parentNode.insertBefore(panel, products);
+    if (products) products.style.display = 'none';   // hide badge cards + QTY steppers (no ordering)
+    if (pa) pa.style.display = 'none';                // hide delivery / cart / buy
     if (panel) panel.style.display = 'block';
     if (sessionStorage.getItem('cb_interest') === '1') showInterestSuccess(true);
   }
   function exitInterestMode() {
     if (!state.interestMode) return;
     state.interestMode = false;
+    var products = document.getElementById('products');
+    if (products) products.style.display = '';
     var pa = document.getElementById('purchaseArea');
     if (pa) pa.style.display = '';
     var panel = document.getElementById('interestPanel');
