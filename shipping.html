@@ -101,7 +101,7 @@
     <!-- Invalid / expired -->
     <div id="invalid" style="display:none">
       <p class="big">This link is no longer valid.</p>
-      <p class="sub">It may have expired, or the response window (August&nbsp;5, 12:00&nbsp;PM&nbsp;Pacific) may have closed. If you think this is a mistake, email
+      <p class="sub">It may have expired, or the response window (August&nbsp;5, 2026, 12:00&nbsp;PM&nbsp;Pacific) may have closed. If you think this is a mistake, email
         <a href="mailto:coruscantproductions@gmail.com">coruscantproductions@gmail.com</a> and we'll sort it out. No response by the deadline simply means we ship to the address on your original order.</p>
     </div>
 
@@ -204,7 +204,7 @@
   function fmtDeadline(iso){
     try {
       const d = new Date(iso);
-      return d.toLocaleString('en-US', { timeZone:'America/Los_Angeles', weekday:'short', month:'long', day:'numeric', hour:'numeric', minute:'2-digit' }) + ' Pacific';
+      return d.toLocaleString('en-US', { timeZone:'America/Los_Angeles', weekday:'short', month:'long', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }) + ' Pacific';
     } catch(e){ return 'August 5, 12:00 PM Pacific'; }
   }
 
