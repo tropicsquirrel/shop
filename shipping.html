@@ -181,7 +181,8 @@
   </div>
 
   <script>
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
+  // Dedicated shipping-prefs deployment (separate from the store's /exec so the store is untouched).
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkA_k6NGWSavjZrOGeQhFxAVc55z4rbpAAUzdhd36mdwlWPFTGmYIn6yBI-zTIhJfk/exec';
   const US_STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC','PR','VI','GU','AS','MP','AA','AE','AP'];
 
   const qs = new URLSearchParams(location.search);
