@@ -286,7 +286,8 @@
     }
 
     $('submitBtn').disabled = true;
-    setMsg('Saving…');
+    $('submitBtn').textContent = 'Saving…';
+    setMsg('');
     try {
       const resp = await fetch(APPS_SCRIPT_URL + params);
       const d = await resp.json();
@@ -302,11 +303,11 @@
         window.scrollTo(0,0);
       } else {
         setMsg((d && d.error) ? d.error : 'Something went wrong. Please try again.', 'var(--pip-amber)');
-        $('submitBtn').disabled = false;
+        $('submitBtn').disabled = false; $('submitBtn').textContent = 'Confirm my choice';
       }
     } catch(e){
       setMsg('Network error. Please try again.', 'var(--pip-amber)');
-      $('submitBtn').disabled = false;
+      $('submitBtn').disabled = false; $('submitBtn').textContent = 'Confirm my choice';
     }
   });
 
