@@ -97,6 +97,11 @@
   });
   setInterval(function () { if (!document.hidden) load(); }, 60000); // live-ish
   setInterval(paintAge, 30000); // keep "x min ago" honest between fetches
+
+  // One-time page-load beacon → where_hit (counts opens, NOT the 60s auto-refreshes).
+  // Fire-and-forget: no-cors + keepalive, response ignored.
+  try { fetch(EXEC + '?action=where_hit&t=' + Date.now(), { mode: 'no-cors', keepalive: true }).catch(function () {}); } catch (e) {}
+
   load();
 })();
 </script>
