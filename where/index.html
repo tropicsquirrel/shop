@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<title>Where's Bryce?</title>
+<style>
+  :root { --grn:#33ff36; --dim:#1a9e1d; --bg:#000; }
+  * { box-sizing:border-box; margin:0; }
+  html,body { height:100%; }
+  body {
+    background:var(--bg); color:var(--grn);
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; padding:1.5rem; text-align:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  .label { color:var(--dim); font-size:.8rem; letter-spacing:.15em; text-transform:uppercase; }
+  #loc { font-size:2.4rem; line-height:1.15; margin:.6rem 0 1.4rem; word-break:break-word; }
+  #loc.empty { color:var(--dim); font-size:1.3rem; }
+  #updated { font-size:1.05rem; }
+  #age { color:var(--dim); font-size:.85rem; margin-top:.25rem; min-height:1em; }
+  #status { color:var(--dim); font-size:.75rem; margin-top:2rem; min-height:1em; }
+  #refresh {
+    margin-top:1.2rem; background:transparent; color:var(--grn);
+    border:1px solid var(--dim); border-radius:4px; padding:.5rem 1.1rem;
+    font:inherit; font-size:.85rem; cursor:pointer;
+  }
+  #refresh:active { background:#062; }
+  .stale #loc { opacity:.55; }
+</style>
+</head>
+<body>
+  <div class="label">Bryce is at</div>
+  <div id="loc" class="empty">…</div>
+  <div class="label">Last updated</div>
+  <div id="updated">—</div>
+  <div id="age"></div>
+  <button id="refresh" type="button">Refresh</button>
+  <div id="status"></div>
+
+<script>
+(function () {
+  var EXEC = 'https://script.google.com/macros/s/AKfycbyRy9S7-xi93kd_sh0fyzFVZnBoudy8tpMDkJsdacOcCSldfXntpgwPU7AN5ySJafUN/exec';
+  var locEl = document.getElementById('loc');
+  var updEl = document.getElementById('updated');
+  var ageEl = document.getElementById('age');
+  var statusEl = document.getElementById('status');
+  var btn = document.getElementById('refresh');
+  var lastIso = null;
+
+  function relAge(iso) {
+    if (!iso) return '';
+    var secs = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+    if (secs < 0) secs = 0;
+    if (secs < 60) return 'just now';
+    var mins = Math.round(secs / 60);
+    if (mins < 60) return mins + ' min ago';
+    var hrs = Math.floor(mins / 60);
+    var rem = mins % 60;
+    return hrs + 'h ' + rem + 'm ago';
+  }
+
+  function paintAge() {
+    ageEl.textContent = lastIso ? '(' + relAge(lastIso) + ')' : '';
+    document.body.classList.toggle('stale',
+      !!lastIso && (Date.now() - new Date(lastIso).getTime()) > 2 * 3600 * 1000);
+  }
+
+  function load() {
+    statusEl.textContent = 'updating…';
+    fetch(EXEC + '?action=where&t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.location) {
+          locEl.textContent = d.location;
+          locEl.classList.remove('empty');
+        } else {
+          locEl.textContent = '— not posted yet —';
+          locEl.classList.add('empty');
+        }
+        updEl.textContent = d && d.updated ? d.updated : '—';
+        lastIso = (d && d.iso) || null;
+        paintAge();
+        statusEl.textContent = '';
+      })
+      .catch(function () {
+        statusEl.textContent = 'Could not refresh — check your connection, then tap Refresh.';
+      });
+  }
+
+  btn.addEventListener('click', load);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) load();
+  });
+  setInterval(function () { if (!document.hidden) load(); }, 60000); // live-ish
+  setInterval(paintAge, 30000); // keep "x min ago" honest between fetches
+  load();
+})();
+</script>
+</body>
+</html>
