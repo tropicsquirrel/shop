@@ -1177,8 +1177,21 @@
       renderProducts();
       updateCart();
       syncInterestMode();
+      handleDeepLink();
     } catch (err) {
       showMessage('ERROR: Terminal connection failed. Try again later.', true);
+    }
+  }
+
+  // Deep-link support: #donate (or #card-donate) opens the College Fund
+  // panel and scrolls to it — run after products render so layout is stable.
+  function handleDeepLink() {
+    const h = (location.hash || '').toLowerCase();
+    if (h === '#donate' || h === '#card-donate') {
+      const detail = document.getElementById('detail-donate');
+      if (detail && !detail.classList.contains('open')) togglePanel('donate');
+      const card = document.getElementById('card-donate');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 
