@@ -638,6 +638,11 @@
                    oninput="selectDonation(0)" onclick="event.stopPropagation()">
           </div>
         </div>
+        <!-- Self-contained contribute button so donations work even when the
+             badge-buying area (#purchaseArea) is hidden in sold-out/interest mode.
+             Shown only in interest mode; normal mode still contributes via #buyBtn. -->
+        <button class="buy-btn" id="donateOnlyBtn" style="display:none; margin-top:0.75rem;"
+                onclick="event.stopPropagation(); handleDonateOnly()" disabled>SELECT AN AMOUNT ABOVE</button>
       </div>
     </div>
   </div>
@@ -1090,6 +1095,13 @@
     if (products) products.style.display = 'none';   // hide badge cards + QTY steppers (no ordering)
     if (pa) pa.style.display = 'none';                // hide delivery / cart / buy
     if (panel) panel.style.display = 'block';
+    // Donations must still work while the ordering UI (incl. its buy button) is hidden:
+    // surface the College Fund card's own contribute button and open the card.
+    var dob = document.getElementById('donateOnlyBtn');
+    if (dob) dob.style.display = 'block';
+    refreshDonateBtn();
+    var dd = document.getElementById('detail-donate');
+    if (dd && !dd.classList.contains('open')) togglePanel('donate');
     if (sessionStorage.getItem('cb_interest') === '1') showInterestSuccess(true);
   }
   function exitInterestMode() {
@@ -1101,6 +1113,8 @@
     if (pa) pa.style.display = '';
     var panel = document.getElementById('interestPanel');
     if (panel) panel.style.display = 'none';
+    var dob = document.getElementById('donateOnlyBtn');
+    if (dob) dob.style.display = 'none';
   }
   function showInterestSuccess(already) {
     var form = document.getElementById('interestForm');
@@ -1486,6 +1500,20 @@
       state.donationCents = Math.round(val * 100);
     }
     updateCart();
+    refreshDonateBtn();
+  }
+
+  // Keep the card's own contribute button (used in sold-out/interest mode) in sync.
+  function refreshDonateBtn() {
+    var dob = document.getElementById('donateOnlyBtn');
+    if (!dob) return;
+    if (state.donationCents >= 100) {
+      dob.disabled = false;
+      dob.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+    } else {
+      dob.disabled = true;
+      dob.textContent = 'SELECT AN AMOUNT ABOVE';
+    }
   }
 
   // ──────────────────────────────────────────────
@@ -1605,6 +1633,47 @@
   }
 
   // ──────────────────────────────────────────────
+  // Contribution-only checkout (shared by #buyBtn and the card's #donateOnlyBtn).
+  // No consent gate — that's for badge sales only (handleBuy).
+  // ──────────────────────────────────────────────
+  async function submitDonationOnly(btn) {
+    if (!btn) return;
+    if (state.donationCents < 100) {
+      showMessage('> Please choose a contribution amount ($1 minimum).', true);
+      return;
+    }
+    btn.disabled = true;
+    btn.classList.add('loading');
+    hideMessage();
+    btn.textContent = 'PROCESSING';
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL + '?action=donate&amount=' + state.donationCents);
+      const data = await resp.json();
+      if (data.error) {
+        showMessage('> ' + data.error, true);
+        btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        return;
+      }
+      if (data.checkout_url) {
+        btn.textContent = 'REDIRECTING';
+        window.location.href = data.checkout_url;
+      }
+    } catch (err) {
+      showMessage('ERROR: Contribution failed. Try again.', true);
+      btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+
+  // The College Fund card's own button (used when #purchaseArea is hidden in interest mode).
+  function handleDonateOnly() {
+    return submitDonationOnly(document.getElementById('donateOnlyBtn'));
+  }
+
+  // ──────────────────────────────────────────────
   // Checkout — badges or contribution
   // ──────────────────────────────────────────────
   async function handleBuy() {
@@ -1626,29 +1695,7 @@
     const hasBadges = cartTotal() > 0;
 
     if (!hasBadges && state.donationCents >= 100) {
-      // Contribution only
-      btn.textContent = 'PROCESSING';
-      try {
-        const resp = await fetch(APPS_SCRIPT_URL + '?action=donate&amount=' + state.donationCents);
-        const data = await resp.json();
-        if (data.error) {
-          showMessage('> ' + data.error, true);
-          btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
-          btn.disabled = false;
-          btn.classList.remove('loading');
-          return;
-        }
-        if (data.checkout_url) {
-          btn.textContent = 'REDIRECTING';
-          window.location.href = data.checkout_url;
-        }
-      } catch (err) {
-        showMessage('ERROR: Contribution failed. Try again.', true);
-        btn.textContent = '[ CONTRIBUTE $' + (state.donationCents / 100).toFixed(2) + ' ]';
-        btn.disabled = false;
-        btn.classList.remove('loading');
-      }
-      return;
+      return submitDonationOnly(btn); // contribution only (no badges in cart)
     }
 
     // Badge checkout
