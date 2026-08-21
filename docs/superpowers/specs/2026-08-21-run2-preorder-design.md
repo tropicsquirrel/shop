@@ -215,9 +215,11 @@ Automating intl checkout must preserve the screening the old inquiry flow did by
    *domestic* order shouldn't be asked for Country; make Country optional/relevant only when intl).
 6. **Success page:** **display the order code** (so a queued/late email never leaves a buyer without it)
    + preorder + est-ship + refund copy.
-7. **Go-live gate:** entire preorder UI behind the backend `PREORDER_LIVE` flag; default = current
-   interest mode; a **distinct preview value** (e.g. `?preview=preorder`, NOT `?preview=true`/`interest`
-   which already means something) forces the preorder UI for review. `?preview` survives the
+7. **Go-live gate:** entire preorder UI behind the backend `PREORDER_LIVE` flag **OR** the secret
+   preview token **`?preview=majesticm00se`** (owner-chosen). Default (no token, flag off) = the current
+   interest page, byte-for-byte unchanged for the public. The token is the **interim reveal** so the
+   owner can view/click the preorder page before it's ready; `PREORDER_LIVE` stays **off** until launch.
+   The token must not collide with the existing `?preview=interest` handling. `?preview` survives the
    brycebadges.com forward (utm params pass through — owner-confirmed).
 
 ---
@@ -303,20 +305,25 @@ run-1 precedent).
 
 ---
 
-## 13. Open items / confirmations for owner
-1. **DEF CON pickup removed** for run 2 (mail-order only) — confirm.
-2. **KS per-backer cap of 5** counts **exclusive-color units only** (assumed) vs. all units — confirm.
-3. **Retire `ks/` before go-live** so the main-store panel is the only exclusive-color surface (one
-   price, one cumulative cap) — confirm. (Alternative: keep `ks/` but share one counter + one price —
-   more work, no upside.)
-4. **US territories/APO-FPO** routed as Domestic (now implemented via the §4.2 country set) — confirm
-   that's the intent.
-5. **Stripe account posture:** charging in full ~4 months pre-ship can trigger a **rolling reserve** or
-   dispute review on a small account. Acknowledge; consider a ship-window disclosure on the Stripe
-   product too, and dispute-rate monitoring. (No code — an ops decision.)
-6. **Price & deadline values:** TBD (owner sets in Script Properties once supplier quote + open date are
-   set). `SHIP_ESTIMATE` default "end of December 2026."
-7. **Carousel assets:** placeholders now; real per-color renders later.
+## 13. Owner rulings (CONFIRMED 2026-08-21) + remaining set-later items
+1. ✅ **DEF CON pickup removed** — mail-order only.
+2. ✅ **KS per-backer cap of 5 = exclusive-color units only** (not all badges in the order).
+3. ✅ **Retire `ks/` before go-live** and **redirect `ks/` → `/`** — the main-store panel is the only
+   exclusive-color surface (one price = base, one cumulative cap).
+4. ✅ **US territories/APO-FPO route as Domestic** (via the §4.2 country set).
+5. ✅ **Stripe posture acknowledged** (owner briefed): the refund window (closes at preorder deadline)
+   is the owner's *promise*; the **card-network chargeback window (~120 days from charge)** is separate
+   and outlives it, and a small account doing preorders may face a **rolling reserve**. Mitigations
+   (no code): put ship-window + refund terms **on the Stripe checkout/product too**; keep a cash buffer;
+   watch dispute rate. Refund policy itself unchanged.
+6. **Preview gate token = `?preview=majesticm00se`** (owner-chosen, hard-to-guess). Public sees the
+   current interest page; only this token reveals the preorder UI. Do **not** go live / no
+   `PREORDER_LIVE=true` until the owner says so — the token is the interim reveal.
+
+**Set-later (non-blocking):**
+- **Price & deadline values** — TBD (owner sets in Script Properties once supplier quote + open date are
+  set). `SHIP_ESTIMATE` default "end of December 2026."
+- **Carousel assets** — placeholders now; real per-color renders later.
 
 ---
 
