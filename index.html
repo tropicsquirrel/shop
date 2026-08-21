@@ -612,6 +612,79 @@
 
   <div id="products"><div style="color:var(--pip-dim)">LOADING INVENTORY DATA...</div></div>
 
+  <!-- ============ RUN-2 PRE-ORDER PREVIEW (token-gated; hidden unless ?preview=majesticm00se) ============ -->
+  <style>
+    #preorderSection .po-eyebrow { color:var(--pip-amber); font-size:0.9rem; letter-spacing:0.15rem; margin-bottom:0.5rem; }
+    #preorderSection .po-head { color:var(--pip-green); font-size:1.35rem; letter-spacing:0.06rem; text-shadow:0 0 10px var(--pip-glow); line-height:1.3; margin-bottom:0.6rem; }
+    #preorderSection .po-countdown { color:var(--pip-amber); font-size:1.05rem; letter-spacing:0.04rem; margin-bottom:0.75rem; }
+    #preorderSection .po-notice { border:1px dashed var(--pip-amber); color:var(--pip-amber); font-size:0.85rem; line-height:1.5; padding:0.6rem 0.8rem; margin-bottom:1rem; }
+    #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
+    #preorderSection .po-ks-panel { border:1px solid var(--pip-border); padding:1rem; margin-top:1rem; }
+    #preorderSection .po-ks-panel label { display:block; font-size:0.8rem; color:var(--pip-dim); margin-bottom:0.6rem; }
+    #preorderSection .po-ks-panel input { width:100%; margin-top:0.3rem; padding:0.6rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1rem; }
+    #preorderSection .po-ks-panel input:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
+    #preorderSection #poKsMsg { min-height:1.1rem; font-size:0.85rem; margin:0.4rem 0; }
+  </style>
+  <div id="preorderSection" style="display:none">
+    <div class="po-eyebrow">&#9622; PRE-ORDER &mdash; RUN 2<span class="blink">_</span></div>
+    <h2 class="po-head">Clip-Boy is coming back &mdash; reserve yours</h2>
+    <div class="po-countdown" id="poCountdown">Pre-orders close: &mdash;</div>
+    <div class="po-notice">PREVIEW BUILD &mdash; prices, dates, and images are placeholders and <strong>not final</strong>. Checkout is disabled; nothing can be purchased here yet.</div>
+
+    <div class="product-card" id="po-card">
+      <div class="product-detail open">
+        <div class="product-detail-inner">
+          <div class="product-description">
+            One Clip-Boy, your colors. Wrist-mounted ESP32-S3 badge &mdash; Wi-Fi/BLE analysis tools,
+            theremin, customizable LEDs, 90+ collectibles &mdash; 3D-printed in gunmetal gray. Pick a
+            trim color below; mix as many as you like (up to 5 per order). We build after pre-orders
+            close and ship <strong>on or about end of December 2026</strong>.
+          </div>
+          <div class="media-gallery">
+            <img src="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png"
+                 alt="Clip-Boy (representative)" style="cursor:pointer; background:#0a0a0a"
+                 onclick="openImageLightbox('https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png')">
+          </div>
+          <div style="color:var(--pip-dim); font-size:0.8rem; font-style:italic; margin-bottom:1rem;">Representative image &mdash; final per-color renders to come.</div>
+
+          <div class="color-qty-section" id="poColors"><!-- rows injected by poRenderColors() --></div>
+
+          <div class="po-ks-panel" id="poKsPanel">
+            <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
+            <label>Kickstarter email
+              <input type="email" id="poKsEmail" placeholder="you@example.com" autocomplete="email">
+            </label>
+            <label>Backer number
+              <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42">
+            </label>
+            <div id="poKsMsg"></div>
+            <button class="buy-btn" id="poKsBtn" onclick="poValidateKs()">[ UNLOCK MY COLORS ]</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">DELIVERY</div>
+    <div class="delivery-options">
+      <button class="delivery-btn" id="po-btn-us" onclick="poSetDelivery('us')">
+        &gt;&gt; SHIP &mdash; U.S.<br><span style="font-size:0.9rem">$20 (1&ndash;3) &middot; $30 (4&ndash;5) + tax</span>
+      </button>
+      <button class="delivery-btn" id="po-btn-intl" onclick="poSetDelivery('intl')">
+        &gt;&gt; SHIP &mdash; INTERNATIONAL<br><span style="font-size:0.9rem">$35 (1&ndash;3) &middot; $55 (4&ndash;5)</span>
+      </button>
+    </div>
+
+    <div id="poCart" class="cart-summary" style="display:none"></div>
+    <button class="buy-btn" id="poBuyBtn" disabled>SELECT COLORS ABOVE</button>
+    <div class="cart-note" style="margin-top:0.6rem;">Ordering more than 5? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> &mdash; bulk orders are handled by email.</div>
+    <div style="color:var(--pip-dim); font-size:0.78rem; line-height:1.5; margin:0.75rem 0;">
+      Sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education
+      only; as-is, no warranty. International customs/duties are the buyer's responsibility.
+      Full refund on request before pre-orders close.
+    </div>
+  </div>
+  <!-- ============ /RUN-2 PRE-ORDER PREVIEW ============ -->
+
   <!-- Contribute card (expandable, no submit — uses main buy button) -->
   <div class="product-card" id="card-donate">
     <div class="product-summary" onclick="togglePanel('donate')">
@@ -1171,6 +1244,7 @@
   }
 
   async function init() {
+    if (PREORDER_PREVIEW) { poEnter(); return; }   // Run-2 pre-order preview (token-gated; no live checkout)
     trackVisit();
     try {
       // Load inventory and media in parallel
@@ -1739,6 +1813,215 @@
     el.className = 'message visible' + (isError ? ' error' : '');
   }
   function hideMessage() { document.getElementById('msg').className = 'message'; }
+
+  // ============================================================================
+  // RUN-2 PRE-ORDER PREVIEW  (token-gated by ?preview=majesticm00se)
+  // Fully self-contained: none of this runs unless the token is present, and it
+  // NEVER calls create_checkout / donate. Checkout is stubbed for preview.
+  // ── PLACEHOLDERS the owner sets before launch: base price, upcharge, deadline.
+  // ============================================================================
+  const PREORDER_PREVIEW = new URLSearchParams(location.search).get('preview') === 'majesticm00se';
+
+  const PREORDER_BASE_CENTS = 15000;            // PLACEHOLDER — base price (Black / KS-exclusive), owner sets
+  const PREORDER_CUSTOM_UPCHARGE_CENTS = 1000;  // +$10 per custom-color unit
+  const PREORDER_DEADLINE = new Date('2026-09-30T19:00:00Z'); // PLACEHOLDER — pre-order close date
+  const PREORDER_MAX = 5;                        // soft per-order cap (>5 = contact us)
+
+  const PO_COLORS = [
+    { id:'Black',       swatch:'#1a1a1a', cls:'base'   },
+    { id:'Red',         swatch:'#cc2222', cls:'custom' },
+    { id:'Blue',        swatch:'#2255cc', cls:'custom' },
+    { id:'White',       swatch:'#e8e8e8', cls:'custom' },
+    { id:'50s Silver',  swatch:'#b0b0b0', cls:'custom' },
+    { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'ks' },
+    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks' },
+  ];
+
+  const poState = { cart:{}, delivery:null, ksUnlocked:false };
+
+  function poKey(id) { return 'po-row-' + id.replace(/[^a-z0-9]/gi, '_'); }
+  function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function poUpLabel() { return '+$' + (PREORDER_CUSTOM_UPCHARGE_CENTS / 100).toFixed(0); }
+  function poColorById(id) { return PO_COLORS.find(function(c){ return c.id === id; }); }
+  function poUnitCents(cls) { return PREORDER_BASE_CENTS + (cls === 'custom' ? PREORDER_CUSTOM_UPCHARGE_CENTS : 0); }
+  function poTotalQty() { return Object.values(poState.cart).reduce(function(a,b){ return a + b; }, 0); }
+  function poShipCents(qty, delivery) {
+    if (qty <= 0 || !delivery) return 0;
+    if (delivery === 'intl') return qty <= 3 ? 3500 : 5500;
+    return qty <= 3 ? 2000 : 3000;  // US
+  }
+
+  function poEnter() {
+    // Hide the normal shop flow; reveal the pre-order section. Only reachable under the token.
+    ['products','purchaseArea','interestPanel','card-donate'].forEach(function(id){
+      var el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    var sec = document.getElementById('preorderSection');
+    if (sec) sec.style.display = 'block';
+    PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; });
+    poRenderColors();
+    // Delegated qty handler (survives poRenderColors innerHTML swaps; index is numeric/safe).
+    document.getElementById('poColors').addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('button[data-po-idx]') : null;
+      if (!b) return;
+      var col = PO_COLORS[+b.getAttribute('data-po-idx')];
+      if (col) poAdjust(col.id, +b.getAttribute('data-po-delta'));
+    });
+    var buy = document.getElementById('poBuyBtn');
+    if (buy) buy.onclick = function(){ showMessage('> Preview only — checkout opens when pre-orders go live.', false); };
+    poTickCountdown();
+    setInterval(poTickCountdown, 1000);
+    poUpdateCart();
+  }
+
+  function poRenderColors() {
+    var rows = PO_COLORS.map(function(c, i){
+      var border = c.border ? 'border-color:' + poEsc(c.border) : '';
+      var tag = c.cls === 'custom' ? '<span class="po-badge-note">' + poUpLabel() + '</span>'
+              : (c.cls === 'ks' ? '<span class="po-badge-note">backer-exclusive</span>' : '');
+      var hidden = c.cls === 'ks' ? ' style="display:none"' : '';
+      var k = poKey(c.id);
+      // Buttons carry the numeric PO_COLORS index (safe) — a delegated listener on
+      // #poColors maps it back to the color id, so color names can't break markup.
+      return '<div class="color-qty-row" id="' + k + '"' + hidden + '>'
+        + '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
+        + '<span class="color-label">' + poEsc(c.id) + tag + '</span>'
+        + '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="-1">−</button>'
+        + '<span class="qty-val" id="poqty-' + k + '">0</span>'
+        + '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="1">+</button>'
+        + '</div>';
+    }).join('');
+    document.getElementById('poColors').innerHTML =
+      '<div class="color-qty-header">SELECT TRIM COLOR &amp; QUANTITY <span style="color:var(--pip-dim)">(custom colors ' + poUpLabel() + ' each)</span></div>' + rows;
+  }
+
+  function poAdjust(id, delta) {
+    var c = poColorById(id); if (!c) return;
+    if (c.cls === 'ks' && !poState.ksUnlocked) return;
+    var cur = poState.cart[id] || 0;
+    var others = poTotalQty() - cur;
+    var desired = Math.max(0, Math.min(cur + delta, PREORDER_MAX - others));
+    poState.cart[id] = desired;
+    var el = document.getElementById('poqty-' + poKey(id));
+    if (el) el.textContent = desired;
+    poUpdateCart();
+  }
+
+  function poSetDelivery(m) {
+    poState.delivery = m;
+    document.getElementById('po-btn-us').classList.toggle('active', m === 'us');
+    document.getElementById('po-btn-intl').classList.toggle('active', m === 'intl');
+    poUpdateCart();
+  }
+
+  function poUpdateCart() {
+    var cartEl = document.getElementById('poCart');
+    var btn = document.getElementById('poBuyBtn');
+    var usBtn = document.getElementById('po-btn-us');
+    var intlBtn = document.getElementById('po-btn-intl');
+    var qty = 0, subtotal = 0, lines = '';
+
+    PO_COLORS.forEach(function(c){
+      var q = poState.cart[c.id] || 0;
+      if (q > 0) {
+        qty += q;
+        var unit = poUnitCents(c.cls);
+        subtotal += q * unit;
+        var extra = c.cls === 'custom' ? ' <span style="color:var(--pip-dim)">(+$10)</span>' : '';
+        lines += '<div class="cart-line"><span class="label">Clip-Boy (' + c.id + ')' + extra + ' × ' + q
+          + '</span><span>$' + (q * unit / 100).toFixed(2) + '</span></div>';
+      }
+    });
+
+    if (qty === 0) {
+      cartEl.style.display = 'none';
+      btn.disabled = true; btn.textContent = 'SELECT COLORS ABOVE';
+      usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
+      return;
+    }
+
+    var overCap = qty > PREORDER_MAX;
+    var ship = poShipCents(qty, poState.delivery);
+    var shipLabel = poState.delivery === 'intl' ? 'Shipping — International'
+                  : (poState.delivery === 'us' ? 'Shipping — U.S.' : 'Shipping');
+
+    if (poState.delivery) {
+      lines += '<div class="cart-line"><span class="label">' + shipLabel + ' (' + (qty <= 3 ? '1–3' : '4–5')
+        + ')</span><span>' + (overCap ? '—' : '$' + (ship / 100).toFixed(2)) + '</span></div>';
+    } else {
+      lines += '<div class="cart-line"><span class="label"><span style="color:var(--pip-amber)">⚠ Select delivery below</span></span><span>—</span></div>';
+    }
+
+    var payable = (poState.delivery && !overCap);
+    var grand = subtotal + (payable ? ship : 0);
+    lines += '<div class="cart-line total"><span>PRE-ORDER TOTAL</span><span>$' + (grand / 100).toFixed(2) + (payable ? '' : '+') + '</span></div>';
+    lines += '<div class="cart-note">⧖ Pre-order — we build after orders close and ship on or about end of December 2026.</div>';
+    if (poState.delivery === 'us') lines += '<div class="cart-note">+ Sales tax on badges &amp; shipping at checkout (if applicable)</div>';
+    if (poState.delivery === 'intl') lines += '<div class="cart-note">International: customs &amp; duties are the buyer\'s responsibility.</div>';
+    lines += '<div class="cart-note" style="color:var(--pip-dim)">Full refund on request before pre-orders close.</div>';
+    if (overCap) lines += '<div class="cart-note">More than 5 badges? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> — bulk orders are handled by email.</div>';
+
+    cartEl.innerHTML = lines;
+    cartEl.style.display = 'block';
+
+    // PREVIEW: the buy button never initiates checkout (onclick set in poEnter).
+    if (overCap) {
+      btn.disabled = true; btn.textContent = 'CONTACT US FOR 5+';
+      usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
+    } else if (!poState.delivery) {
+      btn.disabled = true; btn.textContent = 'SELECT DELIVERY';
+      usBtn.classList.add('attention'); intlBtn.classList.add('attention');
+    } else {
+      btn.disabled = false; btn.textContent = 'PREVIEW — CHECKOUT OPENS AT LAUNCH';
+      usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
+    }
+  }
+
+  async function poValidateKs() {
+    var email = document.getElementById('poKsEmail').value.trim();
+    var backer = document.getElementById('poKsBacker').value.trim();
+    var msg = document.getElementById('poKsMsg');
+    var btn = document.getElementById('poKsBtn');
+    if (!email || !backer) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Enter both your Kickstarter email and backer number.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.style.color = 'var(--pip-amber)'; msg.textContent = 'Please enter a valid email address.'; return; }
+    btn.disabled = true; btn.textContent = 'VERIFYING…'; msg.style.color = 'var(--pip-dim)'; msg.textContent = '';
+    try {
+      var url = API_PROXY_URL + '/ks_auth?email=' + encodeURIComponent(email) + '&backer_id=' + encodeURIComponent(backer);
+      var resp = await fetch(url);
+      var data = await resp.json();
+      if (data && data.ok) {
+        poState.ksUnlocked = true;
+        PO_COLORS.forEach(function(c){
+          if (c.cls === 'ks') { var row = document.getElementById(poKey(c.id)); if (row) row.style.display = ''; }
+        });
+        var capNote = (typeof data.remaining !== 'undefined')
+          ? ' You can pre-order up to ' + data.remaining + ' exclusive unit' + (data.remaining === 1 ? '' : 's') + '.' : '';
+        msg.style.color = 'var(--pip-green)';
+        msg.textContent = 'Verified — Space Badge & Overseer colors unlocked.' + capNote;
+        btn.textContent = 'UNLOCKED ✓';
+      } else {
+        msg.style.color = 'var(--pip-amber)';
+        msg.textContent = (data && (data.message || data.error)) || 'Verification failed. Check your email and backer number.';
+        btn.disabled = false; btn.textContent = '[ UNLOCK MY COLORS ]';
+      }
+    } catch (err) {
+      msg.style.color = 'var(--pip-amber)';
+      msg.textContent = 'Network error. Please try again.';
+      btn.disabled = false; btn.textContent = '[ UNLOCK MY COLORS ]';
+    }
+  }
+
+  function poTickCountdown() {
+    var el = document.getElementById('poCountdown');
+    if (!el) return;
+    var diff = PREORDER_DEADLINE.getTime() - Date.now();
+    if (diff <= 0) { el.textContent = 'Pre-orders are closed. (placeholder date)'; return; }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor(diff % 86400000 / 3600000);
+    var m = Math.floor(diff % 3600000 / 60000);
+    var s = Math.floor(diff % 60000 / 1000);
+    el.textContent = 'Pre-orders close in ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's  (placeholder date)';
+  }
 
   init();
 </script>
