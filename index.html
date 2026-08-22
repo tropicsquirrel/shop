@@ -668,6 +668,10 @@
     #preorderSection .po-terms-body p { margin-bottom:0.5rem; }
     #preorderSection .po-consent { display:flex; gap:0.5rem; align-items:flex-start; font-size:0.85rem; color:var(--pip-green); line-height:1.5; margin:0.5rem 0 0.75rem; cursor:pointer; }
     #preorderSection .po-consent input { margin-top:0.2rem; flex-shrink:0; width:18px; height:18px; }
+    #preorderSection #poMenu { margin-top:0.25rem; }
+    #preorderSection .po-menu-card { margin-top:1rem; }
+    #preorderSection .po-menu-head:focus-visible { outline:1px solid var(--pip-green); outline-offset:-2px; }
+    #preorderSection .po-menu-body { border-top:1px solid var(--pip-border); }
   </style>
   <div id="preorderSection" style="display:none">
     <div class="po-eyebrow">&#9622; PRE-ORDER &mdash; RUN 2<span class="blink">_</span></div>
@@ -676,6 +680,22 @@
     <div class="po-fromprice" id="poFromPrice"></div>
     <div class="po-countdown" id="poCountdown">Pre-orders close: &mdash;</div>
     <div class="po-notice">PREVIEW BUILD &mdash; prices, dates, and images are placeholders and <strong>not final</strong>. Checkout is disabled; nothing can be purchased here yet.</div>
+
+    <!-- == 4-SECTION MENU (all collapsed on arrival; one open at a time) == -->
+    <div id="poMenu">
+
+      <!-- 1. PRE-ORDER -->
+      <div class="product-card po-menu-card" id="posec-preorder">
+        <div class="product-summary po-menu-head" data-posec="preorder" role="button" tabindex="0" aria-expanded="false" onclick="poToggleSection('preorder')" onkeydown="poSecKey(event,'preorder')">
+          <div style="display:flex; align-items:center; flex:1;">
+            <span class="product-toggle" id="posectog-preorder">&#9656;</span>
+            <span class="product-name">Pre-Order a Clip-Boy Mk2</span>
+          </div>
+          <span class="product-price" id="poFromPrice2"></span>
+        </div>
+        <div class="po-menu-body" id="posecbody-preorder" style="display:none">
+          <div class="product-detail-inner">
+            <div id="poVideoSlot"></div>
 
     <div class="product-card" id="po-card">
       <div class="product-detail open">
@@ -736,10 +756,66 @@
     </label>
 
     <button class="buy-btn" id="poBuyBtn" disabled>SELECT COLORS ABOVE</button>
+    <div id="poMsg" role="status" aria-live="polite" style="min-height:1.2rem; font-size:0.9rem; color:var(--pip-amber); margin-top:0.5rem;"></div>
     <div class="cart-note" style="margin-top:0.6rem;">Ordering more than 5? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> &mdash; bulk orders are handled by email.</div>
     <div style="color:var(--pip-dim); font-size:0.78rem; line-height:1.5; margin:0.4rem 0 0.75rem;">
       Sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education only; as-is, no warranty. Secure checkout via Stripe.
     </div>
+          </div><!-- /product-detail-inner -->
+        </div><!-- /posecbody-preorder -->
+      </div><!-- /posec-preorder -->
+
+      <!-- 2. CONTRIBUTE -->
+      <div class="product-card po-menu-card" id="posec-contribute">
+        <div class="product-summary po-menu-head" data-posec="contribute" role="button" tabindex="0" aria-expanded="false" onclick="poToggleSection('contribute')" onkeydown="poSecKey(event,'contribute')">
+          <div style="display:flex; align-items:center; flex:1;">
+            <span class="product-toggle" id="posectog-contribute">&#9656;</span>
+            <span class="product-name">Contribute to Bryce's College Fund</span>
+          </div>
+        </div>
+        <div class="po-menu-body" id="posecbody-contribute" style="display:none">
+          <div class="product-detail-inner">
+            <div class="product-description">All proceeds support Bryce's college fund. Don't need a badge? You can still help &mdash; every dollar goes directly toward Bryce's college education.</div>
+            <div class="donate-amounts">
+              <button class="donate-btn" onclick="poSelectDonation(1000,this)">$10</button>
+              <button class="donate-btn" onclick="poSelectDonation(2000,this)">$20</button>
+              <button class="donate-btn" onclick="poSelectDonation(2500,this)">$25</button>
+              <button class="donate-btn" onclick="poSelectDonation(5000,this)">$50</button>
+              <button class="donate-btn" onclick="poSelectDonation(10000,this)">$100</button>
+              <div class="donate-custom">
+                <span style="color:var(--pip-dim)">$</span>
+                <input type="number" id="poDonateCustom" min="1" placeholder="Other" oninput="poSelectDonation(0,null)">
+              </div>
+            </div>
+            <button class="buy-btn" id="poDonateBtn" style="margin-top:0.75rem" disabled onclick="poContributeStub()">SELECT AN AMOUNT ABOVE</button>
+            <div id="poDonateMsg" role="status" aria-live="polite" style="min-height:1.2rem; font-size:0.9rem; color:var(--pip-amber); margin-top:0.5rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ABOUT BRYCE (content moved in from #card-about by poEnter) -->
+      <div class="product-card po-menu-card" id="posec-about">
+        <div class="product-summary po-menu-head" data-posec="about" role="button" tabindex="0" aria-expanded="false" onclick="poToggleSection('about')" onkeydown="poSecKey(event,'about')">
+          <div style="display:flex; align-items:center; flex:1;">
+            <span class="product-toggle" id="posectog-about">&#9656;</span>
+            <span class="product-name">About Bryce</span>
+          </div>
+        </div>
+        <div class="po-menu-body" id="posecbody-about" style="display:none"></div>
+      </div>
+
+      <!-- 4. AI DISCLOSURE (content moved in from #card-ai by poEnter) -->
+      <div class="product-card po-menu-card" id="posec-ai">
+        <div class="product-summary po-menu-head" data-posec="ai" role="button" tabindex="0" aria-expanded="false" onclick="poToggleSection('ai')" onkeydown="poSecKey(event,'ai')">
+          <div style="display:flex; align-items:center; flex:1;">
+            <span class="product-toggle" id="posectog-ai">&#9656;</span>
+            <span class="product-name">AI Disclosure</span>
+          </div>
+        </div>
+        <div class="po-menu-body" id="posecbody-ai" style="display:none"></div>
+      </div>
+
+    </div><!-- /poMenu -->
   </div>
   <!-- ============ /RUN-2 PRE-ORDER PREVIEW ============ -->
 
@@ -1895,12 +1971,11 @@
     { id:'Red',         swatch:'#cc2222', cls:'custom', images:[REP_IMG] },
     { id:'Blue',        swatch:'#2255cc', cls:'custom', images:[REP_IMG] },
     { id:'White',       swatch:'#e8e8e8', cls:'custom', images:[REP_IMG] },
-    { id:'50s Silver',  swatch:'#b0b0b0', cls:'custom', images:[REP_IMG] },
     { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'ks', images:[REP_IMG] },
     { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks', images:[REP_IMG] },
   ];
 
-  const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null };
+  const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0 };
 
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function poUpLabel() { return '+$' + (PREORDER_CUSTOM_UPCHARGE_CENTS / 100).toFixed(0); }
@@ -1916,15 +1991,30 @@
   }
 
   function poEnter() {
-    // Hide the normal shop flow (incl. the sold-out interest panel); reveal pre-order. Token-only.
-    ['products','purchaseArea','interestPanel','card-donate'].forEach(function(id){
+    // Hide the normal shop flow (incl. sold-out interest panel + live donate/about/ai cards);
+    // reveal the pre-order menu. Token-only — poEnter never runs on the normal store path.
+    ['products','purchaseArea','interestPanel','card-donate','msg','card-about','card-ai'].forEach(function(id){
       var el = document.getElementById(id); if (el) el.style.display = 'none';
     });
+    var cb = document.querySelector('.college-banner'); if (cb) cb.style.display = 'none';
+    var sd = document.querySelector('.section-divider'); if (sd) sd.style.display = 'none';
+
     var sec = document.getElementById('preorderSection');
     if (sec) sec.style.display = 'block';
+
+    // Move (not duplicate) the launch video + About/AI content into the menu.
+    var vid = document.querySelector('.launch-video');
+    var vslot = document.getElementById('poVideoSlot');
+    if (vid && vslot) vslot.appendChild(vid);
+    var aboutInner = document.querySelector('#card-about .product-detail-inner');
+    if (aboutInner) document.getElementById('posecbody-about').appendChild(aboutInner);
+    var aiInner = document.querySelector('#card-ai .product-detail-inner');
+    if (aiInner) document.getElementById('posecbody-ai').appendChild(aiInner);
+
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
     var fp = document.getElementById('poFromPrice'); if (fp) fp.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(2) + ' + shipping';
+    var fp2 = document.getElementById('poFromPrice2'); if (fp2) fp2.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(0);
     poLoadTerms();
 
     poRenderColors();
@@ -1946,10 +2036,50 @@
     });
 
     var buy = document.getElementById('poBuyBtn');
-    if (buy) buy.onclick = function(){ showMessage('> Preview only — checkout opens when pre-orders go live.', false); };
+    if (buy) buy.onclick = function(){ var m = document.getElementById('poMsg'); if (m) m.textContent = 'Preview only — checkout opens when pre-orders go live.'; };
     poTickCountdown();
     setInterval(poTickCountdown, 1000);
     poUpdateCart();
+  }
+
+  // Top-level 4-section menu: one open at a time (click the open one to close all).
+  function poToggleSection(key) {
+    poState.openSec = (poState.openSec === key) ? null : key;
+    ['preorder','contribute','about','ai'].forEach(function(k){
+      var open = (poState.openSec === k);
+      var body = document.getElementById('posecbody-' + k);
+      var tog = document.getElementById('posectog-' + k);
+      var head = document.querySelector('.po-menu-head[data-posec="' + k + '"]');
+      if (body) body.style.display = open ? 'block' : 'none';
+      if (tog) tog.innerHTML = open ? '&#9662;' : '&#9656;';   // ▾ / ▸
+      if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+  function poSecKey(e, key) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); poToggleSection(key); }
+  }
+
+  // Contribute section — STUBBED in preview (no live Stripe). Wires to the real donate at launch.
+  function poSelectDonation(cents, btnEl) {
+    if (cents === 0) {
+      var v = parseFloat((document.getElementById('poDonateCustom') || {}).value);
+      cents = (isNaN(v) || v <= 0) ? 0 : Math.round(v * 100);
+    } else {
+      var ci = document.getElementById('poDonateCustom'); if (ci) ci.value = '';
+    }
+    poState.donationCents = cents;
+    var btns = document.querySelectorAll('#posecbody-contribute .donate-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    if (btnEl) btnEl.classList.add('selected');
+    var db = document.getElementById('poDonateBtn');
+    if (db) {
+      if (cents >= 100) { db.disabled = false; db.textContent = 'PREVIEW — CONTRIBUTE $' + (cents / 100).toFixed(2); }
+      else { db.disabled = true; db.textContent = 'SELECT AN AMOUNT ABOVE'; }
+    }
+  }
+  function poContributeStub() {
+    var m = document.getElementById('poDonateMsg');
+    if (m) m.textContent = 'Preview only — contributions open when pre-orders go live.';
   }
 
   // Accordion: each visible color is a collapsible row (▶/▼) that expands to its own carousel
