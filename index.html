@@ -635,7 +635,17 @@
     #preorderSection .po-carousel .po-next { right:0.4rem; }
     #preorderSection .po-colornote { font-size:0.98rem; color:var(--pip-dim); margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem; }
     #preorderSection .po-excl { color:var(--pip-amber); }
-    #preorderSection .po-ks-done { border:1px solid var(--pip-dim); padding:0.75rem 1rem; margin-top:1rem; color:var(--pip-green); font-size:0.95rem; box-shadow:0 0 8px var(--pip-glow); }
+    #preorderSection .po-ks-done { border:1px solid var(--pip-dim); padding:0.75rem 1rem; margin-top:1rem; color:var(--pip-green); font-size:0.95rem; box-shadow:0 0 8px var(--pip-glow); line-height:1.5; }
+    #preorderSection .po-color { border:1px solid var(--pip-border); margin-bottom:0.5rem; }
+    #preorderSection .po-color.has-qty { border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
+    #preorderSection .po-color-head { display:flex; align-items:center; gap:0.6rem; padding:0.7rem; cursor:pointer; min-height:48px; -webkit-user-select:none; user-select:none; }
+    #preorderSection .po-color-head:active { background:rgba(51,255,54,0.06); }
+    #preorderSection .po-color-head:focus-visible { outline:1px solid var(--pip-green); outline-offset:-2px; }
+    #preorderSection .po-color-toggle { color:var(--pip-dim); font-size:0.9rem; width:1rem; text-align:center; }
+    #preorderSection .po-color-name { flex:1; }
+    #preorderSection .po-color-qtybadge { color:var(--pip-green); font-size:0.95rem; }
+    #preorderSection .po-color-body { border-top:1px solid var(--pip-border); padding:0.8rem; }
+    #preorderSection .po-tag-custom { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
   </style>
   <div id="preorderSection" style="display:none">
     <div class="po-eyebrow">&#9622; PRE-ORDER &mdash; RUN 2<span class="blink">_</span></div>
@@ -653,21 +663,8 @@
           </div>
           <div class="po-shipest"><span style="color:var(--pip-amber)">Estimated Delivery:</span> <span id="poShipEst"></span></div>
 
-          <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each)</span></div>
-          <select class="po-select" id="poColorSelect" aria-label="Trim color"></select>
-          <div class="po-carousel" id="poCarousel">
-            <button class="lightbox-nav po-prev" id="poCarPrev" aria-label="Previous image">◀</button>
-            <img id="poCarImg" alt="Clip-Boy">
-            <button class="lightbox-nav po-next" id="poCarNext" aria-label="Next image">▶</button>
-          </div>
-          <div style="color:var(--pip-dim); font-size:0.8rem; font-style:italic; margin-bottom:0.6rem;">Representative image &mdash; final per-color renders to come.</div>
-          <div class="po-colornote" id="poColorNote"></div>
-          <div class="qty-row">
-            <label>Quantity</label>
-            <button class="qty-btn" id="poMinus" aria-label="Decrease quantity">&minus;</button>
-            <span class="qty-val" id="poSelQty">0</span>
-            <button class="qty-btn" id="poPlus" aria-label="Increase quantity">+</button>
-          </div>
+          <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each &mdash; tap a color to preview)</span></div>
+          <div id="poColors"></div>
 
           <div class="po-ks-panel" id="poKsPanel">
             <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
@@ -1862,7 +1859,7 @@
     { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks', images:[REP_IMG] },
   ];
 
-  const poState = { cart:{}, delivery:null, ksUnlocked:false, selected:null, carIdx:0, ksRemaining:null };
+  const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null };
 
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function poUpLabel() { return '+$' + (PREORDER_CUSTOM_UPCHARGE_CENTS / 100).toFixed(0); }
@@ -1884,16 +1881,26 @@
     });
     var sec = document.getElementById('preorderSection');
     if (sec) sec.style.display = 'block';
-    PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; });
+    PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
 
-    poRenderColorOptions();
-    poSelectColor();  // sync carousel + note + qty to the initial selection
-    document.getElementById('poColorSelect').addEventListener('change', poSelectColor);
-    document.getElementById('poMinus').addEventListener('click', function(){ poAdjustSelected(-1); });
-    document.getElementById('poPlus').addEventListener('click', function(){ poAdjustSelected(1); });
-    document.getElementById('poCarPrev').addEventListener('click', function(){ poCarouselNav(-1); });
-    document.getElementById('poCarNext').addEventListener('click', function(){ poCarouselNav(1); });
+    poRenderColors();
+    // One delegated listener: qty steppers + carousel arrows carry a numeric PO_COLORS index
+    // (injection-safe); a header tap expands/collapses that color's row.
+    var host = document.getElementById('poColors');
+    host.addEventListener('click', function(e){
+      var q = e.target.closest ? e.target.closest('button[data-po-delta]') : null;
+      if (q) { poAdjust(+q.getAttribute('data-po-idx'), +q.getAttribute('data-po-delta')); return; }
+      var nav = e.target.closest ? e.target.closest('button[data-po-nav]') : null;
+      if (nav) { poCarouselNav(+nav.getAttribute('data-po-idx'), +nav.getAttribute('data-po-nav')); return; }
+      var head = e.target.closest ? e.target.closest('.po-color-head') : null;
+      if (head) { poToggleColor(+head.getAttribute('data-po-idx')); }
+    });
+    host.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var head = e.target.closest ? e.target.closest('.po-color-head') : null;
+      if (head) { e.preventDefault(); poToggleColor(+head.getAttribute('data-po-idx')); }
+    });
 
     var buy = document.getElementById('poBuyBtn');
     if (buy) buy.onclick = function(){ showMessage('> Preview only — checkout opens when pre-orders go live.', false); };
@@ -1902,78 +1909,93 @@
     poUpdateCart();
   }
 
-  // Build the color dropdown from the currently-visible colors (KS ones appear after unlock).
-  function poRenderColorOptions() {
-    var sel = document.getElementById('poColorSelect');
-    var prev = poState.selected;
-    var vis = poVisibleColors();
-    sel.innerHTML = vis.map(function(c){
+  // Accordion: each visible color is a collapsible row (▶/▼) that expands to its own carousel
+  // + quantity stepper. KS colors join the list after unlock.
+  function poRenderColors() {
+    var host = document.getElementById('poColors');
+    var open = poState.openIdx;
+    host.innerHTML = poVisibleColors().map(function(c){
       var i = PO_COLORS.indexOf(c);
-      var suffix = c.cls === 'custom' ? ' (' + poUpLabel() + ')'
-                 : (c.cls === 'ks' ? ' — backer-exclusive' : '');
-      return '<option value="' + i + '">' + poEsc(c.id) + suffix + '</option>';
+      var border = c.border ? 'border-color:' + poEsc(c.border) : '';
+      var tag = c.cls === 'custom' ? '<span class="po-tag-custom">' + poUpLabel() + '</span>'
+              : (c.cls === 'ks' ? '<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">backer-exclusive</span>' : '');
+      var isOpen = (open === i);
+      var q = poState.cart[c.id] || 0;
+      return '<div class="po-color' + (q > 0 ? ' has-qty' : '') + '" id="pocol-' + i + '">'
+        + '<div class="po-color-head" data-po-idx="' + i + '" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '">'
+        +   '<span class="po-color-toggle" id="potog-' + i + '">' + (isOpen ? '▼' : '▶') + '</span>'
+        +   '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
+        +   '<span class="po-color-name">' + poEsc(c.id) + tag + '</span>'
+        +   '<span class="po-color-qtybadge" id="poqb-' + i + '"' + (q > 0 ? '' : ' style="display:none"') + '>&times; ' + q + '</span>'
+        + '</div>'
+        + '<div class="po-color-body" id="pobody-' + i + '"' + (isOpen ? '' : ' style="display:none"') + '>'
+        +   '<div class="po-carousel">'
+        +     '<button class="lightbox-nav po-prev" data-po-idx="' + i + '" data-po-nav="-1" aria-label="Previous image">◀</button>'
+        +     '<img id="poimg-' + i + '" alt="Clip-Boy &mdash; ' + poEsc(c.id) + '">'
+        +     '<button class="lightbox-nav po-next" data-po-idx="' + i + '" data-po-nav="1" aria-label="Next image">▶</button>'
+        +   '</div>'
+        +   '<div style="color:var(--pip-dim); font-size:0.78rem; font-style:italic; margin:0.4rem 0 0.6rem;">Representative image &mdash; final per-color renders to come.</div>'
+        +   '<div class="qty-row"><label>Quantity <span style="color:var(--pip-dim)">($' + (poUnitCents(c.cls) / 100).toFixed(2) + ' each)</span></label>'
+        +     '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="-1" aria-label="Decrease">&minus;</button>'
+        +     '<span class="qty-val" id="poqv-' + i + '">' + q + '</span>'
+        +     '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="1" aria-label="Increase">+</button>'
+        +   '</div>'
+        + '</div>'
+        + '</div>';
     }).join('');
-    var stillVisible = vis.some(function(c){ return c.id === prev; });
-    poState.selected = stillVisible ? prev : vis[0].id;
-    sel.value = PO_COLORS.indexOf(poColorById(poState.selected));
+    if (open != null) poRenderRowCarousel(open);
   }
 
-  function poSelectColor() {
-    var sel = document.getElementById('poColorSelect');
-    var c = PO_COLORS[+sel.value];
-    if (!c) return;
-    poState.selected = c.id;
-    poState.carIdx = 0;
-    poRenderCarousel();
-    poRenderColorNote();
-    poRenderSelQty();
+  function poToggleColor(i) {
+    poState.openIdx = (poState.openIdx === i) ? null : i;   // accordion: one open at a time
+    poVisibleColors().forEach(function(c){
+      var idx = PO_COLORS.indexOf(c);
+      var body = document.getElementById('pobody-' + idx);
+      var tog = document.getElementById('potog-' + idx);
+      var head = document.querySelector('.po-color-head[data-po-idx="' + idx + '"]');
+      var isOpen = (poState.openIdx === idx);
+      if (body) body.style.display = isOpen ? '' : 'none';
+      if (tog) tog.textContent = isOpen ? '▼' : '▶';
+      if (head) head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    if (poState.openIdx != null) poRenderRowCarousel(poState.openIdx);
   }
 
-  function poRenderCarousel() {
-    var c = poColorById(poState.selected); if (!c) return;
+  function poRenderRowCarousel(i) {
+    var c = PO_COLORS[i]; if (!c) return;
     var imgs = poImages(c);
-    if (poState.carIdx >= imgs.length) poState.carIdx = 0;
-    var img = document.getElementById('poCarImg');
-    img.src = imgs[poState.carIdx];
-    img.alt = 'Clip-Boy — ' + c.id;
-    img.onclick = function(){ openImageLightbox(imgs[poState.carIdx]); };
+    var ci = poState.carIdx[c.id] || 0;
+    if (ci >= imgs.length) { ci = 0; poState.carIdx[c.id] = 0; }
+    var img = document.getElementById('poimg-' + i);
+    if (!img) return;
+    img.src = imgs[ci];
+    img.style.cursor = 'pointer';
+    img.onclick = function(){ openImageLightbox(imgs[poState.carIdx[c.id] || 0]); };
     var multi = imgs.length > 1;
-    document.getElementById('poCarPrev').style.display = multi ? '' : 'none';
-    document.getElementById('poCarNext').style.display = multi ? '' : 'none';
+    var row = img.parentElement;
+    var prev = row.querySelector('.po-prev'); var next = row.querySelector('.po-next');
+    if (prev) prev.style.display = multi ? '' : 'none';
+    if (next) next.style.display = multi ? '' : 'none';
   }
 
-  function poCarouselNav(dir) {
-    var c = poColorById(poState.selected); if (!c) return;
+  function poCarouselNav(i, dir) {
+    var c = PO_COLORS[i]; if (!c) return;
     var imgs = poImages(c);
-    poState.carIdx = (poState.carIdx + dir + imgs.length) % imgs.length;
-    poRenderCarousel();
+    poState.carIdx[c.id] = ((poState.carIdx[c.id] || 0) + dir + imgs.length) % imgs.length;
+    poRenderRowCarousel(i);
   }
 
-  function poRenderColorNote() {
-    var c = poColorById(poState.selected); if (!c) return;
-    var border = c.border ? 'border-color:' + poEsc(c.border) : '';
-    var tag = c.cls === 'custom' ? '<span style="color:var(--pip-dim)">' + poUpLabel() + '</span>'
-            : (c.cls === 'ks' ? '<span class="po-excl">backer-exclusive</span>' : '');
-    document.getElementById('poColorNote').innerHTML =
-      '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
-      + '<span>' + poEsc(c.id) + '</span>' + tag
-      + '<span style="margin-left:auto; color:var(--pip-green)">$' + (poUnitCents(c.cls) / 100).toFixed(2) + '</span>';
-  }
-
-  function poRenderSelQty() {
-    var el = document.getElementById('poSelQty');
-    if (el) el.textContent = poState.cart[poState.selected] || 0;
-  }
-
-  function poAdjustSelected(delta) {
-    var id = poState.selected;
-    var c = poColorById(id); if (!c) return;
+  function poAdjust(i, delta) {
+    var c = PO_COLORS[i]; if (!c) return;
     if (c.cls === 'ks' && !poState.ksUnlocked) return;
-    var cur = poState.cart[id] || 0;
+    var cur = poState.cart[c.id] || 0;
     var others = poTotalQty() - cur;
     var desired = Math.max(0, Math.min(cur + delta, PREORDER_MAX - others));
-    poState.cart[id] = desired;
-    poRenderSelQty();
+    poState.cart[c.id] = desired;
+    var qv = document.getElementById('poqv-' + i); if (qv) qv.textContent = desired;
+    var qb = document.getElementById('poqb-' + i);
+    if (qb) { qb.innerHTML = '&times; ' + desired; qb.style.display = desired > 0 ? '' : 'none'; }
+    var col = document.getElementById('pocol-' + i); if (col) col.classList.toggle('has-qty', desired > 0);
     poUpdateCart();
   }
 
@@ -2061,15 +2083,15 @@
       if (data && data.ok) {
         poState.ksUnlocked = true;
         poState.ksRemaining = (typeof data.remaining !== 'undefined') ? data.remaining : null;
-        poRenderColorOptions();  // KS colors now appear in the dropdown
-        // Collapse the verification form to a compact confirmation.
+        poRenderColors();  // KS colors now appear as rows in the color list
+        // Collapse the verification form to a compact confirmation (two lines).
         var left = (poState.ksRemaining != null)
           ? (poState.ksRemaining + ' exclusive unit' + (poState.ksRemaining === 1 ? '' : 's') + ' left')
           : 'exclusive colors unlocked';
         var panel = document.getElementById('poKsPanel');
         panel.className = 'po-ks-done';
-        panel.innerHTML = '&#10003; Verified &mdash; ' + poEsc(String(left))
-          + '. Space Badge &amp; Overseer are now in the color list above.';
+        panel.innerHTML = '&#10003; Verified &mdash; ' + poEsc(String(left)) + '.'
+          + '<br>Space Badge &amp; Overseer are now in the color list above.';
       } else {
         msg.style.color = 'var(--pip-amber)';
         msg.textContent = (data && (data.message || data.error)) || 'Verification failed. Check your email and backer number.';
