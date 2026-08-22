@@ -624,10 +624,22 @@
     #preorderSection .po-ks-panel input { width:100%; margin-top:0.3rem; padding:0.6rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1rem; }
     #preorderSection .po-ks-panel input:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
     #preorderSection #poKsMsg { min-height:1.1rem; font-size:0.85rem; margin:0.4rem 0; }
+    #preorderSection .po-subhead { color:var(--pip-dim); font-size:0.6em; display:block; margin-top:0.3rem; letter-spacing:0.15rem; }
+    #preorderSection .po-shipest { font-size:1.05rem; margin:0.5rem 0 1.1rem; }
+    #preorderSection .po-select { width:100%; padding:0.75rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1.05rem; margin-bottom:0.8rem; }
+    #preorderSection .po-select:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
+    #preorderSection .po-carousel { position:relative; display:flex; align-items:center; justify-content:center; border:1px solid var(--pip-border); background:#0a0a0a; min-height:220px; margin-bottom:0.5rem; }
+    #preorderSection .po-carousel img { max-width:100%; max-height:300px; object-fit:contain; cursor:pointer; }
+    #preorderSection .po-carousel .lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); }
+    #preorderSection .po-carousel .po-prev { left:0.4rem; }
+    #preorderSection .po-carousel .po-next { right:0.4rem; }
+    #preorderSection .po-colornote { font-size:0.98rem; color:var(--pip-dim); margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem; }
+    #preorderSection .po-excl { color:var(--pip-amber); }
+    #preorderSection .po-ks-done { border:1px solid var(--pip-dim); padding:0.75rem 1rem; margin-top:1rem; color:var(--pip-green); font-size:0.95rem; box-shadow:0 0 8px var(--pip-glow); }
   </style>
   <div id="preorderSection" style="display:none">
     <div class="po-eyebrow">&#9622; PRE-ORDER &mdash; RUN 2<span class="blink">_</span></div>
-    <h2 class="po-head">Clip-Boy is coming back &mdash; reserve yours</h2>
+    <h2 class="po-head">Clip-Boy is re-emerging from the vault<span class="po-subhead">&mdash; reserve yours</span></h2>
     <div class="po-countdown" id="poCountdown">Pre-orders close: &mdash;</div>
     <div class="po-notice">PREVIEW BUILD &mdash; prices, dates, and images are placeholders and <strong>not final</strong>. Checkout is disabled; nothing can be purchased here yet.</div>
 
@@ -636,18 +648,26 @@
         <div class="product-detail-inner">
           <div class="product-description">
             One Clip-Boy, your colors. Wrist-mounted ESP32-S3 badge &mdash; Wi-Fi/BLE analysis tools,
-            theremin, customizable LEDs, 90+ collectibles &mdash; 3D-printed in gunmetal gray. Pick a
-            trim color below; mix as many as you like (up to 5 per order). We build after pre-orders
-            close and ship <strong>on or about end of December 2026</strong>.
+            theremin, customizable LEDs, 90+ collectibles &mdash; 3D-printed in gunmetal gray. Choose a
+            trim color below; mix as many as you like (up to 5 per order).
           </div>
-          <div class="media-gallery">
-            <img src="https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png"
-                 alt="Clip-Boy (representative)" style="cursor:pointer; background:#0a0a0a"
-                 onclick="openImageLightbox('https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png')">
-          </div>
-          <div style="color:var(--pip-dim); font-size:0.8rem; font-style:italic; margin-bottom:1rem;">Representative image &mdash; final per-color renders to come.</div>
+          <div class="po-shipest"><span style="color:var(--pip-amber)">Estimated Delivery:</span> <span id="poShipEst"></span></div>
 
-          <div class="color-qty-section" id="poColors"><!-- rows injected by poRenderColors() --></div>
+          <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each)</span></div>
+          <select class="po-select" id="poColorSelect" aria-label="Trim color"></select>
+          <div class="po-carousel" id="poCarousel">
+            <button class="lightbox-nav po-prev" id="poCarPrev" aria-label="Previous image">◀</button>
+            <img id="poCarImg" alt="Clip-Boy">
+            <button class="lightbox-nav po-next" id="poCarNext" aria-label="Next image">▶</button>
+          </div>
+          <div style="color:var(--pip-dim); font-size:0.8rem; font-style:italic; margin-bottom:0.6rem;">Representative image &mdash; final per-color renders to come.</div>
+          <div class="po-colornote" id="poColorNote"></div>
+          <div class="qty-row">
+            <label>Quantity</label>
+            <button class="qty-btn" id="poMinus" aria-label="Decrease quantity">&minus;</button>
+            <span class="qty-val" id="poSelQty">0</span>
+            <button class="qty-btn" id="poPlus" aria-label="Increase quantity">+</button>
+          </div>
 
           <div class="po-ks-panel" id="poKsPanel">
             <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
@@ -667,20 +687,20 @@
     <div class="section-label">DELIVERY</div>
     <div class="delivery-options">
       <button class="delivery-btn" id="po-btn-us" onclick="poSetDelivery('us')">
-        &gt;&gt; SHIP &mdash; U.S.<br><span style="font-size:0.9rem">$20 (1&ndash;3) &middot; $30 (4&ndash;5) + tax</span>
+        &gt;&gt; SHIP &mdash; U.S.<br><span style="font-size:0.9rem">$20 (1&ndash;3) &middot; $30 (4&ndash;5)</span>
       </button>
       <button class="delivery-btn" id="po-btn-intl" onclick="poSetDelivery('intl')">
         &gt;&gt; SHIP &mdash; INTERNATIONAL<br><span style="font-size:0.9rem">$35 (1&ndash;3) &middot; $55 (4&ndash;5)</span>
       </button>
     </div>
+    <div class="cart-note" style="margin:-0.4rem 0 1rem;">Sales tax applies to <strong>Texas</strong> addresses only. Any other taxes, VAT, or import duties (if any) are the buyer's responsibility.</div>
 
     <div id="poCart" class="cart-summary" style="display:none"></div>
     <button class="buy-btn" id="poBuyBtn" disabled>SELECT COLORS ABOVE</button>
     <div class="cart-note" style="margin-top:0.6rem;">Ordering more than 5? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> &mdash; bulk orders are handled by email.</div>
     <div style="color:var(--pip-dim); font-size:0.78rem; line-height:1.5; margin:0.75rem 0;">
       Sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education
-      only; as-is, no warranty. International customs/duties are the buyer's responsibility.
-      Full refund on request before pre-orders close.
+      only; as-is, no warranty. Full refund on request before pre-orders close.
     </div>
   </div>
   <!-- ============ /RUN-2 PRE-ORDER PREVIEW ============ -->
@@ -1827,24 +1847,30 @@
   const PREORDER_DEADLINE = new Date('2026-09-30T19:00:00Z'); // PLACEHOLDER — pre-order close date
   const PREORDER_MAX = 5;                        // soft per-order cap (>5 = contact us)
 
+  const REP_IMG = 'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png';
+  const PREORDER_SHIP_ESTIMATE = 'mid-December 2026';  // PLACEHOLDER — owner sets
+
+  // Each color carries its own image list for the carousel. PLACEHOLDER: all use the
+  // representative render for now; drop real per-color images into these arrays later.
   const PO_COLORS = [
-    { id:'Black',       swatch:'#1a1a1a', cls:'base'   },
-    { id:'Red',         swatch:'#cc2222', cls:'custom' },
-    { id:'Blue',        swatch:'#2255cc', cls:'custom' },
-    { id:'White',       swatch:'#e8e8e8', cls:'custom' },
-    { id:'50s Silver',  swatch:'#b0b0b0', cls:'custom' },
-    { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'ks' },
-    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks' },
+    { id:'Black',       swatch:'#1a1a1a', cls:'base',   images:[REP_IMG] },
+    { id:'Red',         swatch:'#cc2222', cls:'custom', images:[REP_IMG] },
+    { id:'Blue',        swatch:'#2255cc', cls:'custom', images:[REP_IMG] },
+    { id:'White',       swatch:'#e8e8e8', cls:'custom', images:[REP_IMG] },
+    { id:'50s Silver',  swatch:'#b0b0b0', cls:'custom', images:[REP_IMG] },
+    { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'ks', images:[REP_IMG] },
+    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks', images:[REP_IMG] },
   ];
 
-  const poState = { cart:{}, delivery:null, ksUnlocked:false };
+  const poState = { cart:{}, delivery:null, ksUnlocked:false, selected:null, carIdx:0, ksRemaining:null };
 
-  function poKey(id) { return 'po-row-' + id.replace(/[^a-z0-9]/gi, '_'); }
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function poUpLabel() { return '+$' + (PREORDER_CUSTOM_UPCHARGE_CENTS / 100).toFixed(0); }
   function poColorById(id) { return PO_COLORS.find(function(c){ return c.id === id; }); }
   function poUnitCents(cls) { return PREORDER_BASE_CENTS + (cls === 'custom' ? PREORDER_CUSTOM_UPCHARGE_CENTS : 0); }
   function poTotalQty() { return Object.values(poState.cart).reduce(function(a,b){ return a + b; }, 0); }
+  function poVisibleColors() { return PO_COLORS.filter(function(c){ return c.cls !== 'ks' || poState.ksUnlocked; }); }
+  function poImages(c) { return (c && c.images && c.images.length) ? c.images : [REP_IMG]; }
   function poShipCents(qty, delivery) {
     if (qty <= 0 || !delivery) return 0;
     if (delivery === 'intl') return qty <= 3 ? 3500 : 5500;
@@ -1852,21 +1878,23 @@
   }
 
   function poEnter() {
-    // Hide the normal shop flow; reveal the pre-order section. Only reachable under the token.
+    // Hide the normal shop flow (incl. the sold-out interest panel); reveal pre-order. Token-only.
     ['products','purchaseArea','interestPanel','card-donate'].forEach(function(id){
       var el = document.getElementById(id); if (el) el.style.display = 'none';
     });
     var sec = document.getElementById('preorderSection');
     if (sec) sec.style.display = 'block';
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; });
-    poRenderColors();
-    // Delegated qty handler (survives poRenderColors innerHTML swaps; index is numeric/safe).
-    document.getElementById('poColors').addEventListener('click', function(e){
-      var b = e.target.closest ? e.target.closest('button[data-po-idx]') : null;
-      if (!b) return;
-      var col = PO_COLORS[+b.getAttribute('data-po-idx')];
-      if (col) poAdjust(col.id, +b.getAttribute('data-po-delta'));
-    });
+    var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
+
+    poRenderColorOptions();
+    poSelectColor();  // sync carousel + note + qty to the initial selection
+    document.getElementById('poColorSelect').addEventListener('change', poSelectColor);
+    document.getElementById('poMinus').addEventListener('click', function(){ poAdjustSelected(-1); });
+    document.getElementById('poPlus').addEventListener('click', function(){ poAdjustSelected(1); });
+    document.getElementById('poCarPrev').addEventListener('click', function(){ poCarouselNav(-1); });
+    document.getElementById('poCarNext').addEventListener('click', function(){ poCarouselNav(1); });
+
     var buy = document.getElementById('poBuyBtn');
     if (buy) buy.onclick = function(){ showMessage('> Preview only — checkout opens when pre-orders go live.', false); };
     poTickCountdown();
@@ -1874,36 +1902,78 @@
     poUpdateCart();
   }
 
-  function poRenderColors() {
-    var rows = PO_COLORS.map(function(c, i){
-      var border = c.border ? 'border-color:' + poEsc(c.border) : '';
-      var tag = c.cls === 'custom' ? '<span class="po-badge-note">' + poUpLabel() + '</span>'
-              : (c.cls === 'ks' ? '<span class="po-badge-note">backer-exclusive</span>' : '');
-      var hidden = c.cls === 'ks' ? ' style="display:none"' : '';
-      var k = poKey(c.id);
-      // Buttons carry the numeric PO_COLORS index (safe) — a delegated listener on
-      // #poColors maps it back to the color id, so color names can't break markup.
-      return '<div class="color-qty-row" id="' + k + '"' + hidden + '>'
-        + '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
-        + '<span class="color-label">' + poEsc(c.id) + tag + '</span>'
-        + '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="-1">−</button>'
-        + '<span class="qty-val" id="poqty-' + k + '">0</span>'
-        + '<button class="qty-btn" data-po-idx="' + i + '" data-po-delta="1">+</button>'
-        + '</div>';
+  // Build the color dropdown from the currently-visible colors (KS ones appear after unlock).
+  function poRenderColorOptions() {
+    var sel = document.getElementById('poColorSelect');
+    var prev = poState.selected;
+    var vis = poVisibleColors();
+    sel.innerHTML = vis.map(function(c){
+      var i = PO_COLORS.indexOf(c);
+      var suffix = c.cls === 'custom' ? ' (' + poUpLabel() + ')'
+                 : (c.cls === 'ks' ? ' — backer-exclusive' : '');
+      return '<option value="' + i + '">' + poEsc(c.id) + suffix + '</option>';
     }).join('');
-    document.getElementById('poColors').innerHTML =
-      '<div class="color-qty-header">SELECT TRIM COLOR &amp; QUANTITY <span style="color:var(--pip-dim)">(custom colors ' + poUpLabel() + ' each)</span></div>' + rows;
+    var stillVisible = vis.some(function(c){ return c.id === prev; });
+    poState.selected = stillVisible ? prev : vis[0].id;
+    sel.value = PO_COLORS.indexOf(poColorById(poState.selected));
   }
 
-  function poAdjust(id, delta) {
+  function poSelectColor() {
+    var sel = document.getElementById('poColorSelect');
+    var c = PO_COLORS[+sel.value];
+    if (!c) return;
+    poState.selected = c.id;
+    poState.carIdx = 0;
+    poRenderCarousel();
+    poRenderColorNote();
+    poRenderSelQty();
+  }
+
+  function poRenderCarousel() {
+    var c = poColorById(poState.selected); if (!c) return;
+    var imgs = poImages(c);
+    if (poState.carIdx >= imgs.length) poState.carIdx = 0;
+    var img = document.getElementById('poCarImg');
+    img.src = imgs[poState.carIdx];
+    img.alt = 'Clip-Boy — ' + c.id;
+    img.onclick = function(){ openImageLightbox(imgs[poState.carIdx]); };
+    var multi = imgs.length > 1;
+    document.getElementById('poCarPrev').style.display = multi ? '' : 'none';
+    document.getElementById('poCarNext').style.display = multi ? '' : 'none';
+  }
+
+  function poCarouselNav(dir) {
+    var c = poColorById(poState.selected); if (!c) return;
+    var imgs = poImages(c);
+    poState.carIdx = (poState.carIdx + dir + imgs.length) % imgs.length;
+    poRenderCarousel();
+  }
+
+  function poRenderColorNote() {
+    var c = poColorById(poState.selected); if (!c) return;
+    var border = c.border ? 'border-color:' + poEsc(c.border) : '';
+    var tag = c.cls === 'custom' ? '<span style="color:var(--pip-dim)">' + poUpLabel() + '</span>'
+            : (c.cls === 'ks' ? '<span class="po-excl">backer-exclusive</span>' : '');
+    document.getElementById('poColorNote').innerHTML =
+      '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
+      + '<span>' + poEsc(c.id) + '</span>' + tag
+      + '<span style="margin-left:auto; color:var(--pip-green)">$' + (poUnitCents(c.cls) / 100).toFixed(2) + '</span>';
+  }
+
+  function poRenderSelQty() {
+    var el = document.getElementById('poSelQty');
+    if (el) el.textContent = poState.cart[poState.selected] || 0;
+  }
+
+  function poAdjustSelected(delta) {
+    var id = poState.selected;
     var c = poColorById(id); if (!c) return;
     if (c.cls === 'ks' && !poState.ksUnlocked) return;
     var cur = poState.cart[id] || 0;
     var others = poTotalQty() - cur;
     var desired = Math.max(0, Math.min(cur + delta, PREORDER_MAX - others));
     poState.cart[id] = desired;
-    var el = document.getElementById('poqty-' + poKey(id));
-    if (el) el.textContent = desired;
+    poRenderSelQty();
     poUpdateCart();
   }
 
@@ -1927,8 +1997,9 @@
         qty += q;
         var unit = poUnitCents(c.cls);
         subtotal += q * unit;
-        var extra = c.cls === 'custom' ? ' <span style="color:var(--pip-dim)">(+$10)</span>' : '';
-        lines += '<div class="cart-line"><span class="label">Clip-Boy (' + c.id + ')' + extra + ' × ' + q
+        var extra = c.cls === 'custom' ? ' <span style="color:var(--pip-dim)">(' + poUpLabel() + ')</span>'
+                  : (c.cls === 'ks' ? ' <span class="po-excl">(exclusive)</span>' : '');
+        lines += '<div class="cart-line"><span class="label">Clip-Boy (' + poEsc(c.id) + ')' + extra + ' × ' + q
           + '</span><span>$' + (q * unit / 100).toFixed(2) + '</span></div>';
       }
     });
@@ -1955,9 +2026,7 @@
     var payable = (poState.delivery && !overCap);
     var grand = subtotal + (payable ? ship : 0);
     lines += '<div class="cart-line total"><span>PRE-ORDER TOTAL</span><span>$' + (grand / 100).toFixed(2) + (payable ? '' : '+') + '</span></div>';
-    lines += '<div class="cart-note">⧖ Pre-order — we build after orders close and ship on or about end of December 2026.</div>';
-    if (poState.delivery === 'us') lines += '<div class="cart-note">+ Sales tax on badges &amp; shipping at checkout (if applicable)</div>';
-    if (poState.delivery === 'intl') lines += '<div class="cart-note">International: customs &amp; duties are the buyer\'s responsibility.</div>';
+    lines += '<div class="cart-note">⧖ Pre-order — we build after orders close. Estimated delivery ' + PREORDER_SHIP_ESTIMATE + '.</div>';
     lines += '<div class="cart-note" style="color:var(--pip-dim)">Full refund on request before pre-orders close.</div>';
     if (overCap) lines += '<div class="cart-note">More than 5 badges? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> — bulk orders are handled by email.</div>';
 
@@ -1991,14 +2060,16 @@
       var data = await resp.json();
       if (data && data.ok) {
         poState.ksUnlocked = true;
-        PO_COLORS.forEach(function(c){
-          if (c.cls === 'ks') { var row = document.getElementById(poKey(c.id)); if (row) row.style.display = ''; }
-        });
-        var capNote = (typeof data.remaining !== 'undefined')
-          ? ' You can pre-order up to ' + data.remaining + ' exclusive unit' + (data.remaining === 1 ? '' : 's') + '.' : '';
-        msg.style.color = 'var(--pip-green)';
-        msg.textContent = 'Verified — Space Badge & Overseer colors unlocked.' + capNote;
-        btn.textContent = 'UNLOCKED ✓';
+        poState.ksRemaining = (typeof data.remaining !== 'undefined') ? data.remaining : null;
+        poRenderColorOptions();  // KS colors now appear in the dropdown
+        // Collapse the verification form to a compact confirmation.
+        var left = (poState.ksRemaining != null)
+          ? (poState.ksRemaining + ' exclusive unit' + (poState.ksRemaining === 1 ? '' : 's') + ' left')
+          : 'exclusive colors unlocked';
+        var panel = document.getElementById('poKsPanel');
+        panel.className = 'po-ks-done';
+        panel.innerHTML = '&#10003; Verified &mdash; ' + poEsc(String(left))
+          + '. Space Badge &amp; Overseer are now in the color list above.';
       } else {
         msg.style.color = 'var(--pip-amber)';
         msg.textContent = (data && (data.message || data.error)) || 'Verification failed. Check your email and backer number.';
