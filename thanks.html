@@ -148,6 +148,26 @@
     </div>
   </div>
 
+  <div class="donation-message" id="preorderMsg">
+    <h1>PRE-ORDER CONFIRMED<span style="animation:blink 1s step-end infinite">_</span></h1>
+    <div class="message-body">
+      Your Clip-Boy Mk2 pre-order is in. You'll receive a receipt from Stripe shortly.
+      <br><br>
+      <span id="poCodeWrap" style="display:none">
+        Your order code:<br>
+        <span id="poCode" style="font-size:2rem; color:var(--pip-green); letter-spacing:0.4rem"></span>
+        <br><br>
+        <span style="font-size:0.9rem">Save this code — it's your reference for this pre-order.</span>
+        <br><br>
+      </span>
+      We build after pre-orders close and ship <strong>on or about mid-December 2026</strong> to the
+      address you gave at checkout — we'll email you when it ships. Full refund on request any time
+      before pre-orders close.
+      <br><br>
+      Thanks for supporting Bryce &amp; Clip-Boy!
+    </div>
+  </div>
+
   <a href="https://tropicsquirrel.github.io/shop/" class="back-btn" id="backBtn">
     [ RETURN TO TERMINAL ]
   </a>
@@ -168,6 +188,16 @@
   if (code) {
     document.getElementById('orderCode').textContent = code;
     document.getElementById('orderCodeDisplay').style.display = 'inline';
+  }
+  // Pre-order (Run 2): show pickup-free confirmation copy.
+  if (params.get('preorder') === '1') {
+    document.getElementById('badgeMsg').style.display = 'none';
+    document.getElementById('donationMsg').style.display = 'none';
+    document.getElementById('preorderMsg').style.display = 'block';
+    if (code) {
+      document.getElementById('poCode').textContent = code;
+      document.getElementById('poCodeWrap').style.display = 'inline';
+    }
   }
   // If the buyer came from the Founding Backer flow, send them back there
   if (params.get('src') === 'ks') {
