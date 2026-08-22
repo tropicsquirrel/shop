@@ -728,10 +728,10 @@
           <div class="po-ks-panel" id="poKsPanel">
             <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
             <label>Kickstarter email
-              <input type="email" id="poKsEmail" placeholder="you@example.com" autocomplete="email">
+              <input type="email" id="poKsEmail" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
             </label>
             <label>Backer number
-              <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42">
+              <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
             </label>
             <div id="poKsMsg" role="status" aria-live="polite"></div>
             <button class="buy-btn" id="poKsBtn" onclick="poValidateKs()">[ UNLOCK MY COLORS ]</button>
