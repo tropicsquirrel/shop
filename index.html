@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io https://clipboy-api.left4rss.workers.dev; frame-ancestors 'none'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://raw.githubusercontent.com https://img.youtube.com https://defcon.social https://www.linkedin.com https://www.kickstarter.com https://itch.io https://www.google.com https://t3.gstatic.com data:; frame-src https://www.youtube-nocookie.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://api.github.com https://tropicsquirrel.github.io https://clipboy-api.left4rss.workers.dev; frame-ancestors 'none'; base-uri 'self'">
   <title>Clip-Boy: The Unofficial DEF CON 34 Electronic Badge — Pre-Order</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tropicsquirrel/shop/main/images/favicon.png">
 
@@ -662,7 +662,8 @@
     #preorderSection .po-terms[open] summary::before { content:'\25BE  '; }
     #preorderSection .po-terms summary:hover { background:rgba(51,255,54,0.05); }
     #preorderSection .po-terms-body { padding:0 0.9rem 0.9rem; color:var(--pip-dim); font-size:0.82rem; line-height:1.6; border-top:1px solid var(--pip-border); }
-    #preorderSection .po-terms-body h4 { color:var(--pip-green); font-size:0.9rem; margin:0.9rem 0 0.3rem; }
+    #preorderSection .po-terms-body h2, #preorderSection .po-terms-body h3, #preorderSection .po-terms-body h4 { color:var(--pip-green); font-size:0.9rem; margin:0.9rem 0 0.3rem; }
+    #preorderSection .po-terms-body .updated { color:var(--pip-amber); font-size:0.8rem; margin-bottom:0.6rem; }
     #preorderSection .po-terms-body p { margin-bottom:0.5rem; }
     #preorderSection .po-consent { display:flex; gap:0.5rem; align-items:flex-start; font-size:0.85rem; color:var(--pip-green); line-height:1.5; margin:0.5rem 0 0.75rem; cursor:pointer; }
     #preorderSection .po-consent input { margin-top:0.2rem; flex-shrink:0; width:18px; height:18px; }
@@ -718,23 +719,8 @@
 
     <details class="po-terms" id="poTerms">
       <summary>Pre-order Terms, Conditions &amp; Refund Policy</summary>
-      <div class="po-terms-body">
-        <p><strong style="color:var(--pip-amber)">In short:</strong> you're charged in full today; we build after pre-orders close and ship on or about <span id="poTermsEst">&mdash;</span>; full refund on request any time before pre-orders close.</p>
-        <h4>1. Pre-order &amp; payment</h4>
-        <p>This is a pre-order. Your card is charged in full at checkout. Units are built after pre-orders close and shipped on or about the estimated delivery date shown at checkout. Dates are estimates and may shift; we'll email you if the timeline changes materially.</p>
-        <h4>2. Cancellations &amp; refunds</h4>
-        <p>You may cancel for a full refund any time before pre-orders close. Once pre-orders close and production begins, orders can no longer be cancelled. If your badge arrives damaged, defective, or not as described, contact us within 14 days of delivery and we'll repair, replace, or refund it.</p>
-        <h4>3. Shipping</h4>
-        <p>Shipping is $20 (1&ndash;3 badges) or $30 (4&ndash;5) to U.S. addresses; $35 (1&ndash;3) or $55 (4&ndash;5) internationally. For more than 5, contact us. Risk of loss passes on delivery to the carrier; estimated delivery dates are not guaranteed.</p>
-        <h4>4. Taxes &amp; duties</h4>
-        <p>Sales tax is applied to Texas shipping addresses only. For international orders, any import taxes, VAT, customs fees, or duties are the buyer's responsibility and are not included in the price or shipping.</p>
-        <h4>5. Product &amp; acceptable use</h4>
-        <p>Clip-Boy is sold for lawful security research and education only. It ships in a passive, listen-only mode; optional research builds with additional capabilities can be loaded by the user and are for authorized testing only. Provided as is, without warranty of any kind. You are responsible for complying with all applicable laws &mdash; including computer-misuse, wiretap/interception, and radio-frequency/spectrum rules &mdash; wherever you use it. You must be 18 or older, or have a parent/guardian's permission.</p>
-        <h4>6. Export</h4>
-        <p>We ship hardware only and do not ship to OFAC-embargoed destinations or parties. International orders may be subject to a compliance screen before shipment.</p>
-        <h4>7. Seller</h4>
-        <p>Sold by Coruscant Productions, LLC (San Antonio, TX). Clip-Boy is an unofficial, independently produced badge and is not affiliated with, endorsed by, or sponsored by DEF CON. Questions: <a href="mailto:coruscantproductions@gmail.com" style="color:var(--pip-amber)">coruscantproductions@gmail.com</a>.</p>
-      </div>
+      <!-- Content is fetched from terms.html (single source; also the Stripe T&C URL). -->
+      <div class="po-terms-body" id="poTermsBody">Loading terms&hellip; <a href="terms.html" target="_blank" rel="noopener" style="color:var(--pip-amber)">open in a new tab</a></div>
     </details>
 
     <label class="po-consent" id="poConsentRow">
@@ -1932,7 +1918,7 @@
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
     var fp = document.getElementById('poFromPrice'); if (fp) fp.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(2) + ' + shipping';
-    var te = document.getElementById('poTermsEst'); if (te) te.textContent = PREORDER_SHIP_ESTIMATE;
+    poLoadTerms();
 
     poRenderColors();
     // One delegated listener: qty steppers + carousel arrows carry a numeric PO_COLORS index
@@ -2157,6 +2143,24 @@
       msg.textContent = 'Network error. Please try again.';
       btn.disabled = false; btn.textContent = '[ UNLOCK MY COLORS ]';
     }
+  }
+
+  // Fetch the standalone terms page (single source; also the Stripe T&C URL) and embed its
+  // #terms-content into the T&C accordion. Same-origin fetch (CSP connect-src 'self').
+  function poLoadTerms() {
+    var body = document.getElementById('poTermsBody');
+    if (!body || body.getAttribute('data-loaded')) return;
+    body.setAttribute('data-loaded', '1');
+    fetch('terms.html', { cache: 'no-cache' })
+      .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
+      .then(function(html){
+        var content = new DOMParser().parseFromString(html, 'text/html').getElementById('terms-content');
+        if (!content) throw new Error('no #terms-content');
+        body.innerHTML = content.innerHTML;
+      })
+      .catch(function(){
+        body.innerHTML = 'Read our full <a href="terms.html" target="_blank" rel="noopener" style="color:var(--pip-amber)">Pre-order Terms &amp; Conditions</a> (opens in a new tab).';
+      });
   }
 
   function poTickCountdown() {
