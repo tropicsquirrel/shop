@@ -688,7 +688,7 @@
       <img class="po-heroimg" src="images/clipboy-emerges-hero.jpg" alt="Clip-Boy emerging from a vault door at dawn" onclick="openImageLightbox('images/clipboy-emerges-full.png')">
     </div>
     <div class="po-countdown" id="poCountdown">Pre-orders close: &mdash;</div>
-    <div class="po-notice">PREVIEW BUILD &mdash; prices, dates, and images are placeholders and <strong>not final</strong>. Checkout is disabled; nothing can be purchased here yet.</div>
+    <div class="po-notice">PREVIEW &mdash; TEST MODE: checkout uses Stripe <strong>test cards</strong> (e.g. 4242&nbsp;4242&nbsp;4242&nbsp;4242); no real charge. Prices, dates, and images may be placeholders.</div>
 
     <!-- == 4-SECTION MENU (all collapsed on arrival; one open at a time) == -->
     <div id="poMenu">
@@ -797,7 +797,7 @@
                 <input type="number" id="poDonateCustom" min="1" placeholder="Other" oninput="poSelectDonation(0,null)">
               </div>
             </div>
-            <button class="buy-btn" id="poDonateBtn" style="margin-top:0.75rem" disabled onclick="poContributeStub()">SELECT AN AMOUNT ABOVE</button>
+            <button class="buy-btn" id="poDonateBtn" style="margin-top:0.75rem" disabled onclick="poContribute()">SELECT AN AMOUNT ABOVE</button>
             <div id="poDonateMsg" role="status" aria-live="polite" style="min-height:1.2rem; font-size:0.9rem; color:var(--pip-amber); margin-top:0.5rem;"></div>
           </div>
         </div>
@@ -1959,20 +1959,31 @@
   function hideMessage() { document.getElementById('msg').className = 'message'; }
 
   // ============================================================================
-  // RUN-2 PRE-ORDER PREVIEW  (token-gated by ?preview=majesticm00se)
-  // Fully self-contained: none of this runs unless the token is present, and it
-  // NEVER calls create_checkout / donate. Checkout is stubbed for preview.
-  // ── PLACEHOLDERS the owner sets before launch: base price, upcharge, deadline.
+  // RUN-2 PRE-ORDER  (token-gated preview via ?preview=majesticm00se; live via po_status.live)
+  // Runs only under the token OR when the backend reports live. Prices/dates come from the
+  // backend (po_status); the constants below are only fallbacks if that fetch fails.
+  // Checkout/contribute call the dedicated Run-2 backend; the preview sends test=<token> so
+  // Stripe TEST mode is used (test cards only, no real charge).
   // ============================================================================
   const PREORDER_PREVIEW = new URLSearchParams(location.search).get('preview') === 'majesticm00se';
-
-  const PREORDER_BASE_CENTS = 15000;            // PLACEHOLDER — base price (Black / KS-exclusive), owner sets
-  const PREORDER_CUSTOM_UPCHARGE_CENTS = 1000;  // +$10 per custom-color unit
-  const PREORDER_DEADLINE = new Date('2026-09-30T19:00:00Z'); // PLACEHOLDER — pre-order close date
+  // Dedicated Run-2 backend (separate deployment). The live store keeps using APPS_SCRIPT_URL.
+  const PREORDER_API_URL = 'https://script.google.com/macros/s/AKfycbwwBgsnaVWdCf8dcSNyVjvIp-31CUUQez8P98mVqi20KCoz_wvbiixeGiyE3tVAvNlI/exec';
   const PREORDER_MAX = 5;                        // soft per-order cap (>5 = contact us)
-
   const REP_IMG = 'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png';
-  const PREORDER_SHIP_ESTIMATE = 'mid-December 2026';  // PLACEHOLDER — owner sets
+
+  // Fallback defaults; po_status overrides these at runtime.
+  const PREORDER_BASE_CENTS_DEFAULT = 15000;
+  const PREORDER_CUSTOM_UPCHARGE_DEFAULT = 1000;
+  const PREORDER_DEADLINE_DEFAULT = new Date('2026-09-30T19:00:00Z');
+  const PREORDER_SHIP_ESTIMATE_DEFAULT = 'mid-December 2026';
+  // Effective, server-driven config (mutated by poLoadStatus()).
+  var poCfg = {
+    baseCents: PREORDER_BASE_CENTS_DEFAULT,
+    customUpcharge: PREORDER_CUSTOM_UPCHARGE_DEFAULT,
+    deadline: PREORDER_DEADLINE_DEFAULT,
+    shipEstimate: PREORDER_SHIP_ESTIMATE_DEFAULT,
+    live: false,
+  };
 
   // Each color carries its own image list for the carousel. PLACEHOLDER: all use the
   // representative render for now; drop real per-color images into these arrays later.
@@ -1985,12 +1996,13 @@
     { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks', images:[REP_IMG] },
   ];
 
-  const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0 };
+  const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0, ksEmail:'', ksBackerId:'' };
 
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function poUpLabel() { return '+$' + (PREORDER_CUSTOM_UPCHARGE_CENTS / 100).toFixed(0); }
+  function poUpLabel() { return '+$' + (poCfg.customUpcharge / 100).toFixed(0); }
   function poColorById(id) { return PO_COLORS.find(function(c){ return c.id === id; }); }
-  function poUnitCents(cls) { return PREORDER_BASE_CENTS + (cls === 'custom' ? PREORDER_CUSTOM_UPCHARGE_CENTS : 0); }
+  function poUnitCents(cls) { return poCfg.baseCents + (cls === 'custom' ? poCfg.customUpcharge : 0); }
+  function poTestParam() { return PREORDER_PREVIEW ? '&test=majesticm00se' : ''; }
   function poTotalQty() { return Object.values(poState.cart).reduce(function(a,b){ return a + b; }, 0); }
   function poVisibleColors() { return PO_COLORS.filter(function(c){ return c.cls !== 'ks' || poState.ksUnlocked; }); }
   function poImages(c) { return (c && c.images && c.images.length) ? c.images : [REP_IMG]; }
@@ -2022,9 +2034,8 @@
     if (aiInner) document.getElementById('posecbody-ai').appendChild(aiInner);
 
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
-    var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
-    var fp = document.getElementById('poFromPrice'); if (fp) fp.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(2) + ' + shipping';
-    var fp2 = document.getElementById('poFromPrice2'); if (fp2) fp2.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(0);
+    poRenderConfigStrings();
+    poLoadStatus();   // fetch server prices/dates → override poCfg, then refresh what's shown
     poLoadTerms();
 
     poRenderColors();
@@ -2046,10 +2057,68 @@
     });
 
     var buy = document.getElementById('poBuyBtn');
-    if (buy) buy.onclick = function(){ var m = document.getElementById('poMsg'); if (m) m.textContent = 'Preview only — checkout opens when pre-orders go live.'; };
+    if (buy) buy.onclick = poSubmitCheckout;
     poTickCountdown();
     setInterval(poTickCountdown, 1000);
     poUpdateCart();
+  }
+
+  // Reflect the effective config (server or fallback) into the hero + section-header price/date text.
+  function poRenderConfigStrings() {
+    var est = document.getElementById('poShipEst'); if (est) est.textContent = poCfg.shipEstimate;
+    var fp = document.getElementById('poFromPrice'); if (fp) fp.textContent = 'From $' + (poCfg.baseCents / 100).toFixed(2) + ' + shipping';
+    var fp2 = document.getElementById('poFromPrice2'); if (fp2) fp2.textContent = 'From $' + (poCfg.baseCents / 100).toFixed(0);
+  }
+
+  // Pull live prices/dates/flags from the Run-2 backend; fall back silently to defaults on failure.
+  function poLoadStatus() {
+    fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || d.error) return;
+        if (typeof d.base_cents === 'number') poCfg.baseCents = d.base_cents;
+        if (typeof d.custom_upcharge_cents === 'number') poCfg.customUpcharge = d.custom_upcharge_cents;
+        if (d.ship_estimate) poCfg.shipEstimate = d.ship_estimate;
+        if (d.deadline) { var dd = new Date(d.deadline); if (!isNaN(dd.getTime())) poCfg.deadline = dd; }
+        poCfg.live = !!d.live;
+        // Refresh anything already rendered with the fallback values.
+        poRenderConfigStrings();
+        poRenderColors();
+        poTickCountdown();
+        poUpdateCart();
+      })
+      .catch(function(){ /* keep fallback defaults; the preview still works */ });
+  }
+
+  // Build {color: qty} for qty>0 and start a real pre-order checkout (test mode in preview).
+  async function poSubmitCheckout() {
+    var m = document.getElementById('poMsg');
+    var btn = document.getElementById('poBuyBtn');
+    var cart = {}, total = 0;
+    PO_COLORS.forEach(function(c){ var q = poState.cart[c.id] || 0; if (q > 0) { cart[c.id] = q; total += q; } });
+    if (total === 0) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Choose at least one color.'; } return; }
+    if (!poState.delivery) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Choose a delivery option.'; } return; }
+    var consent = document.getElementById('poConsent');
+    if (!(consent && consent.checked)) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Please agree to the pre-order terms.'; } return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'STARTING CHECKOUT…'; }
+    if (m) { m.style.color = 'var(--pip-dim)'; m.textContent = ''; }
+    try {
+      var url = PREORDER_API_URL + '?action=preorder_checkout'
+        + '&cart=' + encodeURIComponent(JSON.stringify(cart))
+        + '&delivery=' + encodeURIComponent(poState.delivery)
+        + '&donation=0&consent=1'
+        + (poState.ksEmail ? '&ks_email=' + encodeURIComponent(poState.ksEmail) : '')
+        + (poState.ksBackerId ? '&ks_backer_id=' + encodeURIComponent(poState.ksBackerId) : '')
+        + poTestParam();
+      var resp = await fetch(url);
+      var data = await resp.json();
+      if (data && data.checkout_url) { window.location.href = data.checkout_url; return; }
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = (data && data.error) || 'Could not start checkout. Please try again.'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'PRE-ORDER NOW'; }
+    } catch (err) {
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Network error. Please try again.'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'PRE-ORDER NOW'; }
+    }
   }
 
   // Top-level 4-section menu: one open at a time (click the open one to close all).
@@ -2083,13 +2152,28 @@
     if (btnEl) btnEl.classList.add('selected');
     var db = document.getElementById('poDonateBtn');
     if (db) {
-      if (cents >= 100) { db.disabled = false; db.textContent = 'PREVIEW — CONTRIBUTE $' + (cents / 100).toFixed(2); }
+      if (cents >= 100) { db.disabled = false; db.textContent = 'CONTRIBUTE $' + (cents / 100).toFixed(2); }
       else { db.disabled = true; db.textContent = 'SELECT AN AMOUNT ABOVE'; }
     }
   }
-  function poContributeStub() {
+  // Real College-Fund contribution (test mode in preview → Stripe test cards, no real charge).
+  async function poContribute() {
     var m = document.getElementById('poDonateMsg');
-    if (m) m.textContent = 'Preview only — contributions open when pre-orders go live.';
+    var btn = document.getElementById('poDonateBtn');
+    var cents = poState.donationCents || 0;
+    if (cents < 100) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Please choose an amount ($1 minimum).'; } return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'STARTING…'; }
+    if (m) { m.style.color = 'var(--pip-dim)'; m.textContent = ''; }
+    try {
+      var resp = await fetch(PREORDER_API_URL + '?action=preorder_donate&amount=' + cents + poTestParam());
+      var data = await resp.json();
+      if (data && data.checkout_url) { window.location.href = data.checkout_url; return; }
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = (data && data.error) || 'Could not start. Please try again.'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'CONTRIBUTE $' + (cents / 100).toFixed(2); }
+    } catch (err) {
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Network error. Please try again.'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'CONTRIBUTE $' + (cents / 100).toFixed(2); }
+    }
   }
 
   // Accordion: each visible color is a collapsible row (▶/▼) that expands to its own carousel
@@ -2232,7 +2316,7 @@
     var payable = (poState.delivery && !overCap);
     var grand = subtotal + (payable ? ship : 0);
     lines += '<div class="cart-line total"><span>PRE-ORDER TOTAL</span><span>$' + (grand / 100).toFixed(2) + (payable ? '' : '+') + '</span></div>';
-    lines += '<div class="cart-note">⧖ Pre-order — we build after orders close. Estimated delivery ' + PREORDER_SHIP_ESTIMATE + '.</div>';
+    lines += '<div class="cart-note">⧖ Pre-order — we build after orders close. Estimated delivery ' + poCfg.shipEstimate + '.</div>';
     lines += '<div class="cart-note" style="color:var(--pip-dim)">Charged in full today · full refund on request before pre-orders close.</div>';
     if (qty === PREORDER_MAX) lines += '<div class="cart-note">Maximum ' + PREORDER_MAX + ' badges per order. Need more? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a>.</div>';
     if (overCap) lines += '<div class="cart-note">More than 5 badges? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> — bulk orders are handled by email.</div>';
@@ -2251,7 +2335,7 @@
       btn.disabled = true; btn.textContent = 'AGREE TO TERMS TO CONTINUE';
       usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
     } else {
-      btn.disabled = false; btn.textContent = 'PREVIEW — CHECKOUT OPENS AT LAUNCH';
+      btn.disabled = false; btn.textContent = 'PRE-ORDER NOW';
       usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
     }
   }
@@ -2270,6 +2354,8 @@
       var data = await resp.json();
       if (data && data.ok) {
         poState.ksUnlocked = true;
+        poState.ksEmail = email;          // sent at checkout; backend re-validates + enforces the cap
+        poState.ksBackerId = backer;
         poState.ksRemaining = (typeof data.remaining !== 'undefined') ? data.remaining : null;
         poRenderColors();  // KS colors now appear as rows in the color list
         // Collapse the verification form to a compact confirmation (two lines).
@@ -2313,13 +2399,13 @@
   function poTickCountdown() {
     var el = document.getElementById('poCountdown');
     if (!el) return;
-    var diff = PREORDER_DEADLINE.getTime() - Date.now();
-    if (diff <= 0) { el.textContent = 'Pre-orders are closed. (placeholder date)'; return; }
+    var diff = poCfg.deadline.getTime() - Date.now();
+    if (diff <= 0) { el.textContent = 'Pre-orders are closed.'; return; }
     var d = Math.floor(diff / 86400000);
     var h = Math.floor(diff % 86400000 / 3600000);
     var m = Math.floor(diff % 3600000 / 60000);
     var s = Math.floor(diff % 60000 / 1000);
-    el.textContent = 'Pre-orders close in ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's  (placeholder date)';
+    el.textContent = 'Pre-orders close in ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
   }
 
   init();
