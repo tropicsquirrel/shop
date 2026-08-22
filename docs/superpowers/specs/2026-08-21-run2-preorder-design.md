@@ -38,7 +38,7 @@ interest traffic) from *sold-out interest-gathering* into a **preorder** store f
 
 Design principle: **one product, color choices — not "editions."** Run 1's edition cards confused
 buyers. Charge **in full at preorder** (reuses Stripe Checkout). Build to whatever sells (no run
-cap). Ship after production (~**end of December 2026**).
+cap). Ship after production (~**mid-December 2026**).
 
 A single order may mix **multiple colors** (e.g. a validated backer buying 1 SpaceBadge + 1 Overseer
 + 1 gray/black + 2 custom trims = 5 units). Each color is its own cart line with its own qty.
@@ -322,7 +322,7 @@ run-1 precedent).
 
 **Set-later (non-blocking):**
 - **Price & deadline values** — TBD (owner sets in Script Properties once supplier quote + open date are
-  set). `SHIP_ESTIMATE` default "end of December 2026."
+  set). `SHIP_ESTIMATE` default "mid-December 2026."
 - **Carousel assets** — placeholders now; real per-color renders later.
 
 ---
