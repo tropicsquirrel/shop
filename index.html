@@ -406,7 +406,7 @@
     .donate-btn {
       padding: 0.7rem 1.2rem;
       background: transparent;
-      border: 1px solid var(--pip-border);
+      border: 1px solid var(--pip-dim);
       color: var(--pip-dim);
       font-family: inherit;
       font-size: 1.05rem;
@@ -429,7 +429,7 @@
       width: 100px;
       padding: 0.6rem;
       background: transparent;
-      border: 1px solid var(--pip-border);
+      border: 1px solid var(--pip-dim);
       color: var(--pip-green);
       font-family: inherit;
       font-size: 1.05rem;
@@ -475,7 +475,7 @@
       min-width: 140px;
       padding: 0.9rem 0.6rem;
       background: transparent;
-      border: 1px solid var(--pip-border);
+      border: 1px solid var(--pip-dim);
       color: var(--pip-dim);
       font-family: inherit;
       font-size: 1rem;
@@ -533,7 +533,7 @@
       min-height: 56px;
     }
     .buy-btn:active:not(:disabled) { background: var(--pip-green); color: var(--pip-bg); box-shadow: 0 0 20px var(--pip-glow); }
-    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .buy-btn:disabled { opacity: 0.65; cursor: not-allowed; }
 
     @media (hover: hover) {
       .buy-btn:hover:not(:disabled) { background: var(--pip-green); color: var(--pip-bg); box-shadow: 0 0 20px var(--pip-glow); }
@@ -567,6 +567,11 @@
     @keyframes blink { 50% { opacity: 0; } }
     .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+    /* Respect reduced-motion: stop the infinite pulse/sweep/blink/dots + smooth scroll (WCAG 2.2.2) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+    }
 
     @media (max-width: 480px) {
       body { padding: 0.75rem; font-size: 1.15rem; }
@@ -636,7 +641,11 @@
     #preorderSection .po-colornote { font-size:0.98rem; color:var(--pip-dim); margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem; }
     #preorderSection .po-excl { color:var(--pip-amber); }
     #preorderSection .po-ks-done { border:1px solid var(--pip-dim); padding:0.75rem 1rem; margin-top:1rem; color:var(--pip-green); font-size:0.95rem; box-shadow:0 0 8px var(--pip-glow); line-height:1.5; }
-    #preorderSection .po-color { border:1px solid var(--pip-border); margin-bottom:0.5rem; }
+    #preorderSection .po-cred { color:var(--pip-dim); font-size:0.9rem; margin-bottom:0.5rem; line-height:1.5; }
+    #preorderSection .po-cred strong { color:var(--pip-green); }
+    #preorderSection .po-fromprice { color:var(--pip-green); font-size:1.15rem; margin-bottom:0.5rem; }
+    #preorderSection .po-color-price { color:var(--pip-dim); font-size:0.9rem; }
+    #preorderSection .po-color { border:1px solid var(--pip-dim); margin-bottom:0.5rem; }
     #preorderSection .po-color.has-qty { border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
     #preorderSection .po-color-head { display:flex; align-items:center; gap:0.6rem; padding:0.7rem; cursor:pointer; min-height:48px; -webkit-user-select:none; user-select:none; }
     #preorderSection .po-color-head:active { background:rgba(51,255,54,0.06); }
@@ -649,7 +658,9 @@
   </style>
   <div id="preorderSection" style="display:none">
     <div class="po-eyebrow">&#9622; PRE-ORDER &mdash; RUN 2<span class="blink">_</span></div>
-    <h2 class="po-head">Clip-Boy is re-emerging from the vault<span class="po-subhead">&mdash; reserve yours</span></h2>
+    <h2 class="po-head">Clip-Boy is re-emerging from the vault<span class="po-subhead">&mdash; pre-order yours</span></h2>
+    <div class="po-cred">Built by Bryce &middot; Space Badge <strong>218% funded</strong> on Kickstarter &middot; <strong>152</strong> shipped in Run 1</div>
+    <div class="po-fromprice" id="poFromPrice"></div>
     <div class="po-countdown" id="poCountdown">Pre-orders close: &mdash;</div>
     <div class="po-notice">PREVIEW BUILD &mdash; prices, dates, and images are placeholders and <strong>not final</strong>. Checkout is disabled; nothing can be purchased here yet.</div>
 
@@ -695,9 +706,13 @@
     <div id="poCart" class="cart-summary" style="display:none"></div>
     <button class="buy-btn" id="poBuyBtn" disabled>SELECT COLORS ABOVE</button>
     <div class="cart-note" style="margin-top:0.6rem;">Ordering more than 5? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> &mdash; bulk orders are handled by email.</div>
-    <div style="color:var(--pip-dim); font-size:0.78rem; line-height:1.5; margin:0.75rem 0;">
-      Sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education
-      only; as-is, no warranty. Full refund on request before pre-orders close.
+    <div style="color:var(--pip-green); font-size:0.85rem; line-height:1.6; margin:0.75rem 0; border:1px solid var(--pip-dim); padding:0.75rem;">
+      <strong style="color:var(--pip-amber)">Pre-order terms:</strong> you're <strong>charged in full today</strong>. Estimated delivery <span id="poTermsEst">&mdash;</span>.
+      <strong>Full refund on request any time before pre-orders close.</strong> Once we begin production (after close) orders can't be cancelled &mdash; but we'll always make it right if something arrives wrong.
+      Questions? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20pre-order%20question" style="color:var(--pip-amber);text-decoration:underline;">coruscantproductions@gmail.com</a>
+    </div>
+    <div style="color:var(--pip-dim); font-size:0.78rem; line-height:1.5; margin:0.4rem 0 0.75rem;">
+      Sold by <strong>Coruscant Productions, LLC</strong> for lawful security research and education only; as-is, no warranty. Secure checkout via Stripe.
     </div>
   </div>
   <!-- ============ /RUN-2 PRE-ORDER PREVIEW ============ -->
@@ -779,8 +794,8 @@
     .interest-form label { display:block; font-size:0.8rem; color:var(--pip-dim); letter-spacing:0.05rem; margin-bottom:1rem; }
     .interest-form input[type=text], .interest-form input[type=email], .interest-form select { width:100%; margin-top:0.3rem; padding:0.6rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1rem; }
     .interest-form input:focus, .interest-form select:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
-    .interest-privacy { color:var(--pip-dim); opacity:0.85; font-size:0.8rem; line-height:1.5; margin:0 0 1rem; }
-    .interest-fine { color:var(--pip-dim); opacity:0.7; font-size:0.75rem; text-align:center; margin-top:0.5rem; }
+    .interest-privacy { color:var(--pip-dim); font-size:0.8rem; line-height:1.5; margin:0 0 1rem; }
+    .interest-fine { color:var(--pip-dim); font-size:0.75rem; text-align:center; margin-top:0.5rem; }
     .interest-success { text-align:center; padding:1rem 0; }
     .interest-success-glyph { color:var(--pip-green); font-size:1.15rem; letter-spacing:0.2rem; text-shadow:0 0 12px var(--pip-glow); margin-bottom:0.75rem; }
     .interest-success-body { color:var(--pip-dim); font-size:1rem; line-height:1.7; }
@@ -845,7 +860,7 @@
             indie games. This is his second DEF CON badge — the first was
             Space Badge, 218% funded on Kickstarter.
             <br><br>
-            <span style="font-size:0.9em;opacity:0.85">Clip-Boy is sold by <strong>Coruscant Productions, LLC</strong> (San Antonio, TX). Bryce is the creator.</span>
+            <span style="font-size:0.9em">Clip-Boy is sold by <strong>Coruscant Productions, LLC</strong> (San Antonio, TX). Bryce is the creator.</span>
           </div>
         </div>
         <div class="about-links">
@@ -902,7 +917,7 @@
     ⚠ NOTICE: Badge contains no actual radioactive material.<br>
     SegFault-Tec assumes no liability for spontaneous mutations.<br>
     Stock... Stock always changes. Buy now.<br><br>
-    <span style="font-size:0.85em;opacity:0.8">Clip-Boy is sold by Coruscant Productions, LLC. Bryce is the creator.</span>
+    <span style="font-size:0.85em">Clip-Boy is sold by Coruscant Productions, LLC. Bryce is the creator.</span>
   </div>
 </div>
 
@@ -1883,6 +1898,8 @@
     if (sec) sec.style.display = 'block';
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     var est = document.getElementById('poShipEst'); if (est) est.textContent = PREORDER_SHIP_ESTIMATE;
+    var fp = document.getElementById('poFromPrice'); if (fp) fp.textContent = 'From $' + (PREORDER_BASE_CENTS / 100).toFixed(2) + ' + shipping';
+    var te = document.getElementById('poTermsEst'); if (te) te.textContent = PREORDER_SHIP_ESTIMATE;
 
     poRenderColors();
     // One delegated listener: qty steppers + carousel arrows carry a numeric PO_COLORS index
@@ -1926,6 +1943,7 @@
         +   '<span class="po-color-toggle" id="potog-' + i + '">' + (isOpen ? '▼' : '▶') + '</span>'
         +   '<span class="color-swatch" style="background:' + poEsc(c.swatch) + ';' + border + '"></span>'
         +   '<span class="po-color-name">' + poEsc(c.id) + tag + '</span>'
+        +   '<span class="po-color-price">$' + (poUnitCents(c.cls) / 100).toFixed(2) + '</span>'
         +   '<span class="po-color-qtybadge" id="poqb-' + i + '"' + (q > 0 ? '' : ' style="display:none"') + '>&times; ' + q + '</span>'
         + '</div>'
         + '<div class="po-color-body" id="pobody-' + i + '"' + (isOpen ? '' : ' style="display:none"') + '>'
@@ -2049,7 +2067,8 @@
     var grand = subtotal + (payable ? ship : 0);
     lines += '<div class="cart-line total"><span>PRE-ORDER TOTAL</span><span>$' + (grand / 100).toFixed(2) + (payable ? '' : '+') + '</span></div>';
     lines += '<div class="cart-note">⧖ Pre-order — we build after orders close. Estimated delivery ' + PREORDER_SHIP_ESTIMATE + '.</div>';
-    lines += '<div class="cart-note" style="color:var(--pip-dim)">Full refund on request before pre-orders close.</div>';
+    lines += '<div class="cart-note" style="color:var(--pip-dim)">Charged in full today · full refund on request before pre-orders close.</div>';
+    if (qty === PREORDER_MAX) lines += '<div class="cart-note">Maximum ' + PREORDER_MAX + ' badges per order. Need more? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a>.</div>';
     if (overCap) lines += '<div class="cart-note">More than 5 badges? <a href="mailto:coruscantproductions@gmail.com?subject=Clip-Boy%20bulk%20pre-order" style="color:var(--pip-amber);text-decoration:underline;">Contact us</a> — bulk orders are handled by email.</div>';
 
     cartEl.innerHTML = lines;
