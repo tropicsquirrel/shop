@@ -327,6 +327,35 @@ run-1 precedent).
 
 ---
 
+## 13a. Terms & Conditions + tax (decided 2026-08-21, after reading run-1 Code.gs)
+
+**T&C — most-defensible approach chosen:** full **Pre-order Terms, Conditions & Refund Policy**
+hosted on our own page (versioned) + a **required consent checkbox** at checkout that **gates** the
+buy button. Defensibility comes from *affirmative consent + a stored record*, not from where the text
+lives — so `create_checkout` must **record the acceptance** (buyer, terms version, timestamp) in the
+Orders row and in Stripe metadata. Also pass **`custom_text[submit][message]`** to the Stripe session
+(API-only, no dashboard setup) with a one-line terms/ship-window note so the terms also appear on the
+payment page the issuer sees. Optional stronger tier: **`consent_collection[terms_of_service]='required'`**
+(Stripe records a timestamped acceptance) — needs a Terms-of-Service URL set in Stripe Dashboard →
+Settings → Business/Public details; **not required** if we use the recorded-checkbox approach.
+Frontend T&C section + required consent checkbox shipped in the preview (2026-08-21).
+
+**Tax = Texas only.** `automatic_tax[enabled]=true` (as run 1) charges tax per **Stripe Tax
+registrations** — so TX-only is a **dashboard action, not code**: owner registers **only Texas** in
+Stripe Dashboard → Tax → Registrations. **Donation line must be non-taxable:** set the College-Fund
+line's `product_data[tax_code]` to Stripe's non-taxable code so automatic tax doesn't tax the
+contribution (run-1 left it taxable — a real fix for run 2).
+
+**Verified against run-1 `Code.gs` (2026-08-21):**
+- `create_checkout` **already clamps** `donation` (`<0 → 0`, `>100000 → 100000`) and only adds the
+  line at `>=100` → **no live underpayment bug** (the earlier §0 concern is CLOSED).
+- Run-1 Stripe checkout sends **no** terms/consent text (no `custom_text`, no `consent_collection`) —
+  only line-item names + "Pickup code: XXXX" + the KS firmware-credit dropdown. So any policy on the
+  run-1 checkout page could only have come from Stripe Dashboard settings.
+
+**New owner dashboard actions for go-live:** (1) register **only Texas** in Stripe Tax; (2) optionally
+set a Terms-of-Service URL if we adopt `consent_collection`.
+
 ## 14. Process
 PLAN (this doc) → 2 independent reviews **[done]** → focused money-critical re-review **[done → rev
 2.1]** → **owner approves spec** → implement on `run2-preorder` → **2 impl-vs-plan reviews** → owner
