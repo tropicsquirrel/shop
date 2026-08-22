@@ -655,6 +655,7 @@
     #preorderSection .po-color-qtybadge { color:var(--pip-green); font-size:0.95rem; }
     #preorderSection .po-color-body { border-top:1px solid var(--pip-border); padding:0.8rem; }
     #preorderSection .po-tag-custom { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
+    #preorderSection .po-specs { color:var(--pip-dim); font-size:0.9rem; line-height:1.7; margin:0.2rem 0 1rem 1.2rem; }
     #preorderSection .po-terms { border:1px solid var(--pip-dim); margin:0.75rem 0; }
     #preorderSection .po-terms summary { padding:0.7rem; cursor:pointer; color:var(--pip-amber); font-size:0.9rem; min-height:44px; display:flex; align-items:center; list-style:none; -webkit-user-select:none; user-select:none; }
     #preorderSection .po-terms summary::-webkit-details-marker { display:none; }
@@ -680,10 +681,16 @@
       <div class="product-detail open">
         <div class="product-detail-inner">
           <div class="product-description">
-            One Clip-Boy, your colors. Wrist-mounted ESP32-S3 badge &mdash; Wi-Fi/BLE analysis tools,
-            theremin, customizable LEDs, 90+ collectibles &mdash; 3D-printed in gunmetal gray. Choose a
-            trim color below; mix as many as you like (up to 5 per order).
+            One Clip-Boy, your colors. A wrist-mounted ESP32-S3 badge, 3D-printed in gunmetal gray.
+            Choose a trim color below; mix as many as you like (up to 5 per order).
           </div>
+          <ul class="po-specs">
+            <li>ESP32-S3 &middot; Wi-Fi &amp; Bluetooth analysis tools</li>
+            <li>Theremin &middot; customizable LEDs</li>
+            <li>90+ unlockable collectibles</li>
+            <li>Wrist-mounted, 3D-printed gunmetal-gray shell</li>
+            <li>Ships passive / listen-only; optional research builds you can load</li>
+          </ul>
           <div class="po-shipest"><span style="color:var(--pip-amber)">Estimated Delivery:</span> <span id="poShipEst"></span></div>
 
           <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each &mdash; tap a color to preview)</span></div>
@@ -697,7 +704,7 @@
             <label>Backer number
               <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42">
             </label>
-            <div id="poKsMsg"></div>
+            <div id="poKsMsg" role="status" aria-live="polite"></div>
             <button class="buy-btn" id="poKsBtn" onclick="poValidateKs()">[ UNLOCK MY COLORS ]</button>
           </div>
         </div>
