@@ -1992,7 +1992,7 @@
   // Fallback defaults; po_status overrides these at runtime.
   const PREORDER_BASE_CENTS_DEFAULT = 13500;
   const PREORDER_CUSTOM_UPCHARGE_DEFAULT = 1000;
-  const PREORDER_DEADLINE_DEFAULT = new Date('2026-09-30T19:00:00Z');
+  const PREORDER_DEADLINE_DEFAULT = new Date('2026-09-14T00:00:00-05:00'); // close = midnight CT ending Sep 13 2026 (server po_status is authoritative)
   const PREORDER_SHIP_ESTIMATE_DEFAULT = 'mid-December 2026';
   const PREORDER_OMNITAG_CENTS = 1500;   // Omni-Tag add-on ($15); server (Preorder.gs OMNITAG_CENTS) is authoritative
   // Effective, server-driven config (mutated by poLoadStatus()).
