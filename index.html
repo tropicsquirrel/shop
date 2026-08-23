@@ -2340,7 +2340,7 @@
       lines += '<div class="cart-line"><span class="label">' + shipLabel + ' (' + (qty <= 3 ? '1–3 badges' : '4–5 badges')
         + ')</span><span>' + (overCap ? '—' : '$' + (ship / 100).toFixed(2)) + '</span></div>';
     } else {
-      lines += '<div class="cart-line"><span class="label"><span style="color:var(--pip-amber)">⚠ Select delivery below</span></span><span>—</span></div>';
+      lines += '<div class="cart-line"><span class="label"><span style="color:var(--pip-amber)">⚠ Choose a delivery option above for shipping &amp; total</span></span><span>—</span></div>';
     }
 
     var payable = (poState.delivery && !overCap);
