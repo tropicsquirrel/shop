@@ -678,6 +678,12 @@
     #preorderSection .po-menu-card { margin-top:1rem; }
     #preorderSection .po-menu-head:focus-visible { outline:1px solid var(--pip-green); outline-offset:-2px; }
     #preorderSection .po-menu-body { border-top:1px solid var(--pip-border); }
+    .po-modal { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; padding:1.2rem; }
+    .po-modal-card { max-width:440px; width:100%; border:2px solid var(--pip-green); background:#050f05; padding:1.6rem; box-shadow:0 0 30px var(--pip-glow); font-size:0.98rem; line-height:1.55; color:var(--pip-green); }
+    .po-modal-card h3 { font-size:1.2rem; letter-spacing:0.04rem; }
+    .po-modal-actions { display:flex; flex-direction:column; gap:0.6rem; }
+    .po-modal-edit { background:transparent; border:1px solid var(--pip-dim); color:var(--pip-dim); font-family:inherit; font-size:0.9rem; padding:0.6rem; cursor:pointer; min-height:44px; }
+    .po-modal-edit:hover { border-color:var(--pip-green); color:var(--pip-green); }
   </style>
   <div id="preorderSection" style="display:none">
     <div class="po-herotop">
@@ -820,6 +826,19 @@
             </div>
             <button class="buy-btn" id="poDonateBtn" style="margin-top:0.75rem" disabled onclick="poContribute()">SELECT AN AMOUNT ABOVE</button>
             <div id="poDonateMsg" role="status" aria-live="polite" style="min-height:1.2rem; font-size:0.9rem; color:var(--pip-amber); margin-top:0.5rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Big-contribution confirm — fires when a College Fund gift exceeds $100 (decimal-point sanity) -->
+      <div id="poDonateModal" class="po-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="poDonateModalTitle">
+        <div class="po-modal-card">
+          <h3 id="poDonateModalTitle" style="color:var(--pip-green); margin-bottom:0.6rem;">Wow &mdash; thank you! &#128153;</h3>
+          <p style="margin-bottom:0.6rem;">You're about to contribute <strong id="poDonateModalAmt" style="color:var(--pip-amber);"></strong> to Bryce's college fund. That's incredibly generous.</p>
+          <p style="color:var(--pip-dim); margin-bottom:1rem;">Just making sure the decimal point is where you meant it. Ready?</p>
+          <div class="po-modal-actions">
+            <button class="buy-btn" id="poDonateModalGo">YES, CONTRIBUTE <span id="poDonateModalAmt2"></span></button>
+            <button class="po-modal-edit" id="poDonateModalEdit">Let me edit that</button>
           </div>
         </div>
       </div>
@@ -1998,24 +2017,35 @@
   const PREORDER_DEADLINE_DEFAULT = new Date('2026-09-14T00:00:00-05:00'); // close = midnight CT ending Sep 13 2026 (server po_status is authoritative)
   const PREORDER_SHIP_ESTIMATE_DEFAULT = 'mid-December 2026';
   const PREORDER_OMNITAG_CENTS = 1500;   // Omni-Tag add-on ($15); server (Preorder.gs OMNITAG_CENTS) is authoritative
-  // Effective, server-driven config (mutated by poLoadStatus()).
+  const PREORDER_DONATION_MAX_DEFAULT = 1000000;   // $10k abuse backstop; server (donation_max_cents) is authoritative
+  // Effective, server-driven config (mutated by poLoadStatus()). Once po_status responds, the SERVER
+  // is the single source of truth for every price the buyer sees (base, upcharge, per-color class,
+  // ship tiers, omnitag, donation cap) — these locals are only the pre-status fallback.
   var poCfg = {
     baseCents: PREORDER_BASE_CENTS_DEFAULT,
     customUpcharge: PREORDER_CUSTOM_UPCHARGE_DEFAULT,
     deadline: PREORDER_DEADLINE_DEFAULT,
     shipEstimate: PREORDER_SHIP_ESTIMATE_DEFAULT,
+    omnitagCents: PREORDER_OMNITAG_CENTS,
+    donationMaxCents: PREORDER_DONATION_MAX_DEFAULT,
+    ship: null,                       // server {us:[c1,c2], intl:[c1,c2]}; null → local poShipCents fallback
     live: false,
   };
 
-  // Each color carries its own image list for the carousel. PLACEHOLDER: all use the
-  // representative render for now; drop real per-color images into these arrays later.
+  // Each color: swatch + carousel images (presentation, frontend-only). Its PRICE class (cls:
+  // base|custom) and backer-exclusive flag (ks) are OVERRIDDEN by po_status at load (see
+  // poLoadStatus), so the price shown can never diverge from the price charged. Adding a color
+  // still needs an entry here (swatch + images) AND a matching PO_COLOR_MAP row in Preorder.gs.
   const PO_COLORS = [
     { id:'Black',       swatch:'#1a1a1a', cls:'base',   images:['images/mk2/Black-00.jpg','images/mk2/Black-05.jpg','images/mk2/Black-11.jpg'] },
     { id:'Red',         swatch:'#cc2222', cls:'custom', images:['images/mk2/Red-00.jpg','images/mk2/Red-05.jpg','images/mk2/Red-11.jpg'] },
     { id:'Blue',        swatch:'#2255cc', cls:'custom', images:['images/mk2/Blue-00.jpg','images/mk2/Blue-05.jpg','images/mk2/Blue-11.jpg'] },
     { id:'White',       swatch:'#e8e8e8', cls:'custom', images:['images/mk2/White-00.jpg','images/mk2/White-05.jpg','images/mk2/White-11.jpg'] },
-    { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'ks', images:['images/mk2/space.jpg'] },
-    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'ks', images:['images/mk2/overseer.jpg'] },
+    { id:'Pink',        swatch:'#ff5fa2', cls:'custom', images:['images/mk2/Pink-00.jpg','images/mk2/Pink-05.jpg','images/mk2/Pink-11.jpg'] },
+    { id:'Purple',      swatch:'#8a4fff', cls:'custom', images:['images/mk2/Purple-00.jpg','images/mk2/Purple-05.jpg','images/mk2/Purple-11.jpg'] },
+    { id:'Gold',        swatch:'#e0b030', cls:'custom', images:['images/mk2/Gold-00.jpg','images/mk2/Gold-05.jpg','images/mk2/Gold-11.jpg'] },
+    { id:'Space Badge', swatch:'#c0202a', border:'#ffffff', cls:'base', ks:true, images:['images/mk2/SpaceBadge-00.jpg','images/mk2/SpaceBadge-05.jpg','images/mk2/SpaceBadge-11.jpg'] },
+    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'base', ks:true, images:['images/mk2/Overseer-00.jpg','images/mk2/Overseer-05.jpg','images/mk2/Overseer-11.jpg'] },
   ];
 
   const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0, ksEmail:'', ksBackerId:'' };
@@ -2026,12 +2056,14 @@
   function poUnitCents(cls) { return poCfg.baseCents + (cls === 'custom' ? poCfg.customUpcharge : 0); }
   function poTestParam() { return PREORDER_PREVIEW ? '&test=majesticm00se' : ''; }
   function poTotalQty() { return Object.values(poState.cart).reduce(function(a,b){ return a + b; }, 0); }
-  function poVisibleColors() { return PO_COLORS.filter(function(c){ return c.cls !== 'ks' || poState.ksUnlocked; }); }
+  function poVisibleColors() { return PO_COLORS.filter(function(c){ return !c.ks || poState.ksUnlocked; }); }
   function poImages(c) { return (c && c.images && c.images.length) ? c.images : [REP_IMG]; }
   function poShipCents(qty, delivery) {
     if (qty <= 0 || !delivery) return 0;
+    var t = poCfg.ship && poCfg.ship[delivery];       // server-authoritative tiers when available
+    if (t) return qty <= 3 ? t[0] : t[1];
     if (delivery === 'intl') return qty <= 3 ? 2500 : 3500;
-    return qty <= 3 ? 1500 : 2000;  // US
+    return qty <= 3 ? 1500 : 2000;  // US fallback (pre-status)
   }
 
   function poEnter() {
@@ -2102,6 +2134,11 @@
         if (typeof d.custom_upcharge_cents === 'number') poCfg.customUpcharge = d.custom_upcharge_cents;
         if (d.ship_estimate) poCfg.shipEstimate = d.ship_estimate;
         if (d.deadline) { var dd = new Date(d.deadline); if (!isNaN(dd.getTime())) poCfg.deadline = dd; }
+        if (typeof d.omnitag_cents === 'number') poCfg.omnitagCents = d.omnitag_cents;
+        if (typeof d.donation_max_cents === 'number') poCfg.donationMaxCents = d.donation_max_cents;
+        if (d.ship && d.ship.us && d.ship.intl) poCfg.ship = d.ship;
+        // Server is authoritative for each color's price class + backer flag (kills shown-vs-charged drift).
+        if (d.colors) { PO_COLORS.forEach(function(c){ var s = d.colors[c.id]; if (s) { if (s.cls) c.cls = s.cls; c.ks = !!s.ks; } }); }
         poCfg.live = !!d.live;
         // Refresh anything already rendered with the fallback values.
         poRenderConfigStrings();
@@ -2180,11 +2217,34 @@
     }
   }
   // Real College-Fund contribution (test mode in preview → Stripe test cards, no real charge).
-  async function poContribute() {
+  // >$100 pops a confirm modal (decimal-point sanity) before charging; server clamps to donationMaxCents.
+  function poContribute() {
     var m = document.getElementById('poDonateMsg');
-    var btn = document.getElementById('poDonateBtn');
     var cents = poState.donationCents || 0;
     if (cents < 100) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Please choose an amount ($1 minimum).'; } return; }
+    if (cents > poCfg.donationMaxCents) {
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'The maximum online contribution is $' + Math.round(poCfg.donationMaxCents / 100).toLocaleString() + '. Please email us to give more — thank you!'; }
+      return;
+    }
+    if (cents > 10000) { poShowDonateConfirm(cents); return; }   // > $100 → confirm the decimal point
+    poDonateGo(cents);
+  }
+
+  function poDonateFmt(cents) { return '$' + (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function poShowDonateConfirm(cents) {
+    var mod = document.getElementById('poDonateModal');
+    if (!mod) { poDonateGo(cents); return; }                     // fail open to the normal flow if markup missing
+    document.getElementById('poDonateModalAmt').textContent = poDonateFmt(cents);
+    document.getElementById('poDonateModalAmt2').textContent = poDonateFmt(cents);
+    mod.style.display = 'flex';
+    document.getElementById('poDonateModalGo').onclick = function(){ mod.style.display = 'none'; poDonateGo(cents); };
+    document.getElementById('poDonateModalEdit').onclick = function(){ mod.style.display = 'none'; var ci = document.getElementById('poDonateCustom'); if (ci) ci.focus(); };
+  }
+
+  async function poDonateGo(cents) {
+    var m = document.getElementById('poDonateMsg');
+    var btn = document.getElementById('poDonateBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'STARTING…'; }
     if (m) { m.style.color = 'var(--pip-dim)'; m.textContent = ''; }
     try {
@@ -2208,7 +2268,7 @@
       var i = PO_COLORS.indexOf(c);
       var border = c.border ? 'border-color:' + poEsc(c.border) : '';
       var tag = c.cls === 'custom' ? '<span class="po-tag-custom">' + poUpLabel() + '</span>'
-              : (c.cls === 'ks' ? '<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">backer-exclusive</span>' : '');
+              : (c.ks ? '<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">backer-exclusive</span>' : '');
       var isOpen = (open === i);
       var q = poState.cart[c.id] || 0;
       return '<div class="po-color' + (q > 0 ? ' has-qty' : '') + '" id="pocol-' + i + '">'
@@ -2278,7 +2338,7 @@
 
   function poAdjust(i, delta) {
     var c = PO_COLORS[i]; if (!c) return;
-    if (c.cls === 'ks' && !poState.ksUnlocked) return;
+    if (c.ks && !poState.ksUnlocked) return;
     var cur = poState.cart[c.id] || 0;
     var others = poTotalQty() - cur;
     var desired = Math.max(0, Math.min(cur + delta, PREORDER_MAX - others));
@@ -2311,7 +2371,7 @@
         var unit = poUnitCents(c.cls);
         subtotal += q * unit;
         var extra = c.cls === 'custom' ? ' <span style="color:var(--pip-dim)">(' + poUpLabel() + ')</span>'
-                  : (c.cls === 'ks' ? ' <span class="po-excl">(exclusive)</span>' : '');
+                  : (c.ks ? ' <span class="po-excl">(exclusive)</span>' : '');
         lines += '<div class="cart-line"><span class="label">Clip-Boy (' + poEsc(c.id) + ')' + extra + ' × ' + q
           + '</span><span>$' + (q * unit / 100).toFixed(2) + '</span></div>';
       }
@@ -2330,8 +2390,8 @@
     var omniChk = document.getElementById('poOmnitagChk');
     var omniOn = !!(omniChk && omniChk.checked);
     if (omniOn) {
-      subtotal += PREORDER_OMNITAG_CENTS;
-      lines += '<div class="cart-line"><span class="label">Omni-Tag add-on</span><span>$' + (PREORDER_OMNITAG_CENTS / 100).toFixed(2) + '</span></div>';
+      subtotal += poCfg.omnitagCents;
+      lines += '<div class="cart-line"><span class="label">Omni-Tag add-on</span><span>$' + (poCfg.omnitagCents / 100).toFixed(2) + '</span></div>';
     }
 
     var overCap = qty > PREORDER_MAX;
@@ -2442,7 +2502,7 @@
     var el = document.getElementById('poCountdown');
     if (!el) return;
     var diff = poCfg.deadline.getTime() - Date.now();
-    if (diff <= 0) { el.textContent = 'Pre-orders are closed. Run 2 is complete — there won\'t be another.'; return; }
+    if (diff <= 0) { el.textContent = 'Pre-orders are closed — this was the only run. Now building; ships ~' + poCfg.shipEstimate + '.'; return; }
     var d = Math.floor(diff / 86400000);
     var h = Math.floor(diff % 86400000 / 3600000);
     var m = Math.floor(diff % 3600000 / 60000);
