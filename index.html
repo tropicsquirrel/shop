@@ -767,6 +767,25 @@
       </label>
     </div>
 
+    <!-- Optional College-Fund contribution added to THIS order (ONE checkout). Shown once a badge is selected.
+         Shares poState.donationCents with the standalone Contribute picker (linked; one figure, one charge). -->
+    <div id="poOrderDonate" style="display:none; border:1px solid var(--pip-dim); padding:0.7rem 0.85rem; margin:0.25rem 0 1rem;">
+      <div style="margin-bottom:0.4rem;">Add a little to <strong>Bryce's college fund</strong>? <span style="color:var(--pip-dim)">(optional)</span></div>
+      <div style="color:var(--pip-dim); font-size:0.85rem; margin-bottom:0.5rem;">You're already checking out &mdash; 100% goes to his fund, and it's <strong style="color:var(--pip-green)">charged once, together with your badges</strong>.</div>
+      <div class="donate-amounts">
+        <button class="donate-btn" type="button" data-amt="2500" onclick="poSelectOrderDonation(2500,this)">$25</button>
+        <button class="donate-btn" type="button" data-amt="5000" onclick="poSelectOrderDonation(5000,this)">$50</button>
+        <button class="donate-btn" type="button" data-amt="10000" onclick="poSelectOrderDonation(10000,this)">$100</button>
+        <button class="donate-btn" type="button" data-amt="25000" onclick="poSelectOrderDonation(25000,this)">$250</button>
+        <div class="donate-custom">
+          <span style="color:var(--pip-dim)">$</span>
+          <input type="number" id="poOrderDonateCustom" min="1" inputmode="decimal" placeholder="Other" oninput="poSelectOrderDonation(0,null)">
+        </div>
+      </div>
+      <div style="color:var(--pip-dim); font-size:0.8rem; margin-top:0.35rem;">Same fund as the Contribute section below &mdash; two ways to give, never two charges. Tap an amount again to remove.</div>
+      <div id="poDonateLive" aria-live="polite" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);"></div>
+    </div>
+
     <div class="section-label">DELIVERY</div>
     <div class="delivery-options">
       <button class="delivery-btn" id="po-btn-us" onclick="poSetDelivery('us')">
@@ -812,16 +831,15 @@
         </div>
         <div class="po-menu-body" id="posecbody-contribute" style="display:none">
           <div class="product-detail-inner">
-            <div class="product-description">All proceeds support Bryce's college fund. Don't need a badge? You can still help &mdash; every dollar goes directly toward Bryce's college education.</div>
+            <div class="product-description">Don't want a badge? You can still give &mdash; every dollar goes directly to Bryce's college fund. <span style="color:var(--pip-dim)">(Ordering a badge? You can add a contribution right in the pre-order checkout &mdash; no separate step needed.)</span></div>
             <div class="donate-amounts">
-              <button class="donate-btn" onclick="poSelectDonation(1000,this)">$10</button>
-              <button class="donate-btn" onclick="poSelectDonation(2000,this)">$20</button>
-              <button class="donate-btn" onclick="poSelectDonation(2500,this)">$25</button>
-              <button class="donate-btn" onclick="poSelectDonation(5000,this)">$50</button>
-              <button class="donate-btn" onclick="poSelectDonation(10000,this)">$100</button>
+              <button class="donate-btn" type="button" data-amt="2500" onclick="poSelectDonation(2500,this)">$25</button>
+              <button class="donate-btn" type="button" data-amt="5000" onclick="poSelectDonation(5000,this)">$50</button>
+              <button class="donate-btn" type="button" data-amt="10000" onclick="poSelectDonation(10000,this)">$100</button>
+              <button class="donate-btn" type="button" data-amt="25000" onclick="poSelectDonation(25000,this)">$250</button>
               <div class="donate-custom">
                 <span style="color:var(--pip-dim)">$</span>
-                <input type="number" id="poDonateCustom" min="1" placeholder="Other" oninput="poSelectDonation(0,null)">
+                <input type="number" id="poDonateCustom" min="1" inputmode="decimal" placeholder="Other" oninput="poSelectDonation(0,null)">
               </div>
             </div>
             <button class="buy-btn" id="poDonateBtn" style="margin-top:0.75rem" disabled onclick="poContribute()">SELECT AN AMOUNT ABOVE</button>
@@ -2150,22 +2168,34 @@
   }
 
   // Build {color: qty} for qty>0 and start a real pre-order checkout (test mode in preview).
-  async function poSubmitCheckout() {
+  // A contribution > $100 pops the same confirm modal before charging (badge + donation = ONE session).
+  function poSubmitCheckout() {
     var m = document.getElementById('poMsg');
-    var btn = document.getElementById('poBuyBtn');
     var cart = {}, total = 0;
     PO_COLORS.forEach(function(c){ var q = poState.cart[c.id] || 0; if (q > 0) { cart[c.id] = q; total += q; } });
     if (total === 0) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Choose at least one color.'; } return; }
     if (!poState.delivery) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Choose a delivery option.'; } return; }
     var consent = document.getElementById('poConsent');
     if (!(consent && consent.checked)) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Please agree to the pre-order terms.'; } return; }
+    var donation = poState.donationCents || 0;
+    if (donation > poCfg.donationMaxCents) {
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Max online contribution is $' + Math.round(poCfg.donationMaxCents / 100).toLocaleString() + '. Email us to give more — thank you!'; }
+      return;
+    }
+    if (donation > 10000) { poShowDonateConfirm(donation, function(){ poDoCheckout(cart, donation); }); return; }  // >$100 → decimal-point sanity
+    poDoCheckout(cart, donation);
+  }
+
+  async function poDoCheckout(cart, donation) {
+    var m = document.getElementById('poMsg');
+    var btn = document.getElementById('poBuyBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'STARTING CHECKOUT…'; }
     if (m) { m.style.color = 'var(--pip-dim)'; m.textContent = ''; }
     try {
       var url = PREORDER_API_URL + '?action=preorder_checkout'
         + '&cart=' + encodeURIComponent(JSON.stringify(cart))
         + '&delivery=' + encodeURIComponent(poState.delivery)
-        + '&donation=0&consent=1'
+        + '&donation=' + (donation || 0) + '&consent=1'
         + ((document.getElementById('poOmnitagChk') && document.getElementById('poOmnitagChk').checked) ? '&omnitag=1' : '')
         + (poState.ksEmail ? '&ks_email=' + encodeURIComponent(poState.ksEmail) : '')
         + (poState.ksBackerId ? '&ks_backer_id=' + encodeURIComponent(poState.ksBackerId) : '')
@@ -2198,30 +2228,61 @@
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); poToggleSection(key); }
   }
 
-  // Contribute section — STUBBED in preview (no live Stripe). Wires to the real donate at launch.
-  function poSelectDonation(cents, btnEl) {
-    if (cents === 0) {
-      var v = parseFloat((document.getElementById('poDonateCustom') || {}).value);
-      cents = (isNaN(v) || v <= 0) ? 0 : Math.round(v * 100);
-    } else {
-      var ci = document.getElementById('poDonateCustom'); if (ci) ci.value = '';
-    }
-    poState.donationCents = cents;
-    var btns = document.querySelectorAll('#posecbody-contribute .donate-btn');
-    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
-    if (btnEl) btnEl.classList.add('selected');
-    var db = document.getElementById('poDonateBtn');
-    if (db) {
-      if (cents >= 100) { db.disabled = false; db.textContent = 'CONTRIBUTE $' + (cents / 100).toFixed(2); }
-      else { db.disabled = true; db.textContent = 'SELECT AN AMOUNT ABOVE'; }
-    }
+  // ── College-Fund contribution: ONE shared figure (poState.donationCents), edited by EITHER picker ──
+  // The in-checkout add-on and the standalone Contribute picker mirror the same value (linked); it is
+  // charged ONCE — with the badges when a badge is in the cart, else on its own via the Contribute button.
+  function poSetDonation(cents, skipSel) {
+    poState.donationCents = Math.max(0, cents || 0);
+    poSyncDonationUI(skipSel);          // mirror chips + custom fields in BOTH pickers
+    poUpdateCart();                     // cart line + total + standalone button state (poUpdateDonateBtn)
+    var live = document.getElementById('poDonateLive');
+    if (live) live.textContent = poState.donationCents >= 100
+      ? ('Contribution set to $' + (poState.donationCents / 100).toFixed(2) + '.') : 'Contribution cleared.';
   }
+  function poSyncDonationUI(skipSel) {
+    var cents = poState.donationCents || 0;
+    [['#posecbody-contribute', 'poDonateCustom'], ['#poOrderDonate', 'poOrderDonateCustom']].forEach(function(pair){
+      var scope = document.querySelector(pair[0]); if (!scope) return;
+      var matched = false;
+      var btns = scope.querySelectorAll('.donate-btn');
+      for (var i = 0; i < btns.length; i++) {
+        var amt = parseInt(btns[i].getAttribute('data-amt') || '0', 10);
+        var on = (amt > 0 && amt === cents);
+        btns[i].classList.toggle('selected', on);
+        if (on) matched = true;
+      }
+      var custom = document.getElementById(pair[1]);
+      if (custom && ('#' + pair[1]) !== skipSel) custom.value = (cents > 0 && !matched) ? (cents / 100) : '';
+    });
+  }
+  function poUpdateDonateBtn() {
+    var db = document.getElementById('poDonateBtn'); if (!db) return;
+    var cents = poState.donationCents || 0;
+    if (cents < 100) { db.disabled = true; db.textContent = 'SELECT AN AMOUNT ABOVE'; }
+    else if (poTotalQty() > 0) { db.disabled = true; db.textContent = '✓ $' + (cents / 100).toFixed(2) + ' INCLUDED WITH YOUR BADGE ORDER'; }
+    else { db.disabled = false; db.textContent = 'CONTRIBUTE $' + (cents / 100).toFixed(2); }
+  }
+  // Preset click: tap the selected chip again to remove. Custom "Other": arg cents===0 → read the field.
+  function poSelectDonation(cents, btnEl) {
+    if (cents === 0) { var v = parseFloat((document.getElementById('poDonateCustom') || {}).value); poSetDonation((isNaN(v) || v <= 0) ? 0 : Math.round(v * 100), '#poDonateCustom'); return; }
+    poSetDonation(cents === poState.donationCents ? 0 : cents, null);
+  }
+  function poSelectOrderDonation(cents, btnEl) {
+    if (cents === 0) { var v = parseFloat((document.getElementById('poOrderDonateCustom') || {}).value); poSetDonation((isNaN(v) || v <= 0) ? 0 : Math.round(v * 100), '#poOrderDonateCustom'); return; }
+    poSetDonation(cents === poState.donationCents ? 0 : cents, null);
+  }
+
   // Real College-Fund contribution (test mode in preview → Stripe test cards, no real charge).
   // >$100 pops a confirm modal (decimal-point sanity) before charging; server clamps to donationMaxCents.
   function poContribute() {
     var m = document.getElementById('poDonateMsg');
     var cents = poState.donationCents || 0;
     if (cents < 100) { if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Please choose an amount ($1 minimum).'; } return; }
+    // Structural double-charge guard: if a badge is in the cart, the contribution rides that ONE checkout.
+    if (poTotalQty() > 0) {
+      if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'Your $' + (cents / 100).toFixed(2) + ' contribution is already on your badge order above — just hit PRE-ORDER NOW (one payment).'; }
+      return;
+    }
     if (cents > poCfg.donationMaxCents) {
       if (m) { m.style.color = 'var(--pip-amber)'; m.textContent = 'The maximum online contribution is $' + Math.round(poCfg.donationMaxCents / 100).toLocaleString() + '. Please email us to give more — thank you!'; }
       return;
@@ -2232,14 +2293,16 @@
 
   function poDonateFmt(cents) { return '$' + (cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-  function poShowDonateConfirm(cents) {
+  // onConfirm defaults to the standalone donate flow; the in-order path passes its own (badge + donation, one session).
+  function poShowDonateConfirm(cents, onConfirm) {
+    var go = onConfirm || function(){ poDonateGo(cents); };
     var mod = document.getElementById('poDonateModal');
-    if (!mod) { poDonateGo(cents); return; }                     // fail open to the normal flow if markup missing
+    if (!mod) { go(); return; }                                  // fail open if markup missing
     document.getElementById('poDonateModalAmt').textContent = poDonateFmt(cents);
     document.getElementById('poDonateModalAmt2').textContent = poDonateFmt(cents);
     mod.style.display = 'flex';
-    document.getElementById('poDonateModalGo').onclick = function(){ mod.style.display = 'none'; poDonateGo(cents); };
-    document.getElementById('poDonateModalEdit').onclick = function(){ mod.style.display = 'none'; var ci = document.getElementById('poDonateCustom'); if (ci) ci.focus(); };
+    document.getElementById('poDonateModalGo').onclick = function(){ mod.style.display = 'none'; go(); };
+    document.getElementById('poDonateModalEdit').onclick = function(){ mod.style.display = 'none'; };
   }
 
   async function poDonateGo(cents) {
@@ -2363,6 +2426,7 @@
     var usBtn = document.getElementById('po-btn-us');
     var intlBtn = document.getElementById('po-btn-intl');
     var qty = 0, subtotal = 0, lines = '';
+    poUpdateDonateBtn();   // keep the standalone Contribute button in sync (enabled vs "included with badge order")
 
     PO_COLORS.forEach(function(c){
       var q = poState.cart[c.id] || 0;
@@ -2382,16 +2446,24 @@
       btn.disabled = true; btn.textContent = 'SELECT COLORS ABOVE';
       usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
       var omniHide = document.getElementById('poOmnitag'); if (omniHide) omniHide.style.display = 'none';
+      var odHide = document.getElementById('poOrderDonate'); if (odHide) odHide.style.display = 'none';
       return;
     }
 
     // Omni-Tag add-on — only offered once a badge is selected.
     var omniEl = document.getElementById('poOmnitag'); if (omniEl) omniEl.style.display = 'block';
+    var odEl = document.getElementById('poOrderDonate'); if (odEl) odEl.style.display = 'block';
     var omniChk = document.getElementById('poOmnitagChk');
     var omniOn = !!(omniChk && omniChk.checked);
     if (omniOn) {
       subtotal += poCfg.omnitagCents;
       lines += '<div class="cart-line"><span class="label">Omni-Tag add-on</span><span>$' + (poCfg.omnitagCents / 100).toFixed(2) + '</span></div>';
+    }
+
+    var orderDonation = poState.donationCents || 0;
+    if (orderDonation >= 100) {
+      subtotal += orderDonation;
+      lines += '<div class="cart-line"><span class="label">College Fund contribution</span><span>$' + (orderDonation / 100).toFixed(2) + '</span></div>';
     }
 
     var overCap = qty > PREORDER_MAX;
