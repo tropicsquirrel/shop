@@ -624,7 +624,7 @@
     #preorderSection .po-countdown { color:var(--pip-amber); font-size:1.05rem; letter-spacing:0.04rem; margin-bottom:0.75rem; }
     #preorderSection .po-notice { border:1px dashed var(--pip-amber); color:var(--pip-amber); font-size:0.85rem; line-height:1.5; padding:0.6rem 0.8rem; margin-bottom:1rem; }
     #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
-    #preorderSection .po-ks-panel { border:1px solid var(--pip-border); padding:1rem; margin-top:1rem; }
+    #preorderSection .po-ks-panel { padding:0; }
     #preorderSection .po-ks-panel label { display:block; font-size:0.8rem; color:var(--pip-dim); margin-bottom:0.6rem; }
     #preorderSection .po-ks-panel input { width:100%; margin-top:0.3rem; padding:0.6rem; background:#000; color:var(--pip-green); border:1px solid var(--pip-dim); font-family:inherit; font-size:1rem; }
     #preorderSection .po-ks-panel input:focus { outline:none; border-color:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); }
@@ -725,16 +725,26 @@
           <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each &mdash; tap a color to preview)</span></div>
           <div id="poColors"></div>
 
-          <div class="po-ks-panel" id="poKsPanel">
-            <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
-            <label>Kickstarter email
-              <input type="email" id="poKsEmail" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
-            </label>
-            <label>Backer number
-              <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
-            </label>
-            <div id="poKsMsg" role="status" aria-live="polite"></div>
-            <button class="buy-btn" id="poKsBtn" onclick="poValidateKs()">[ UNLOCK MY COLORS ]</button>
+          <!-- Kickstarter backer — collapsed card in the color list; unlocks Space Badge + Overseer -->
+          <div class="po-color" id="po-ks-card">
+            <div class="po-color-head" id="po-ks-head" role="button" tabindex="0" aria-expanded="false" onclick="poToggleKs()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();poToggleKs();}">
+              <span class="po-color-toggle" id="po-ks-tog">&#9656;</span>
+              <span class="color-swatch" style="background:linear-gradient(135deg,#c0202a 0 50%,#1f6fb2 50% 100%); border-color:var(--pip-amber)"></span>
+              <span class="po-color-name">Kickstarter Backer<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">exclusive colors</span></span>
+            </div>
+            <div class="po-color-body" id="po-ks-body" style="display:none">
+              <div class="po-ks-panel" id="poKsPanel">
+                <div style="color:var(--pip-green); font-size:0.95rem; margin-bottom:0.6rem;">Kickstarter Space Badge backer? Unlock your exclusive colors.</div>
+                <label>Kickstarter email
+                  <input type="email" id="poKsEmail" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
+                </label>
+                <label>Backer number
+                  <input type="text" id="poKsBacker" inputmode="numeric" placeholder="e.g. 42" onkeydown="if(event.key==='Enter'){event.preventDefault();poValidateKs();}">
+                </label>
+                <div id="poKsMsg" role="status" aria-live="polite"></div>
+                <button class="buy-btn" id="poKsBtn" onclick="poValidateKs()">[ UNLOCK MY COLORS ]</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2338,6 +2348,15 @@
       btn.disabled = false; btn.textContent = 'PRE-ORDER NOW';
       usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
     }
+  }
+
+  // Collapsible "Kickstarter Backer" card (its own row in the color list).
+  function poToggleKs() {
+    var body = document.getElementById('po-ks-body'); if (!body) return;
+    var isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    var tog = document.getElementById('po-ks-tog'); if (tog) tog.innerHTML = isOpen ? '&#9656;' : '&#9662;';
+    var head = document.getElementById('po-ks-head'); if (head) head.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
   }
 
   async function poValidateKs() {
