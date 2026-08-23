@@ -750,13 +750,23 @@
       </div>
     </div>
 
+    <div id="poOmnitag" style="display:none; border:1px solid var(--pip-dim); padding:0.7rem 0.85rem; margin:0.25rem 0 1rem;">
+      <label class="po-consent" style="margin:0;">
+        <input type="checkbox" id="poOmnitagChk" onchange="poUpdateCart()">
+        <span>Add an <strong>Omni-Tag</strong> (+$15) &mdash; a small companion accessory shipped with your order.
+        <span style="color:var(--pip-dim)">It's 3D-printable, so you can make your own for free from the
+        <a href="https://github.com/SafeHazard/Clip-Boy/blob/main/Clip-Boy/hardware/omnitag.3mf" target="_blank" rel="noopener" style="color:var(--pip-amber);text-decoration:underline;">omnitag.3mf</a>
+        file &mdash; we encourage it! This add-on is just a convenience if you'd rather we print and include one.</span></span>
+      </label>
+    </div>
+
     <div class="section-label">DELIVERY</div>
     <div class="delivery-options">
       <button class="delivery-btn" id="po-btn-us" onclick="poSetDelivery('us')">
-        &gt;&gt; SHIP &mdash; U.S.<br><span style="font-size:0.9rem">$20 (1&ndash;3 badges) &middot; $30 (4&ndash;5 badges)</span>
+        &gt;&gt; SHIP &mdash; U.S.<br><span style="font-size:0.9rem">$15 (1&ndash;3 badges) &middot; $20 (4&ndash;5 badges)</span>
       </button>
       <button class="delivery-btn" id="po-btn-intl" onclick="poSetDelivery('intl')">
-        &gt;&gt; SHIP &mdash; INTERNATIONAL<br><span style="font-size:0.9rem">$35 (1&ndash;3 badges) &middot; $55 (4&ndash;5 badges)</span>
+        &gt;&gt; SHIP &mdash; INTERNATIONAL<br><span style="font-size:0.9rem">$25 (1&ndash;3 badges) &middot; $35 (4&ndash;5 badges)</span>
       </button>
     </div>
     <div class="cart-note" style="margin:-0.4rem 0 1rem;">Sales tax applies to <strong>Texas</strong> addresses only. Any other taxes, VAT, or import duties (if any) are the buyer's responsibility.</div>
@@ -1982,10 +1992,11 @@
   const REP_IMG = 'https://raw.githubusercontent.com/tropicsquirrel/shop/main/Clip%20Boy%20Final%20Transparent.png';
 
   // Fallback defaults; po_status overrides these at runtime.
-  const PREORDER_BASE_CENTS_DEFAULT = 15000;
+  const PREORDER_BASE_CENTS_DEFAULT = 13500;
   const PREORDER_CUSTOM_UPCHARGE_DEFAULT = 1000;
   const PREORDER_DEADLINE_DEFAULT = new Date('2026-09-30T19:00:00Z');
   const PREORDER_SHIP_ESTIMATE_DEFAULT = 'mid-December 2026';
+  const PREORDER_OMNITAG_CENTS = 1500;   // Omni-Tag add-on ($15); server (Preorder.gs OMNITAG_CENTS) is authoritative
   // Effective, server-driven config (mutated by poLoadStatus()).
   var poCfg = {
     baseCents: PREORDER_BASE_CENTS_DEFAULT,
@@ -2018,8 +2029,8 @@
   function poImages(c) { return (c && c.images && c.images.length) ? c.images : [REP_IMG]; }
   function poShipCents(qty, delivery) {
     if (qty <= 0 || !delivery) return 0;
-    if (delivery === 'intl') return qty <= 3 ? 3500 : 5500;
-    return qty <= 3 ? 2000 : 3000;  // US
+    if (delivery === 'intl') return qty <= 3 ? 2500 : 3500;
+    return qty <= 3 ? 1500 : 2000;  // US
   }
 
   function poEnter() {
@@ -2117,6 +2128,7 @@
         + '&cart=' + encodeURIComponent(JSON.stringify(cart))
         + '&delivery=' + encodeURIComponent(poState.delivery)
         + '&donation=0&consent=1'
+        + ((document.getElementById('poOmnitagChk') && document.getElementById('poOmnitagChk').checked) ? '&omnitag=1' : '')
         + (poState.ksEmail ? '&ks_email=' + encodeURIComponent(poState.ksEmail) : '')
         + (poState.ksBackerId ? '&ks_backer_id=' + encodeURIComponent(poState.ksBackerId) : '')
         + poTestParam();
@@ -2308,7 +2320,17 @@
       cartEl.style.display = 'none';
       btn.disabled = true; btn.textContent = 'SELECT COLORS ABOVE';
       usBtn.classList.remove('attention'); intlBtn.classList.remove('attention');
+      var omniHide = document.getElementById('poOmnitag'); if (omniHide) omniHide.style.display = 'none';
       return;
+    }
+
+    // Omni-Tag add-on — only offered once a badge is selected.
+    var omniEl = document.getElementById('poOmnitag'); if (omniEl) omniEl.style.display = 'block';
+    var omniChk = document.getElementById('poOmnitagChk');
+    var omniOn = !!(omniChk && omniChk.checked);
+    if (omniOn) {
+      subtotal += PREORDER_OMNITAG_CENTS;
+      lines += '<div class="cart-line"><span class="label">Omni-Tag add-on</span><span>$' + (PREORDER_OMNITAG_CENTS / 100).toFixed(2) + '</span></div>';
     }
 
     var overCap = qty > PREORDER_MAX;
