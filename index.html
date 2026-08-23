@@ -728,7 +728,7 @@
           <!-- Kickstarter backer — collapsed card in the color list; unlocks Space Badge + Overseer -->
           <div class="po-color" id="po-ks-card">
             <div class="po-color-head" id="po-ks-head" role="button" tabindex="0" aria-expanded="false" onclick="poToggleKs()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();poToggleKs();}">
-              <span class="po-color-toggle" id="po-ks-tog">&#9656;</span>
+              <span class="po-color-toggle" id="po-ks-tog">&#9654;</span>
               <span class="color-swatch" style="background:linear-gradient(135deg,#c0202a 0 50%,#1f6fb2 50% 100%); border-color:var(--pip-amber)"></span>
               <span class="po-color-name">Kickstarter Backer<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">exclusive colors</span></span>
             </div>
@@ -2375,7 +2375,7 @@
     var body = document.getElementById('po-ks-body'); if (!body) return;
     var isOpen = body.style.display !== 'none';
     body.style.display = isOpen ? 'none' : 'block';
-    var tog = document.getElementById('po-ks-tog'); if (tog) tog.innerHTML = isOpen ? '&#9656;' : '&#9662;';
+    var tog = document.getElementById('po-ks-tog'); if (tog) tog.innerHTML = isOpen ? '&#9654;' : '&#9660;';
     var head = document.getElementById('po-ks-head'); if (head) head.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
   }
 
