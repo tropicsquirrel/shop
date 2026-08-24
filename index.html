@@ -2170,7 +2170,9 @@
 
   // Pull live prices/dates/flags from the Run-2 backend; fall back silently to defaults on failure.
   function poFmtDeadline() {
-    try { return poCfg.deadline.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
+    // Deadline is the CLOSE instant (00:00 CT starting Sep 14); the last orderable day is the moment
+    // just before it, so show THAT date (Sep 13) to match the "end of the 13th" close.
+    try { return new Date(poCfg.deadline.getTime() - 1000).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
     catch (e) { return 'the deadline'; }
   }
   function poRenderProgress() {
