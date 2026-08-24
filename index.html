@@ -623,6 +623,13 @@
     #preorderSection .po-head { color:var(--pip-green); font-size:2.1rem; letter-spacing:0.06rem; text-shadow:0 0 10px var(--pip-glow); line-height:1.25; margin-bottom:0.6rem; }
     #preorderSection .po-countdown { color:var(--pip-amber); font-size:1.05rem; letter-spacing:0.04rem; margin-bottom:0.75rem; }
     #preorderSection .po-notice { border:1px dashed var(--pip-amber); color:var(--pip-amber); font-size:0.85rem; line-height:1.5; padding:0.6rem 0.8rem; margin-bottom:1rem; }
+    #preorderSection .po-progress { border:1px solid var(--pip-dim); padding:0.75rem 0.85rem; margin:0 0 1rem; }
+    #preorderSection .po-progress-top { display:flex; justify-content:space-between; align-items:baseline; color:var(--pip-green); font-size:0.98rem; margin-bottom:0.45rem; }
+    #preorderSection .po-progress-pct { color:var(--pip-amber); font-size:0.85rem; }
+    #preorderSection .po-progress-track { height:16px; background:#0a0a0a; border:1px solid var(--pip-dim); overflow:hidden; }
+    #preorderSection .po-progress-fill { height:100%; background:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); transition:width 0.6s ease; }
+    #preorderSection .po-progress-copy { color:var(--pip-dim); font-size:0.82rem; line-height:1.55; margin-top:0.5rem; }
+    #preorderSection .po-progress-copy strong { color:var(--pip-green); }
     #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
     #preorderSection .po-ks-panel { padding:0; }
     #preorderSection .po-ks-panel label { display:block; font-size:0.8rem; color:var(--pip-dim); margin-bottom:0.6rem; }
@@ -694,6 +701,14 @@
     </div>
     <div class="po-countdown" id="poCountdown">Pre-orders close soon</div>
     <div class="po-herofinal">When pre-orders close, it's gone. No restock, no second batch.</div>
+
+    <!-- Viability progress — paid badge units toward PREORDER_GOAL (from po_status). All-or-nothing framing. -->
+    <div class="po-progress" id="poProgress" style="display:none">
+      <div class="po-progress-top"><span id="poProgressLabel"></span><span class="po-progress-pct" id="poProgressPct"></span></div>
+      <div class="po-progress-track"><div class="po-progress-fill" id="poProgressFill" style="width:0%"></div></div>
+      <div class="po-progress-copy" id="poProgressCopy"></div>
+    </div>
+
     <div class="po-notice">PREVIEW &mdash; TEST MODE: checkout uses Stripe <strong>test cards</strong> (e.g. 4242&nbsp;4242&nbsp;4242&nbsp;4242); no real charge. Prices, dates, and images may be placeholders.</div>
 
     <!-- == 4-SECTION MENU (all collapsed on arrival; one open at a time) == -->
@@ -2054,6 +2069,8 @@
     omnitagCents: PREORDER_OMNITAG_CENTS,
     donationMaxCents: PREORDER_DONATION_MAX_DEFAULT,
     ship: null,                       // server {us:[c1,c2], intl:[c1,c2]}; null → local poShipCents fallback
+    goal: 150,                        // viability threshold in badge units (server PREORDER_GOAL)
+    progress: 0,                      // paid badge units so far (server po_status, 60s cache)
     live: false,
   };
 
@@ -2115,6 +2132,7 @@
 
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     poRenderConfigStrings();
+    poRenderProgress();
     poLoadStatus();   // fetch server prices/dates → override poCfg, then refresh what's shown
     poLoadTerms();
 
@@ -2151,6 +2169,26 @@
   }
 
   // Pull live prices/dates/flags from the Run-2 backend; fall back silently to defaults on failure.
+  function poFmtDeadline() {
+    try { return poCfg.deadline.toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); }
+    catch (e) { return 'the deadline'; }
+  }
+  function poRenderProgress() {
+    var wrap = document.getElementById('poProgress'); if (!wrap) return;
+    var goal = poCfg.goal || 150, n = poCfg.progress || 0;
+    var pct = Math.max(0, Math.min(100, Math.round(n / goal * 100)));
+    wrap.style.display = 'block';
+    document.getElementById('poProgressFill').style.width = pct + '%';
+    document.getElementById('poProgressPct').textContent = pct + '%';
+    var funded = n >= goal;
+    document.getElementById('poProgressLabel').textContent = (funded ? 'Funded! ' : '') + n + ' of ' + goal + ' badges reserved';
+    var copy = document.getElementById('poProgressCopy');
+    if (funded) {
+      copy.innerHTML = '<strong>We hit ' + goal + ' &mdash; Run 2 is happening!</strong> Every pre-order will be built and shipped on or about ' + poEsc(poCfg.shipEstimate) + '.';
+    } else {
+      copy.innerHTML = 'We build Run 2 <strong>only if we reach ' + goal + ' badges</strong> by ' + poEsc(poFmtDeadline()) + '. If we fall short, <strong>every pre-order is refunded in full</strong> &mdash; no risk to you.';
+    }
+  }
   function poLoadStatus() {
     fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' })
       .then(function(r){ return r.json(); })
@@ -2165,12 +2203,15 @@
         if (d.ship && d.ship.us && d.ship.intl) poCfg.ship = d.ship;
         // Server is authoritative for each color's price class + backer flag (kills shown-vs-charged drift).
         if (d.colors) { PO_COLORS.forEach(function(c){ var s = d.colors[c.id]; if (s) { if (s.cls) c.cls = s.cls; c.ks = !!s.ks; } }); }
+        if (typeof d.goal === 'number') poCfg.goal = d.goal;
+        if (typeof d.progress === 'number') poCfg.progress = d.progress;
         poCfg.live = !!d.live;
         // Refresh anything already rendered with the fallback values.
         poRenderConfigStrings();
         poRenderColors();
         poTickCountdown();
         poUpdateCart();
+        poRenderProgress();
       })
       .catch(function(){ /* keep fallback defaults; the preview still works */ });
   }
