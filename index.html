@@ -714,7 +714,7 @@
       <div class="po-progress-copy" id="poProgressCopy"></div>
     </div>
 
-    <div class="po-notice">PREVIEW &mdash; TEST MODE: checkout uses Stripe <strong>test cards</strong> (e.g. 4242&nbsp;4242&nbsp;4242&nbsp;4242); no real charge. Prices, dates, and images may be placeholders.</div>
+    <div class="po-notice" id="poNotice">PREVIEW &mdash; TEST MODE: checkout uses Stripe <strong>test cards</strong> (e.g. 4242&nbsp;4242&nbsp;4242&nbsp;4242); no real charge. Prices, dates, and images may be placeholders.</div>
 
     <!-- == 4-SECTION MENU (all collapsed on arrival; one open at a time) == -->
     <div id="poMenu">
@@ -1474,6 +1474,11 @@
 
   async function init() {
     if (PREORDER_PREVIEW) { poEnter(); return; }   // Run-2 pre-order preview (token-gated; no live checkout)
+    // AUTO-FLIP: once PREORDER_LIVE=true (server), show the pre-order store to EVERYONE (no token needed).
+    try {
+      var poSt = await fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' }).then(function(r){ return r.json(); });
+      if (poSt && poSt.live) { poEnter(); return; }
+    } catch (e) { /* po_status unreachable → fall through to the normal store */ }
     trackVisit();
     try {
       // Load inventory and media in parallel
@@ -2125,6 +2130,8 @@
 
     var sec = document.getElementById('preorderSection');
     if (sec) sec.style.display = 'block';
+    // Live/public load (no preview token) → hide the TEST-MODE preview banner from real buyers.
+    if (!PREORDER_PREVIEW) { var nt = document.getElementById('poNotice'); if (nt) nt.style.display = 'none'; }
 
     // Move (not duplicate) the launch video + About/AI content into the menu.
     var vid = document.querySelector('.launch-video');
