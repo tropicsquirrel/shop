@@ -688,15 +688,12 @@
   <div id="preorderSection" style="display:none">
     <div class="po-herotop">
       <div class="po-herotext">
-        <div class="po-eyebrow">&#9622; RUN 2 &mdash; ONE-TIME PRODUCTION RUN<span class="blink">_</span></div>
         <h2 class="po-head">Clip-Boy is re-emerging<br>from the vault</h2>
-        <div class="po-cred">Built by Bryce &middot; Space Badge <strong>218% funded</strong> on Kickstarter &middot; <strong>152</strong> shipped in Run 1</div>
-        <div class="po-herofinal">We build this run <strong>once</strong> &mdash; when pre-orders close, it's gone. No restock, no second batch.</div>
-        <div class="po-fromprice" id="poFromPrice"></div>
       </div>
       <img class="po-heroimg" src="images/clipboy-emerges-hero.jpg" alt="Clip-Boy emerging from a vault door at dawn" onclick="openImageLightbox('images/clipboy-emerges-full.png')">
     </div>
-    <div class="po-countdown" id="poCountdown">This is the only run.</div>
+    <div class="po-countdown" id="poCountdown">Pre-orders close soon</div>
+    <div class="po-herofinal">When pre-orders close, it's gone. No restock, no second batch.</div>
     <div class="po-notice">PREVIEW &mdash; TEST MODE: checkout uses Stripe <strong>test cards</strong> (e.g. 4242&nbsp;4242&nbsp;4242&nbsp;4242); no real charge. Prices, dates, and images may be placeholders.</div>
 
     <!-- == 4-SECTION MENU (all collapsed on arrival; one open at a time) == -->
@@ -2590,7 +2587,7 @@
     var h = Math.floor(diff % 86400000 / 3600000);
     var m = Math.floor(diff % 3600000 / 60000);
     var s = Math.floor(diff % 60000 / 1000);
-    el.textContent = 'The only run · pre-orders close in ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
+    el.textContent = 'Pre-orders close in ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
   }
 
   init();
