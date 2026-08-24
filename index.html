@@ -1474,11 +1474,14 @@
 
   async function init() {
     if (PREORDER_PREVIEW) { poEnter(); return; }   // Run-2 pre-order preview (token-gated; no live checkout)
-    // AUTO-FLIP: once PREORDER_LIVE=true (server), show the pre-order store to EVERYONE (no token needed).
+    // AUTO-FLIP: check PREORDER_LIVE first. Hide the normal-store "LOADING INVENTORY..." placeholder while
+    // we check, so a live visitor never sees a stock-checking flash before the pre-order page appears.
+    var prodEl = document.getElementById('products'); if (prodEl) prodEl.style.display = 'none';
     try {
       var poSt = await fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' }).then(function(r){ return r.json(); });
       if (poSt && poSt.live) { poEnter(); return; }
     } catch (e) { /* po_status unreachable → fall through to the normal store */ }
+    if (prodEl) prodEl.style.display = '';   // not live → restore the normal store, then load stock
     trackVisit();
     try {
       // Load inventory and media in parallel
