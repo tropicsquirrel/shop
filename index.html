@@ -1384,6 +1384,7 @@
     return (state.products || []).reduce(function(n, p) { return n + (parseInt(p.available) || 0); }, 0);
   }
   function syncInterestMode() {
+    if (poActive) return;   // never show the sold-out interest panel once the pre-order UI is active
     if (interestForcePreview) { enterInterestMode(); return; }
     if ((state.products || []).length > 0 && sellableTotal() === 0) enterInterestMode();
     else exitInterestMode();
@@ -1539,6 +1540,7 @@
   // ──────────────────────────────────────────────
   let lastRefresh = Date.now();
   document.addEventListener('visibilitychange', async function() {
+    if (poActive) return;   // pre-order mode: no normal-store stock refresh / interest-panel re-show
     if (document.visibilityState !== 'visible') return;
     if (Date.now() - lastRefresh < 120000) return; // skip if <2min ago
     lastRefresh = Date.now();
@@ -2117,6 +2119,7 @@
 
   const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0, ksEmail:'', ksBackerId:'' };
   var poOptimisticEntered = false;   // true when init() showed the pre-order page before po_status confirmed
+  var poActive = false;              // true once the pre-order UI is shown — disables ALL normal-store logic
 
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function poUpLabel() { return '+$' + (poCfg.customUpcharge / 100).toFixed(0); }
@@ -2135,6 +2138,7 @@
   }
 
   function poEnter() {
+    poActive = true;   // pre-order UI is now in control — disable all normal-store logic (interest panel, stock refresh)
     // Hide the normal shop flow (incl. sold-out interest panel + live donate/about/ai cards);
     // reveal the pre-order menu. Token-only — poEnter never runs on the normal store path.
     ['products','purchaseArea','interestPanel','card-donate','msg','card-about','card-ai'].forEach(function(id){
