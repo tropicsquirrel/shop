@@ -624,10 +624,12 @@
     #preorderSection .po-countdown { color:var(--pip-amber); font-size:1.05rem; letter-spacing:0.04rem; margin-bottom:0.75rem; }
     #preorderSection .po-notice { border:1px dashed var(--pip-amber); color:var(--pip-amber); font-size:0.85rem; line-height:1.5; padding:0.6rem 0.8rem; margin-bottom:1rem; }
     #preorderSection .po-progress { border:1px solid var(--pip-dim); padding:0.75rem 0.85rem; margin:0 0 1rem; }
-    #preorderSection .po-progress-top { display:flex; justify-content:space-between; align-items:baseline; color:var(--pip-green); font-size:0.98rem; margin-bottom:0.45rem; }
-    #preorderSection .po-progress-pct { color:var(--pip-amber); font-size:0.85rem; }
-    #preorderSection .po-progress-track { height:16px; background:#0a0a0a; border:1px solid var(--pip-dim); overflow:hidden; }
+    #preorderSection .po-progress-top { display:flex; justify-content:space-between; align-items:baseline; gap:0.6rem; color:var(--pip-green); font-size:0.98rem; margin-bottom:0.45rem; }
+    #preorderSection .po-progress-pct { color:var(--pip-amber); font-size:0.8rem; white-space:nowrap; }
+    #preorderSection .po-progress-track { position:relative; height:16px; background:#0a0a0a; border:1px solid var(--pip-dim); overflow:hidden; }
     #preorderSection .po-progress-fill { height:100%; background:var(--pip-green); box-shadow:0 0 8px var(--pip-glow); transition:width 0.6s ease; }
+    #preorderSection .po-progress-fill.funded { background:var(--pip-amber); }
+    #preorderSection .po-progress-goal { position:absolute; top:0; bottom:0; left:80%; border-left:2px dashed var(--pip-amber); pointer-events:none; }
     #preorderSection .po-progress-copy { color:var(--pip-dim); font-size:0.82rem; line-height:1.55; margin-top:0.5rem; }
     #preorderSection .po-progress-copy strong { color:var(--pip-green); }
     #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
@@ -704,8 +706,11 @@
 
     <!-- Viability progress — paid badge units toward PREORDER_GOAL (from po_status). All-or-nothing framing. -->
     <div class="po-progress" id="poProgress" style="display:none">
-      <div class="po-progress-top"><span id="poProgressLabel"></span><span class="po-progress-pct" id="poProgressPct"></span></div>
-      <div class="po-progress-track"><div class="po-progress-fill" id="poProgressFill" style="width:0%"></div></div>
+      <div class="po-progress-top"><span id="poProgressLabel"></span><span class="po-progress-pct" id="poProgressGoalNote"></span></div>
+      <div class="po-progress-track">
+        <div class="po-progress-fill" id="poProgressFill" style="width:0%"></div>
+        <div class="po-progress-goal"></div>
+      </div>
       <div class="po-progress-copy" id="poProgressCopy"></div>
     </div>
 
@@ -2190,17 +2195,22 @@
   function poRenderProgress() {
     var wrap = document.getElementById('poProgress'); if (!wrap) return;
     var goal = poCfg.goal || 150, n = poCfg.progress || 0;
-    var pct = Math.max(0, Math.min(100, Math.round(n / goal * 100)));
-    wrap.style.display = 'block';
-    document.getElementById('poProgressFill').style.width = pct + '%';
-    document.getElementById('poProgressPct').textContent = pct + '%';
+    // Goal sits at 80% of the track (20% headroom past it) so the bar reads as a fundraiser
+    // thermometer with room to exceed — NOT a capacity meter that fills to a ceiling.
+    var trackMax = goal * 1.25;
+    var pct = n <= 0 ? 0 : Math.max(3, Math.min(100, n / trackMax * 100));
     var funded = n >= goal;
-    document.getElementById('poProgressLabel').textContent = (funded ? 'Funded! ' : '') + n + ' of ' + goal + ' badges reserved';
+    wrap.style.display = 'block';
+    var fill = document.getElementById('poProgressFill');
+    fill.style.width = pct + '%';
+    fill.classList.toggle('funded', funded);
+    document.getElementById('poProgressLabel').textContent = (funded ? '✓ FUNDED · ' : '') + n + ' pre-ordered' + (funded ? '' : ' so far');
+    document.getElementById('poProgressGoalNote').textContent = funded ? 'no cap · still open' : ('min. ' + goal + ' to build');
     var copy = document.getElementById('poProgressCopy');
     if (funded) {
-      copy.innerHTML = '<strong>We hit ' + goal + ' &mdash; Run 2 is happening!</strong> Every pre-order will be built and shipped on or about ' + poEsc(poCfg.shipEstimate) + '.';
+      copy.innerHTML = '<strong>Greenlit &mdash; we passed ' + goal + '!</strong> Run 2 is happening. No cap: every pre-order ships, on or about ' + poEsc(poCfg.shipEstimate) + '.';
     } else {
-      copy.innerHTML = 'We build Run 2 <strong>only if we reach ' + goal + ' badges</strong> by ' + poEsc(poFmtDeadline()) + '.<br>If we fall short, <strong>every pre-order is refunded in full</strong> &mdash; no risk to you.';
+      copy.innerHTML = '<strong>' + goal + ' pre-orders greenlights Run 2</strong> by ' + poEsc(poFmtDeadline()) + ' &mdash; ' + goal + ' is the minimum to build, not a limit (every pre-order past it still ships).<br>If we fall short, <strong>every pre-order is refunded in full</strong> &mdash; no risk to you.';
     }
   }
   function poLoadStatus() {
