@@ -689,10 +689,10 @@
     <div class="po-herotop">
       <div class="po-herotext">
         <div class="po-eyebrow">&#9622; RUN 2 &mdash; ONE-TIME PRODUCTION RUN<span class="blink">_</span></div>
-        <h2 class="po-head">Clip-Boy is re-emerging from the vault<span class="po-subhead">&mdash; pre-order yours</span></h2>
+        <h2 class="po-head">Clip-Boy is re-emerging from the vault</h2>
+        <div class="po-fromprice" id="poFromPrice"></div>
         <div class="po-cred">Built by Bryce &middot; Space Badge <strong>218% funded</strong> on Kickstarter &middot; <strong>152</strong> shipped in Run 1</div>
         <div class="po-herofinal">We build this run <strong>once</strong> &mdash; when pre-orders close, it's gone. No restock, no second batch.</div>
-        <div class="po-fromprice" id="poFromPrice"></div>
       </div>
       <img class="po-heroimg" src="images/clipboy-emerges-hero.jpg" alt="Clip-Boy emerging from a vault door at dawn" onclick="openImageLightbox('images/clipboy-emerges-full.png')">
     </div>
@@ -748,7 +748,7 @@
           <div class="po-color" id="po-ks-card">
             <div class="po-color-head" id="po-ks-head" role="button" tabindex="0" aria-expanded="false" onclick="poToggleKs()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();poToggleKs();}">
               <span class="po-color-toggle" id="po-ks-tog">&#9654;</span>
-              <span class="color-swatch" style="background:linear-gradient(135deg,#c0202a 0 50%,#1f6fb2 50% 100%); border-color:var(--pip-amber)"></span>
+              <span class="color-swatch" style="background:linear-gradient(135deg,#c0202a 0 25%,#f2f2f2 25% 50%,#1f6fb2 50% 75%,#f2c14e 75% 100%); border-color:var(--pip-amber)"></span>
               <span class="po-color-name">Kickstarter Backer<span class="po-excl" style="font-size:0.85rem; margin-left:0.4rem;">exclusive colors</span></span>
             </div>
             <div class="po-color-body" id="po-ks-body" style="display:none">
@@ -2074,7 +2074,7 @@
     { id:'Gold',        swatch:'#e0b030', cls:'custom', images:['images/mk2/Gold-00.jpg','images/mk2/Gold-05.jpg','images/mk2/Gold-11.jpg'] },
     { id:'Green',       swatch:'#2fb63f', cls:'custom', images:['images/mk2/Green-00.jpg','images/mk2/Green-05.jpg','images/mk2/Green-11.jpg'] },
     { id:'Space Badge', swatch:'linear-gradient(135deg,#c0202a 0 33%,#f2f2f2 33% 66%,#1f6fb2 66% 100%)', border:'#ffffff', cls:'base', ks:true, images:['images/mk2/SpaceBadge-00.jpg','images/mk2/SpaceBadge-05.jpg','images/mk2/SpaceBadge-11.jpg'] },
-    { id:'Overseer',    swatch:'#1f6fb2', border:'#f2c14e', cls:'base', ks:true, images:['images/mk2/Overseer-00.jpg','images/mk2/Overseer-05.jpg','images/mk2/Overseer-11.jpg'] },
+    { id:'Overseer',    swatch:'linear-gradient(135deg,#1f6fb2 0 50%,#f2c14e 50% 100%)', border:'#ffffff', cls:'base', ks:true, images:['images/mk2/Overseer-00.jpg','images/mk2/Overseer-05.jpg','images/mk2/Overseer-11.jpg'] },
   ];
 
   const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0, ksEmail:'', ksBackerId:'' };
