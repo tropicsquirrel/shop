@@ -1474,12 +1474,23 @@
 
   async function init() {
     if (PREORDER_PREVIEW) { poEnter(); return; }   // Run-2 pre-order preview (token-gated; no live checkout)
-    // AUTO-FLIP: check PREORDER_LIVE first. Hide the normal-store "LOADING INVENTORY..." placeholder while
-    // we check, so a live visitor never sees a stock-checking flash before the pre-order page appears.
+    // AUTO-FLIP (optimistic): the store is live for the whole pre-order window and Apps Script po_status
+    // can be slow to wake, so show the pre-order page IMMEDIATELY rather than blocking on the fetch.
+    // poLoadStatus() (inside poEnter) confirms live + fills live prices/progress; if the server says NOT
+    // live, it self-corrects (localStorage flips 'po_live' → one reload lands on the normal-store path,
+    // guarded so there's no loop). Only a cached 'false' takes the await-first path below.
     var prodEl = document.getElementById('products'); if (prodEl) prodEl.style.display = 'none';
+    var poLiveCache = null;
+    try { poLiveCache = localStorage.getItem('po_live'); } catch (e) {}
+    if (poLiveCache !== 'false') {   // 'true' or unknown → optimistic instant render
+      poOptimisticEntered = true;
+      poEnter();
+      return;
+    }
+    // Cached not-live → verify (cheap; it may have flipped back on) before showing the normal store.
     try {
       var poSt = await fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' }).then(function(r){ return r.json(); });
-      if (poSt && poSt.live) { poEnter(); return; }
+      if (poSt && poSt.live) { try { localStorage.setItem('po_live', 'true'); } catch (e2) {} poEnter(); return; }
     } catch (e) { /* po_status unreachable → fall through to the normal store */ }
     if (prodEl) prodEl.style.display = '';   // not live → restore the normal store, then load stock
     trackVisit();
@@ -2105,6 +2116,7 @@
   ];
 
   const poState = { cart:{}, delivery:null, ksUnlocked:false, openIdx:null, carIdx:{}, ksRemaining:null, openSec:null, donationCents:0, ksEmail:'', ksBackerId:'' };
+  var poOptimisticEntered = false;   // true when init() showed the pre-order page before po_status confirmed
 
   function poEsc(s) { return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function poUpLabel() { return '+$' + (poCfg.customUpcharge / 100).toFixed(0); }
@@ -2228,6 +2240,10 @@
       .then(function(r){ return r.json(); })
       .then(function(d){
         if (!d || d.error) return;
+        try { localStorage.setItem('po_live', d.live ? 'true' : 'false'); } catch (e) {}
+        // We optimistically showed the pre-order page but the store isn't live → reload cleanly to the
+        // normal store (cache is now 'false', so the reload won't re-enter this optimistic path).
+        if (poOptimisticEntered && !d.live) { window.location.reload(); return; }
         if (typeof d.base_cents === 'number') poCfg.baseCents = d.base_cents;
         if (typeof d.custom_upcharge_cents === 'number') poCfg.customUpcharge = d.custom_upcharge_cents;
         if (d.ship_estimate) poCfg.shipEstimate = d.ship_estimate;
