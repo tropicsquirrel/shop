@@ -2511,7 +2511,7 @@
   var PO_LINEUP = [
     { src:'images/mk2/lineup.jpg', cap:'The Clip-Boy Mk2 Trims' },
     { src:'images/mk2/dt.jpg',     cap:'The Dark Tangent @ DC34. Not an endorsement' },
-    { src:'images/mk2/winn-hj-topaz.jpg', cap:'Winn @ Hacker Jeopardy. Not an endorsement' }
+    { src:'images/mk2/winn.jpg',   cap:'Winn @ Hacker Jeopardy. Not an endorsement', credit:'Photo by AST Cell, DEF CON Photo Goon' }
   ];
   var poLineupIdx = 0;
   function poLineupRender() {
@@ -2519,7 +2519,13 @@
     if (!img) return;
     img.src = PO_LINEUP[poLineupIdx].src;
     var cap = document.getElementById('poLineupCap');
-    if (cap) cap.innerHTML = poEsc(PO_LINEUP[poLineupIdx].cap) + '<br><span style="font-size:0.72rem;">tap to enlarge</span>';
+    if (cap) {
+      var L = PO_LINEUP[poLineupIdx];
+      cap.innerHTML = poEsc(L.cap)
+        + (L.credit ? '<br><span style="font-size:0.72rem;">' + poEsc(L.credit) + '</span>' : '')
+        + '<br><span style="font-size:0.72rem;">tap to enlarge</span>'
+        + '<br>';   // trailing newline separates the caption block from the color chooser below
+    }
     var caro = img.parentElement;
     var multi = PO_LINEUP.length > 1;
     var prev = caro.querySelector('.po-prev'); var next = caro.querySelector('.po-next');
