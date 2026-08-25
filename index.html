@@ -759,7 +759,7 @@
                    onclick="poLineupOpen()">
               <button class="lightbox-nav po-next" onclick="poLineupNav(1)" aria-label="Next image">&#9654;</button>
             </div>
-            <figcaption style="color:var(--pip-dim); font-size:0.78rem; font-style:italic; margin-top:0.3rem;">The full lineup &mdash; tap to enlarge.</figcaption>
+            <figcaption id="poLineupCap" style="color:var(--pip-dim); font-size:0.78rem; font-style:italic; margin-top:0.3rem; text-align:center;"></figcaption>
           </figure>
 
           <div class="color-qty-header">CHOOSE YOUR TRIM COLOR <span style="color:var(--pip-dim)">(custom colors +$10 each &mdash; tap a color to preview)</span></div>
@@ -2508,12 +2508,18 @@
   }
 
   // Standalone carousel for the "full lineup" family shots (independent of the color rows).
-  var PO_LINEUP = ['images/mk2/lineup.jpg', 'images/mk2/dt.jpg', 'images/mk2/winn.jpg'];
+  var PO_LINEUP = [
+    { src:'images/mk2/lineup.jpg', cap:'The Clip-Boy Mk2 Trims' },
+    { src:'images/mk2/dt.jpg',     cap:'The Dark Tangent @ DC34' },
+    { src:'images/mk2/winn.jpg',   cap:'Winn @ Hacker Jeopardy' }
+  ];
   var poLineupIdx = 0;
   function poLineupRender() {
     var img = document.getElementById('poLineup');
     if (!img) return;
-    img.src = PO_LINEUP[poLineupIdx];
+    img.src = PO_LINEUP[poLineupIdx].src;
+    var cap = document.getElementById('poLineupCap');
+    if (cap) cap.innerHTML = poEsc(PO_LINEUP[poLineupIdx].cap) + '<br><span style="font-size:0.72rem;">tap to enlarge</span>';
     var caro = img.parentElement;
     var multi = PO_LINEUP.length > 1;
     var prev = caro.querySelector('.po-prev'); var next = caro.querySelector('.po-next');
@@ -2524,7 +2530,7 @@
     poLineupIdx = (poLineupIdx + dir + PO_LINEUP.length) % PO_LINEUP.length;
     poLineupRender();
   }
-  function poLineupOpen() { openImageLightbox(PO_LINEUP[poLineupIdx]); }
+  function poLineupOpen() { openImageLightbox(PO_LINEUP[poLineupIdx].src); }
 
   function poAdjust(i, delta) {
     var c = PO_COLORS[i]; if (!c) return;
