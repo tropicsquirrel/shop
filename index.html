@@ -748,13 +748,17 @@
           </ul>
           <div class="po-shipest"><span style="color:var(--pip-amber)">Estimated Delivery:</span> <span id="poShipEst"></span></div>
 
-          <!-- Group "family" shot of every colorway. Drop images/mk2/lineup.jpg to enable; the whole
-               figure auto-hides (onerror) until that file exists, so the page never shows a broken image. -->
+          <!-- Group "family" shots of every colorway (carousel). Images live in images/mk2/ (see
+               PO_LINEUP below). The whole figure auto-hides (onerror) if the first image is missing,
+               so the page never shows a broken image. -->
           <figure id="poLineupFig" style="margin:0.6rem 0 0.25rem;">
-            <img id="poLineup" src="images/mk2/lineup.jpg" alt="Every Clip-Boy Mk2 trim color together"
-                 onerror="var f=document.getElementById('poLineupFig'); if(f) f.style.display='none';"
-                 onclick="openImageLightbox('images/mk2/lineup.jpg')"
-                 style="width:100%; display:block; border:1px solid var(--pip-border); cursor:pointer;">
+            <div class="po-carousel">
+              <button class="lightbox-nav po-prev" onclick="poLineupNav(-1)" aria-label="Previous image">&#9664;</button>
+              <img id="poLineup" alt="Every Clip-Boy Mk2 trim color together"
+                   onerror="var f=document.getElementById('poLineupFig'); if(f) f.style.display='none';"
+                   onclick="poLineupOpen()">
+              <button class="lightbox-nav po-next" onclick="poLineupNav(1)" aria-label="Next image">&#9654;</button>
+            </div>
             <figcaption style="color:var(--pip-dim); font-size:0.78rem; font-style:italic; margin-top:0.3rem;">The full lineup &mdash; tap to enlarge.</figcaption>
           </figure>
 
@@ -2164,6 +2168,7 @@
     PO_COLORS.forEach(function(c){ poState.cart[c.id] = 0; poState.carIdx[c.id] = 0; });
     poRenderConfigStrings();
     poRenderProgress();
+    poLineupRender();   // load the first "full lineup" carousel frame (img has no static src)
     poLoadStatus();   // fetch server prices/dates → override poCfg, then refresh what's shown
     poLoadTerms();
 
@@ -2501,6 +2506,25 @@
     poState.carIdx[c.id] = ((poState.carIdx[c.id] || 0) + dir + imgs.length) % imgs.length;
     poRenderRowCarousel(i);
   }
+
+  // Standalone carousel for the "full lineup" family shots (independent of the color rows).
+  var PO_LINEUP = ['images/mk2/lineup.jpg', 'images/mk2/dt.jpg', 'images/mk2/winn.jpg'];
+  var poLineupIdx = 0;
+  function poLineupRender() {
+    var img = document.getElementById('poLineup');
+    if (!img) return;
+    img.src = PO_LINEUP[poLineupIdx];
+    var caro = img.parentElement;
+    var multi = PO_LINEUP.length > 1;
+    var prev = caro.querySelector('.po-prev'); var next = caro.querySelector('.po-next');
+    if (prev) prev.style.display = multi ? '' : 'none';
+    if (next) next.style.display = multi ? '' : 'none';
+  }
+  function poLineupNav(dir) {
+    poLineupIdx = (poLineupIdx + dir + PO_LINEUP.length) % PO_LINEUP.length;
+    poLineupRender();
+  }
+  function poLineupOpen() { openImageLightbox(PO_LINEUP[poLineupIdx]); }
 
   function poAdjust(i, delta) {
     var c = PO_COLORS[i]; if (!c) return;
