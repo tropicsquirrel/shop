@@ -632,6 +632,16 @@
     #preorderSection .po-progress-goal { position:absolute; top:0; bottom:0; left:80%; border-left:2px dashed var(--pip-amber); pointer-events:none; }
     #preorderSection .po-progress-copy { color:var(--pip-dim); font-size:0.82rem; line-height:1.55; margin-top:0.5rem; }
     #preorderSection .po-progress-copy strong { color:var(--pip-green); }
+    /* Loading state: real count takes a few seconds to come back from po_status. Show a spinner +
+       indeterminate sweep instead of a misleading "0 pre-ordered". */
+    #preorderSection .po-spin { display:inline-block; width:0.8em; height:0.8em; margin-right:0.45em; vertical-align:-0.08em; border:2px solid var(--pip-dim); border-top-color:var(--pip-green); border-radius:50%; box-shadow:0 0 4px var(--pip-glow); animation:poSpin 0.7s linear infinite; }
+    @keyframes poSpin { to { transform:rotate(360deg); } }
+    #preorderSection .po-progress-fill.indet { width:30% !important; transition:none; animation:poIndet 1.15s ease-in-out infinite alternate; }
+    @keyframes poIndet { from { transform:translateX(-120%); } to { transform:translateX(340%); } }
+    @media (prefers-reduced-motion: reduce) {
+      #preorderSection .po-spin { animation:none; }
+      #preorderSection .po-progress-fill.indet { animation:none; transform:none; width:30% !important; opacity:0.5; }
+    }
     #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
     #preorderSection .po-ks-panel { padding:0; }
     #preorderSection .po-ks-panel label { display:block; font-size:0.8rem; color:var(--pip-dim); margin-bottom:0.6rem; }
@@ -2224,16 +2234,28 @@
       return { date: g.day + ' ' + g.month + ' ' + g.year, time: g.hour + ':' + g.minute + ' Central US' };
     } catch (e) { return null; }
   }
+  var poProgressLoaded = false;   // flips true once po_status returns (or fails) — until then, show a spinner
   function poRenderProgress() {
     var wrap = document.getElementById('poProgress'); if (!wrap) return;
     var goal = poCfg.goal || 150, n = poCfg.progress || 0;
+    var fill = document.getElementById('poProgressFill');
+    // Still waiting on the live count → spinner + indeterminate sweep, never a premature "0 pre-ordered".
+    if (!poProgressLoaded) {
+      wrap.style.display = 'block';
+      document.getElementById('poProgressLabel').innerHTML = '<span class="po-spin" aria-hidden="true"></span>Counting pre-orders&hellip;';
+      document.getElementById('poProgressGoalNote').textContent = 'min. ' + goal + ' to build';
+      fill.classList.remove('funded');
+      fill.classList.add('indet');
+      document.getElementById('poProgressCopy').innerHTML = '<strong>' + goal + ' pre-orders greenlights Run 2</strong> by ' + poEsc(poFmtDeadline()) + ' &mdash; ' + goal + ' is the minimum to build, not a limit (every pre-order past it still ships).<br>If we fall short, <strong>every pre-order is refunded in full</strong> &mdash; no risk to you.';
+      return;
+    }
+    fill.classList.remove('indet');
     // Goal sits at 80% of the track (20% headroom past it) so the bar reads as a fundraiser
     // thermometer with room to exceed — NOT a capacity meter that fills to a ceiling.
     var trackMax = goal * 1.25;
     var pct = n <= 0 ? 0 : Math.max(3, Math.min(100, n / trackMax * 100));
     var funded = n >= goal;
     wrap.style.display = 'block';
-    var fill = document.getElementById('poProgressFill');
     fill.style.width = pct + '%';
     fill.classList.toggle('funded', funded);
     document.getElementById('poProgressLabel').textContent = (funded ? '✓ FUNDED · ' : '') + n + ' pre-ordered' + (funded ? '' : ' so far');
@@ -2249,7 +2271,7 @@
     fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' })
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if (!d || d.error) return;
+        if (!d || d.error) { poProgressLoaded = true; poRenderProgress(); return; }
         try { localStorage.setItem('po_live', d.live ? 'true' : 'false'); } catch (e) {}
         // We optimistically showed the pre-order page but the store isn't live → reload cleanly to the
         // normal store (cache is now 'false', so the reload won't re-enter this optimistic path).
@@ -2271,9 +2293,10 @@
         poRenderColors();
         poTickCountdown();
         poUpdateCart();
+        poProgressLoaded = true;
         poRenderProgress();
       })
-      .catch(function(){ /* keep fallback defaults; the preview still works */ });
+      .catch(function(){ /* keep fallback defaults; the preview still works */ poProgressLoaded = true; poRenderProgress(); });
   }
 
   // Build {color: qty} for qty>0 and start a real pre-order checkout (test mode in preview).
