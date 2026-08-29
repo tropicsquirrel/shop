@@ -642,6 +642,10 @@
       #preorderSection .po-spin { animation:none; }
       #preorderSection .po-progress-fill.indet { animation:none; transform:none; width:30% !important; opacity:0.5; }
     }
+    /* Brief highlight when a background refresh bumps the live count. */
+    #preorderSection .po-progress-top.bumped { animation:poBump 1.2s ease-out; }
+    @keyframes poBump { 0%,100% { text-shadow:none; } 20% { text-shadow:0 0 10px var(--pip-glow); } }
+    @media (prefers-reduced-motion: reduce) { #preorderSection .po-progress-top.bumped { animation:none; } }
     #preorderSection .po-badge-note { color:var(--pip-dim); font-size:0.85rem; margin-left:0.4rem; }
     #preorderSection .po-ks-panel { padding:0; }
     #preorderSection .po-ks-panel label { display:block; font-size:0.8rem; color:var(--pip-dim); margin-bottom:0.6rem; }
@@ -2181,6 +2185,7 @@
     poRenderProgress();
     poLineupRender();   // load the first "full lineup" carousel frame (img has no static src)
     poLoadStatus();   // fetch server prices/dates → override poCfg, then refresh what's shown
+    poStartProgressPolling();   // keep the live pre-order count fresh (~every 10 min, visible tabs only)
     poLoadTerms();
 
     poRenderColors();
@@ -2297,6 +2302,45 @@
         poRenderProgress();
       })
       .catch(function(){ /* keep fallback defaults; the preview still works */ poProgressLoaded = true; poRenderProgress(); });
+  }
+
+  // Lightweight periodic refresh of JUST the pre-order count (~1/hr in practice). Deliberately does
+  // NOT re-run poLoadStatus — that rebuilds the color list and would collapse an open selection.
+  var poProgressTimer = null;
+  var PO_PROGRESS_POLL_MS = 10 * 60 * 1000;   // 10 min; server caches the count 60s, so tighter is moot
+  function poRefreshProgress() {
+    if (document.hidden) return Promise.resolve();   // don't poll a backgrounded tab
+    return fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || d.error) return;
+        if (typeof d.goal === 'number') poCfg.goal = d.goal;
+        if (typeof d.progress === 'number') {
+          var bumped = (d.progress !== poCfg.progress);
+          poCfg.progress = d.progress;
+          poProgressLoaded = true;
+          poRenderProgress();
+          if (bumped) {
+            var top = document.querySelector('#preorderSection .po-progress-top');
+            if (top) { top.classList.remove('bumped'); void top.offsetWidth; top.classList.add('bumped'); }
+          }
+        }
+      })
+      .catch(function(){ /* transient network blip — keep the last known count, try again next tick */ });
+  }
+  function poStartProgressPolling() {
+    if (poProgressTimer) return;   // already polling (poEnter runs once, but guard anyway)
+    function schedule() {
+      var jitter = PO_PROGRESS_POLL_MS * (0.9 + Math.random() * 0.2);   // +/-10% so many tabs don't sync
+      poProgressTimer = setTimeout(function(){
+        // Stop once pre-orders have closed — the count is frozen; no point polling.
+        if (poCfg.deadline && Date.now() >= poCfg.deadline.getTime()) { poProgressTimer = null; return; }
+        poRefreshProgress().finally(schedule);
+      }, jitter);
+    }
+    schedule();
+    // A tab returning to the foreground may be showing a stale count — refresh it promptly.
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) poRefreshProgress(); });
   }
 
   // Build {color: qty} for qty>0 and start a real pre-order checkout (test mode in preview).
