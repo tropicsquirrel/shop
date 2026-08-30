@@ -622,6 +622,15 @@
     #preorderSection .po-eyebrow { color:var(--pip-amber); font-size:0.9rem; letter-spacing:0.15rem; margin-bottom:0.5rem; }
     #preorderSection .po-head { color:var(--pip-green); font-size:2.1rem; letter-spacing:0.06rem; text-shadow:0 0 10px var(--pip-glow); line-height:1.25; margin-bottom:0.6rem; }
     #preorderSection .po-countdown { color:var(--pip-amber); font-size:1.05rem; letter-spacing:0.04rem; margin-bottom:0.75rem; }
+    /* Time-left readout: green, with a slow ~5s "breathing" glow to draw the eye without nagging. */
+    #preorderSection .po-timeleft { color:var(--pip-green); font-weight:bold; animation:poBreathe 5s ease-in-out infinite; }
+    @keyframes poBreathe {
+      0%, 100% { text-shadow:0 0 2px var(--pip-glow); opacity:0.82; }
+      50%      { text-shadow:0 0 12px var(--pip-glow), 0 0 22px var(--pip-glow); opacity:1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #preorderSection .po-timeleft { animation:none; text-shadow:0 0 6px var(--pip-glow); }
+    }
     #preorderSection .po-notice { border:1px dashed var(--pip-amber); color:var(--pip-amber); font-size:0.85rem; line-height:1.5; padding:0.6rem 0.8rem; margin-bottom:1rem; }
     #preorderSection .po-progress { border:1px solid var(--pip-dim); padding:0.75rem 0.85rem; margin:0 0 1rem; }
     #preorderSection .po-progress-top { display:flex; justify-content:space-between; align-items:baseline; gap:0.6rem; color:var(--pip-green); font-size:0.98rem; margin-bottom:0.45rem; }
@@ -2781,16 +2790,25 @@
     var el = document.getElementById('poCountdown');
     if (!el) return;
     var diff = poCfg.deadline.getTime() - Date.now();
-    if (diff <= 0) { el.textContent = 'Pre-orders are closed — this was the only run. Now building; ships ~' + poCfg.shipEstimate + '.'; return; }
+    if (diff <= 0) { el.textContent = 'Pre-orders are closed — this was the only run. Now building; ships ~' + poCfg.shipEstimate + '.'; el.removeAttribute('data-cd'); return; }
     var d = Math.floor(diff / 86400000);
     var h = Math.floor(diff % 86400000 / 3600000);
     var m = Math.floor(diff % 3600000 / 60000);
-    var s = Math.floor(diff % 60000 / 1000);
+    var timeText = '(' + d + 'd ' + h + 'h ' + m + 'm)';
     var when = poFmtCloseParts();
+    // Only the numbers change each second. Rebuilding innerHTML every tick would restart the
+    // .po-timeleft breathe animation, so rebuild the static part ONLY when it actually changes
+    // (first render, or a server deadline override); otherwise just swap the numbers in place.
+    var sig = when ? (when.date + '|' + when.time) : 'nowhen';
+    if (el.getAttribute('data-cd') === sig) {
+      var tl = el.querySelector('.po-timeleft');
+      if (tl) { tl.textContent = timeText; return; }
+    }
+    el.setAttribute('data-cd', sig);
     el.innerHTML = (when
       ? 'Pre-orders close on <span style="color:var(--pip-green)">' + when.date + '</span> / ' + when.time + ' '
       : 'Pre-orders close in ')
-      + '(' + d + 'd ' + h + 'h ' + m + 'm)';
+      + '<span class="po-timeleft">' + timeText + '</span>';
   }
 
   init();
