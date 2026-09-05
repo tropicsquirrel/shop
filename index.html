@@ -1418,6 +1418,11 @@
     else exitInterestMode();
   }
   function enterInterestMode() {
+    // RETIRED / VESTIGIAL (2026-09-05): the sold-out "gauge interest in a second run" flow is dead
+    // now that the one-time pre-order run is the only path to a badge. Kept intact for reference but
+    // made unreachable at this single choke point — every caller (syncInterestMode, ?preview=interest)
+    // routes through here, so the panel can never be surfaced. Remove this guard to revive it.
+    return;
     if (state.interestMode) return;
     state.interestMode = true;
     var panel = document.getElementById('interestPanel');
@@ -1520,7 +1525,14 @@
     try {
       var poSt = await fetch(PREORDER_API_URL + '?action=po_status', { cache: 'no-cache' }).then(function(r){ return r.json(); });
       if (poSt && poSt.live) { try { localStorage.setItem('po_live', 'true'); } catch (e2) {} poEnter(); return; }
-    } catch (e) { /* po_status unreachable → fall through to the normal store */ }
+      // else: server EXPLICITLY says not-live → fall through to the normal store below.
+    } catch (e) {
+      // po_status unreachable (cold start / network blip). The store is live for the whole pre-order
+      // window, so DON'T strand the user on the dead normal store (sold-out cards, no order path) —
+      // optimistically show the pre-order page. poEnter's own poLoadStatus retries + self-corrects.
+      // (poOptimisticEntered stays false, so there's no reload loop if it truly is closed.)
+      poEnter(); return;
+    }
     if (prodEl) prodEl.style.display = '';   // not live → restore the normal store, then load stock
     trackVisit();
     try {
